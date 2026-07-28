@@ -9,6 +9,9 @@ from app.utils.jwt import create_access_token
 from app.database.fake_db import fake_users_db
 from app.core.security import get_current_user
 from fastapi import Depends
+from app.core.roles import UserRole
+
+
 
 router = APIRouter(
     prefix="/auth",
@@ -34,7 +37,7 @@ def register(user: RegisterRequest):
         "name": user.name,
         "email": user.email,
         "password": hashed_password,
-        "role": "User"
+        "role": UserRole.ADMIN  
     }
 
     return {
