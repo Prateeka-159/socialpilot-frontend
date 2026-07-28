@@ -29,3 +29,6 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class UpdateProfileRequest(BaseModel):
+    name: str
