@@ -1,0 +1,105 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.welcome-card {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 3px 12px rgba(0,0,0,.08);
+}
+
+.welcome-card h1 {
+  margin-bottom: 10px;
+}
+
+.welcome-card p {
+  color: gray;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  box-shadow: 0 3px 10px rgba(0,0,0,.08);
+}
+
+.stat-card .icon {
+  color: #2563eb;
+}
+
+.stat-card h2 {
+  margin: 0;
+}
+
+.stat-card p {
+  margin-top: 5px;
+  color: gray;
+}
+
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.activity-card,
+.platform-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 3px 10px rgba(0,0,0,.08);
+}
+
+.activity-card ul {
+  margin-top: 20px;
+  padding-left: 20px;
+}
+
+.activity-card li {
+  margin-bottom: 15px;
+}
+
+.platform {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.connected {
+  color: green;
+  font-weight: bold;
+}
+
+.disconnected {
+  color: red;
+  font-weight: bold;
+}
+
+@media (max-width:900px) {
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-card{
+    transition:.3s;
+}
+
+.stat-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 10px 25px rgba(37,99,235,.15);
+}

@@ -1,0 +1,41 @@
+.analytics-page{
+    display:flex;
+    flex-direction:column;
+    gap:30px;
+}
+
+.analytics-header{
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+.analytics-header p{
+    color:#666;
+}
+
+.analytics-grid{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px;
+}
+
+.chart-card{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+.chart-card h2{
+    margin-bottom:20px;
+}
+
+@media(max-width:900px){
+
+.analytics-grid{
+    grid-template-columns:1fr;
+}
+
+}
