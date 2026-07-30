@@ -1,3 +1,5 @@
+import React from "react";
+
 function Input({
   label,
   type = "text",
@@ -7,10 +9,20 @@ function Input({
   name,
 }) {
   return (
-    <div style={{ marginBottom: "15px" }}>
-      <label>{label}</label>
-
-      <br />
+    <div style={{ marginBottom: "20px", display: "flex", flexDirection: "column", gap: "6px" }}>
+      {label && (
+        <label
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "10px",
+            letterSpacing: "0.2em",
+            color: "var(--c-taupe)",
+            fontWeight: 600,
+          }}
+        >
+          {label}
+        </label>
+      )}
 
       <input
         type={type}
@@ -19,9 +31,14 @@ function Input({
         value={value}
         onChange={onChange}
         style={{
-          width: "250px",
-          padding: "10px",
-          marginTop: "5px",
+          width: "100%",
+          padding: "10px 0",
+          border: "none",
+          borderBottom: "1px solid var(--c-taupe-40)",
+          background: "transparent",
+          color: "var(--c-dark)",
+          fontSize: "15px",
+          outline: "none",
         }}
       />
     </div>

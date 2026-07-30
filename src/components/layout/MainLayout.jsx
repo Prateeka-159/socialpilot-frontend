@@ -1,3 +1,4 @@
+import React from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
@@ -5,17 +6,13 @@ import "./MainLayout.css";
 
 function MainLayout() {
   return (
-    <>
+    <div className="sp-app-wrapper">
+      <Sidebar />
       <Navbar />
-
-      <div className="layout">
-        <Sidebar />
-
-        <main className="content">
-          <Outlet />
-        </main>
-      </div>
-    </>
+      <main className="sp-main-content">
+        <Outlet />
+      </main>
+    </div>
   );
 }
 

@@ -1,47 +1,73 @@
+import React from "react";
 import {
   LayoutDashboard,
   User,
   BarChart3,
   Settings,
   Link2,
+  Calendar,
   LogOut,
+  ArrowUpRight,
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import Logo from "../common/Logo";
 import "./Sidebar.css";
 
 function Sidebar() {
+  const navigate = useNavigate();
   const menu = [
-    { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
-    { name: "Social Accounts", path: "/social-accounts", icon: <Link2 size={20} /> },
-    { name: "Analytics", path: "/analytics", icon: <BarChart3 size={20} /> },
-    { name: "Profile", path: "/profile", icon: <User size={20} /> },
-    { name: "Settings", path: "/settings", icon: <Settings size={20} /> },
+    { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={18} /> },
+    { name: "Social Accounts", path: "/social-accounts", icon: <Link2 size={18} /> },
+    { name: "Scheduler", path: "/scheduler", icon: <Calendar size={18} /> },
+    { name: "Analytics", path: "/analytics", icon: <BarChart3 size={18} /> },
+    { name: "Profile", path: "/profile", icon: <User size={18} /> },
+    { name: "Settings", path: "/settings", icon: <Settings size={18} /> },
   ];
 
+  const handleLogout = () => {
+    navigate("/");
+  };
+
   return (
-    <aside className="sidebar">
-      <div className="logo">
-        <h2>SocialPilot</h2>
+    <aside className="sp-sidebar">
+      <div className="sidebar-header">
+        <Logo variant="light" />
       </div>
 
-      <div className="menu">
+      <div className="sidebar-section-label">NAVIGATION</div>
+
+      <nav className="sidebar-nav">
         {menu.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              isActive ? "menu-item active" : "menu-item"
+              isActive ? "sidebar-link active" : "sidebar-link"
             }
           >
-            {item.icon}
-            <span>{item.name}</span>
+            <span className="link-icon">{item.icon}</span>
+            <span className="link-text">{item.name}</span>
           </NavLink>
         ))}
-      </div>
+      </nav>
 
-      <div className="logout">
-        <LogOut size={20} />
-        <span>Logout</span>
+      <div className="sidebar-footer">
+        <div className="user-strip">
+          <img
+            src="/images.jpg"
+            alt="User avatar"
+            className="user-avatar-img"
+          />
+          <div className="user-meta">
+            <span className="user-name">Alex Vance</span>
+            <span className="user-role">Head of Social</span>
+          </div>
+        </div>
+
+        <button className="logout-trigger" onClick={handleLogout} title="Sign Out">
+          <LogOut size={16} />
+          <span>Exit Session</span>
+        </button>
       </div>
     </aside>
   );

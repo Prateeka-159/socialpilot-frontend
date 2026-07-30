@@ -1,31 +1,71 @@
-import { Bell, Search, UserCircle } from "lucide-react";
+import React, { useState } from "react";
+import { Search, Bell, Settings, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
 function Navbar() {
+  const [searchValue, setSearchValue] = useState("");
+  const navigate = useNavigate();
+
   return (
-    <nav className="navbar">
-
-      <div className="search-box">
-        <Search size={18} />
-        <input
-          type="text"
-          placeholder="Search..."
-        />
-      </div>
-
-      <div className="nav-right">
-        <Bell className="icon" size={22} />
-
-        <div className="profile">
-          <UserCircle size={28} />
-          <div>
-            <h4>Admin</h4>
-            <small>Administrator</small>
-          </div>
+    <header className="sp-navbar">
+      <div className="nav-left">
+        <div className="search-wrapper">
+          <Search size={16} className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search campaigns, metrics, posts..."
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="search-input"
+          />
+          {searchValue && (
+            <button className="clear-search" onClick={() => setSearchValue("")}>
+              ✕
+            </button>
+          )}
         </div>
       </div>
 
-    </nav>
+      <div className="nav-right">
+        <button
+          className="nav-action-btn"
+          onClick={() => navigate("/scheduler")}
+          title="New Post"
+        >
+          <Sparkles size={15} />
+          <span>New Post</span>
+        </button>
+
+        <button
+          className="nav-icon-btn"
+          onClick={() => navigate("/settings")}
+          title="Notifications"
+        >
+          <Bell size={18} />
+          <span className="notif-badge"></span>
+        </button>
+
+        <button
+          className="nav-icon-btn"
+          onClick={() => navigate("/settings")}
+          title="Settings"
+        >
+          <Settings size={18} />
+        </button>
+
+        <div className="nav-divider"></div>
+
+        <div className="nav-user-preview" onClick={() => navigate("/profile")}>
+          <img
+            src="/images.jpg"
+            alt="Alex Vance"
+            className="nav-avatar-img"
+          />
+          <span className="nav-user-name">Alex V.</span>
+        </div>
+      </div>
+    </header>
   );
 }
 
