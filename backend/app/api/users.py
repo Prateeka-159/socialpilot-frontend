@@ -1,10 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 from app.core.security import get_current_user
 from app.schemas.auth import UpdateProfileRequest
-from app.core.postgres import get_db
-from app.models.sql_models import User, UserRoleEnum
+from app.database.fake_db import fake_users_db
 from app.core.rbac import require_roles
+from app.core.roles import UserRole
 
 router = APIRouter(
     prefix="/users",
@@ -12,115 +11,105 @@ router = APIRouter(
 )
 
 @router.get("/me")
-def get_my_profile(current_user=Depends(get_current_user), db: Session = Depends(get_db)):
-    email = current_user.get("sub") if isinstance(current_user, dict) else current_user
-    db_user = db.query(User).filter(User.email == email).first()
+def get_my_profile(current_user=Depends(get_current_user)):
+    email = current_user["sub"]
+
+    db_user = fake_users_db.get(email)
 
     if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
 
     return {
-        "message": "User Profile",
         "user": {
-            "user_id": db_user.user_id,
-            "full_name": db_user.full_name,
-            "email": db_user.email,
-            "phone": db_user.phone,
-            "bio": db_user.bio,
-            "location": db_user.location,
-            "role": db_user.role.value,
-            "timezone": db_user.timezone,
-            "status": db_user.status.value,
-            "created_at": db_user.created_at.isoformat() if db_user.created_at else None,
-            "updated_at": db_user.updated_at.isoformat() if db_user.updated_at else None
+            "name": db_user["name"],
+            "email": db_user["email"],
+            "role": db_user["role"],
+            "phone": db_user.get("phone", ""),
+            "location": db_user.get("location", ""),
+            "bio": db_user.get("bio", "")
         }
     }
-
 
 @router.put("/me")
 def update_profile(
     user_data: UpdateProfileRequest,
-    current_user=Depends(get_current_user),
-    db: Session = Depends(get_db)
+    current_user=Depends(get_current_user)
 ):
-    email = current_user.get("sub") if isinstance(current_user, dict) else current_user
+    email = current_user["sub"]
 
-    db_user = db.query(User).filter(User.email == email).first()
+    db_user = fake_users_db.get(email)
+
     if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
 
-    if user_data.name:
-        db_user.full_name = user_data.name
+    if user_data.name is not None:
+        db_user["name"] = user_data.name
+
     if user_data.phone is not None:
-        db_user.phone = user_data.phone
-    if user_data.bio is not None:
-        db_user.bio = user_data.bio
-    if user_data.location is not None:
-        db_user.location = user_data.location
+        db_user["phone"] = user_data.phone
 
-    db.commit()
-    db.refresh(db_user)
+    if user_data.location is not None:
+        db_user["location"] = user_data.location
+
+    if user_data.bio is not None:
+        db_user["bio"] = user_data.bio
 
     return {
         "message": "Profile updated successfully",
         "user": {
-            "user_id": db_user.user_id,
-            "full_name": db_user.full_name,
-            "email": db_user.email,
-            "phone": db_user.phone,
-            "bio": db_user.bio,
-            "location": db_user.location,
-            "role": db_user.role.value
+            "name": db_user["name"],
+            "email": db_user["email"],
+            "role": db_user["role"],
+            "phone": db_user["phone"],
+            "location": db_user["location"],
+            "bio": db_user["bio"]
         }
     }
 
-
 @router.get("/")
 def get_all_users(
-    db: Session = Depends(get_db),
-    current_user=Depends(require_roles(UserRoleEnum.ADMINISTRATOR.value))
+    current_user=Depends(require_roles(UserRole.ADMIN))
 ):
-    users_db = db.query(User).all()
-    users_list = []
+    users = []
 
-    for u in users_db:
-        users_list.append({
-            "user_id": u.user_id,
-            "name": u.full_name,
-            "email": u.email,
-            "role": u.role.value,
-            "bio": u.bio,
-            "location": u.location,
-            "status": u.status.value
+    for user in fake_users_db.values():
+        users.append({
+            "name": user["name"],
+            "email": user["email"],
+            "role": user["role"]
         })
 
     return {
-        "total_users": len(users_list),
-        "users": users_list
+        "total_users": len(users),
+        "users": users
     }
+
 
 
 @router.delete("/{email}")
 def delete_user(
     email: str,
-    db: Session = Depends(get_db),
-    current_user=Depends(require_roles(UserRoleEnum.ADMINISTRATOR.value))
+    current_user=Depends(require_roles(UserRole.ADMIN))
 ):
-    db_user = db.query(User).filter(User.email == email).first()
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
+    if email not in fake_users_db:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
 
-    deleted_info = {
-        "user_id": db_user.user_id,
-        "name": db_user.full_name,
-        "email": db_user.email,
-        "role": db_user.role.value
-    }
-
-    db.delete(db_user)
-    db.commit()
+    deleted_user = fake_users_db.pop(email)
 
     return {
         "message": "User deleted successfully",
-        "deleted_user": deleted_info
+        "deleted_user": {
+            "name": deleted_user["name"],
+            "email": deleted_user["email"],
+            "role": deleted_user["role"]
+        }
     }
