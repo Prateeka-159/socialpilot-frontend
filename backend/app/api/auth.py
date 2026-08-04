@@ -37,7 +37,10 @@ def register(user: RegisterRequest):
         "name": user.name,
         "email": user.email,
         "password": hashed_password,
-        "role": UserRole.ADMIN  
+        "role": user.role,
+        "phone": "",
+        "location": "",
+        "bio": ""
     }
 
     return {
@@ -79,9 +82,4 @@ def login(user: LoginRequest):
 
 
 
-@router.get("/me")
-def get_me(current_user=Depends(get_current_user)):
-    return {
-        "message": "Current User",
-        "user": current_user
-    }
+

@@ -12,11 +12,26 @@ router = APIRouter(
 
 @router.get("/me")
 def get_my_profile(current_user=Depends(get_current_user)):
-    return {
-        "message": "User Profile",
-        "user": current_user
-    }
+    email = current_user["sub"]
 
+    db_user = fake_users_db.get(email)
+
+    if not db_user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    return {
+        "user": {
+            "name": db_user["name"],
+            "email": db_user["email"],
+            "role": db_user["role"],
+            "phone": db_user.get("phone", ""),
+            "location": db_user.get("location", ""),
+            "bio": db_user.get("bio", "")
+        }
+    }
 
 @router.put("/me")
 def update_profile(
@@ -33,13 +48,29 @@ def update_profile(
             detail="User not found"
         )
 
-    db_user["name"] = user_data.name
+    if user_data.name is not None:
+        db_user["name"] = user_data.name
+
+    if user_data.phone is not None:
+        db_user["phone"] = user_data.phone
+
+    if user_data.location is not None:
+        db_user["location"] = user_data.location
+
+    if user_data.bio is not None:
+        db_user["bio"] = user_data.bio
 
     return {
         "message": "Profile updated successfully",
-        "user": db_user
+        "user": {
+            "name": db_user["name"],
+            "email": db_user["email"],
+            "role": db_user["role"],
+            "phone": db_user["phone"],
+            "location": db_user["location"],
+            "bio": db_user["bio"]
+        }
     }
-
 
 @router.get("/")
 def get_all_users(
