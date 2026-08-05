@@ -4,6 +4,7 @@ export const getAccounts = async () => {
   const response = await fetch(
     `${API_BASE_URL}/social-accounts`,
     {
+      credentials: "include",
       headers: authHeader(),
     }
   );
@@ -22,6 +23,7 @@ export const connectAccount = async (platform, username) => {
     `${API_BASE_URL}/social-accounts/connect`,
     {
       method: "POST",
+      credentials: "include",
       headers: authHeader(),
       body: JSON.stringify({
         platform,
@@ -44,6 +46,7 @@ export const deleteAccount = async (id) => {
     `${API_BASE_URL}/social-accounts/${id}`,
     {
       method: "DELETE",
+      credentials: "include",
       headers: authHeader(),
     }
   );

@@ -1,48 +1,138 @@
-.queue-container {
+﻿.queue-container {
   padding: 32px;
-  color: #ffffff;
-  background-color: #0d0d0d;
+  background-color: #f4efe6;
   min-height: 100vh;
+  color: #1f2937;
 }
 
-.queue-container h2 {
-  font-size: 22px;
-  margin-bottom: 24px;
+.queue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.eyebrow-text {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #7b5d44;
+  font-size: 11px;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.queue-header h2 {
+  font-family: var(--font-serif);
+  font-size: 34px;
+  font-weight: 700;
+  margin: 0;
+  color: #2c2c2c;
+}
+
+.queue-subtitle {
+  margin: 14px 0 0;
+  max-width: 520px;
+  color: #5f5347;
+  line-height: 1.75;
+}
+
+.queue-action-btn {
+  border: none;
+  background: #8a5a3c;
+  color: #f8f5ef;
+  padding: 14px 24px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.queue-action-btn:hover {
+  background: #9c6b4a;
 }
 
 .queue-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  gap: 18px;
 }
 
-.queue-item {
-  background: #141414;
-  border: 1px solid #262626;
-  padding: 16px 20px;
-  border-radius: 8px;
+.queue-card {
+  background: #ffffff;
+  border: 1px solid #dfd2c5;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 22px 44px rgba(108, 88, 70, 0.08);
+}
+
+.queue-card-head {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .queue-time {
   font-size: 13px;
-  color: #888;
-  width: 160px;
-}
-
-.queue-body {
-  font-size: 14px;
-  color: #eee;
-  flex: 1;
+  color: #7b5d44;
+  font-weight: 700;
 }
 
 .queue-badge {
-  background: #142e1b;
-  border: 1px solid #22542e;
-  color: #4ade80;
-  padding: 4px 10px;
-  border-radius: 12px;
+  padding: 8px 14px;
+  border-radius: 999px;
   font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-queued {
+  background: #f7e2cf;
+  color: #7b4b2a;
+}
+
+.badge-scheduled {
+  background: #e9f3e8;
+  color: #2d5f3b;
+}
+
+.badge-draft {
+  background: #f3eee6;
+  color: #7b634f;
+}
+
+.queue-body {
+  font-size: 15px;
+  color: #2d2922;
+  margin-bottom: 20px;
+  line-height: 1.7;
+}
+
+.queue-card-footer {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.card-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 999px;
+}
+
+.card-btn.secondary {
+  background: #f0e7dd;
+  color: #5e4230;
+}
+
+.card-btn.muted {
+  background: #f7f1eb;
+  color: #7b5d44;
+}
+
+.card-btn:hover {
+  transform: translateY(-1px);
 }

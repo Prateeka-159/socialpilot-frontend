@@ -218,6 +218,154 @@
   margin-top: 4px;
 }
 
+.drafts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.drafts-heading {
+  font-size: 22px;
+  margin: 0 0 8px;
+}
+
+.drafts-subtitle {
+  margin: 0;
+  color: var(--c-taupe);
+  font-size: 13px;
+  max-width: 320px;
+}
+
+.new-draft-btn {
+  border: none;
+  background: var(--c-dark);
+  color: var(--c-cream);
+  padding: 8px 16px;
+  font-size: 13px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.new-draft-btn:hover {
+  background: var(--primary-hover);
+}
+
+.drafts-cards-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.draft-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 22px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 28px;
+  box-shadow: 0 20px 45px rgba(39, 37, 31, 0.06);
+}
+
+.draft-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.draft-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.draft-card-title {
+  font-size: 16px;
+  margin: 0;
+  line-height: 1.4;
+  color: var(--c-dark);
+}
+
+.draft-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(88, 85, 78, 0.1);
+  color: var(--c-dark);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.draft-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.platform-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(88, 85, 78, 0.08);
+  color: var(--c-dark);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.draft-author {
+  color: var(--c-taupe);
+  font-size: 13px;
+}
+
+.sub-text {
+  color: var(--c-taupe);
+  font-size: 14px;
+  margin: 0;
+}
+
+.draft-card-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 999px;
+  transition: var(--transition);
+}
+
+.edit-btn {
+  color: var(--c-dark);
+  background: rgba(39, 37, 31, 0.06);
+}
+
+.delete-btn {
+  color: var(--c-red);
+  background: rgba(255, 80, 80, 0.1);
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+}
+
 .queue-edit-link {
   font-size: 10px;
   letter-spacing: 0.15em;

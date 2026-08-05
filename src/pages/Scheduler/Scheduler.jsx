@@ -4,7 +4,6 @@ import {
   Clock,
   Send,
   Sparkles,
-  Layers,
 } from "lucide-react";
 import { FaLinkedin, FaInstagram, FaFacebook } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
@@ -25,31 +24,10 @@ function Scheduler() {
     { id: 3, src: "/ripples-of-sand-in-black-and-white.jpg", name: "Ripples of Sand" },
   ];
 
-  const queuedPosts = [
-    {
-      id: 101,
-      date: "TOMORROW, 18:00 UTC",
-      platforms: [<FaLinkedin key="l" />, <FaInstagram key="i" />],
-      caption: "Synthesizing architectural rhythm and structural minimalism across urban spaces.",
-      image: "/biking-over-bridge.jpg",
-      status: "QUEUED",
-    },
-    {
-      id: 102,
-      date: "AUG 01, 12:30 UTC",
-      platforms: [<FaInstagram key="i" />, <FaXTwitter key="x" />],
-      caption: "Monochrome textures in organic movement: Sand ripples and temporal geometry.",
-      image: "/ripples-of-sand-in-black-and-white.jpg",
-      status: "SCHEDULED",
-    },
-    {
-      id: 103,
-      date: "AUG 03, 09:00 UTC",
-      platforms: [<FaLinkedin key="l" />, <FaFacebook key="f" />],
-      caption: "Case study preview on modern workflow frameworks and studio delegation.",
-      image: "/images.jpg",
-      status: "DRAFT",
-    },
+  const draftItems = [
+    { id: 1, title: 'Q3 Product Roadmap Announcement', targetPlatform: 'LinkedIn', lastSaved: '10 mins ago', author: 'Alex Vance' },
+    { id: 2, title: 'Cyberpunk Theme Launch Assets', targetPlatform: 'Instagram', lastSaved: '2 hours ago', author: 'Alex Vance' },
+    { id: 3, title: 'Weekly Tech Insights Thread', targetPlatform: 'X (Twitter)', lastSaved: 'Yesterday', author: 'Alex Vance' },
   ];
 
   const togglePlatform = (key) => {
@@ -148,7 +126,7 @@ function Scheduler() {
 
             {/* Media Asset Selector */}
             <div className="form-section">
-              <span className="form-label font-mono">TOPIC TO POST ABOUT</span>
+              <span className="form-label font-mono">ADD PICTURES:</span>
               <div className="media-selector-grid">
                 {publicImages.map((img) => (
                   <div
@@ -200,36 +178,39 @@ function Scheduler() {
           </form>
         </div>
 
-        {/* Right Column: Queued Media Timeline */}
-        <div className="timeline-column">
+        <div className="drafts-column">
           <div className="column-title-row hairline-b">
-            <Layers size={18} />
-            <h2 className="column-heading font-serif">Queued Publications</h2>
+            <Sparkles size={18} />
+            <h2 className="column-heading font-serif">Drafts</h2>
           </div>
 
-          <div className="queue-flat-list">
-            {queuedPosts.map((post) => (
-              <div key={post.id} className="queue-flat-row hairline-b">
-                <div className="queue-thumb-wrap">
-                  <img src={post.image} alt="Queued attachment" />
-                </div>
+          <div className="drafts-header">
+            <div>
+              <h3 className="drafts-heading">Saved drafts</h3>
+              <p className="drafts-subtitle">Quickly review your drafts and keep the queue full.</p>
+            </div>
+            <button className="new-draft-btn">+ Create Draft</button>
+          </div>
 
-                <div className="queue-content-wrap">
-                  <div className="queue-meta-row font-mono">
-                    <span className="queue-date">{post.date}</span>
-                    <div className="queue-icons">{post.platforms}</div>
+          <div className="drafts-cards-grid">
+            {draftItems.map((item) => (
+              <article key={item.id} className="draft-card">
+                <div className="draft-card-main">
+                  <div className="draft-card-top">
+                    <h3 className="draft-card-title">{item.title}</h3>
+                    <span className="draft-chip">Draft</span>
                   </div>
-
-                  <p className="queue-caption">{post.caption}</p>
-
-                  <div className="queue-footer-row font-mono">
-                    <span className={`status-pill ${post.status.toLowerCase()}`}>
-                      {post.status}
-                    </span>
-                    <button className="queue-edit-link">Edit Post →</button>
+                  <div className="draft-meta-row">
+                    <span className="platform-tag">{item.targetPlatform}</span>
+                    <span className="draft-author">{item.author}</span>
                   </div>
+                  <p className="sub-text">Last saved {item.lastSaved}</p>
                 </div>
-              </div>
+                <div className="draft-card-actions">
+                  <button className="action-btn edit-btn">Edit</button>
+                  <button className="action-btn delete-btn">Delete</button>
+                </div>
+              </article>
             ))}
           </div>
         </div>
