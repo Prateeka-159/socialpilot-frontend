@@ -9,13 +9,15 @@ import Scheduler from "../pages/Scheduler/Scheduler";
 import Analytics from "../pages/Analytics/Analytics";
 import Profile from "../pages/Profile/Profile";
 import Settings from "../pages/Settings/Settings";
+import Drafts from "../pages/Drafts/Drafts";
+import CalendarView from "../pages/Calendar/CalendarView";
+import Queue from "../pages/Queue/Queue";
 
 import MainLayout from "../components/layout/MainLayout";
 
 function AppRoutes() {
   return (
     <Routes>
-
       {/* Public Pages */}
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
@@ -28,8 +30,10 @@ function AppRoutes() {
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/drafts" element={<Drafts />} />
+        <Route path="/calendar" element={<CalendarView />} />
+        <Route path="/queue" element={<Queue />} />
       </Route>
-
     </Routes>
   );
 }

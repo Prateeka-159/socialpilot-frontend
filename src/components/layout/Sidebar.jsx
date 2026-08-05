@@ -1,4 +1,3 @@
-import React from "react";
 import {
   LayoutDashboard,
   User,
@@ -7,7 +6,8 @@ import {
   Link2,
   Calendar,
   LogOut,
-  ArrowUpRight,
+  FileText,
+  ListOrdered
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import Logo from "../common/Logo";
@@ -19,6 +19,9 @@ function Sidebar() {
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={18} /> },
     { name: "Social Accounts", path: "/social-accounts", icon: <Link2 size={18} /> },
     { name: "Scheduler", path: "/scheduler", icon: <Calendar size={18} /> },
+    { name: "Drafts", path: "/drafts", icon: <FileText size={18} /> },
+    { name: "Calendar", path: "/calendar", icon: <Calendar size={18} /> },
+    { name: "Queue", path: "/queue", icon: <ListOrdered size={18} /> },
     { name: "Analytics", path: "/analytics", icon: <BarChart3 size={18} /> },
     { name: "Profile", path: "/profile", icon: <User size={18} /> },
     { name: "Settings", path: "/settings", icon: <Settings size={18} /> },
