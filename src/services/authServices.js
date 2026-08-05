@@ -3,6 +3,7 @@ import API_BASE_URL from "./api";
 export const login = async (email, password) => {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
@@ -18,8 +19,7 @@ export const login = async (email, password) => {
     throw new Error(data.detail || "Login failed");
   }
 
-  localStorage.setItem("token", data.access_token);
-
+  // Token is stored in an httpOnly cookie; no localStorage usage anymore.
   return data;
 };
 
@@ -45,6 +45,9 @@ export const register = async (name, email, password) => {
   return data;
 };
 
-export const logout = () => {
-  localStorage.removeItem("token");
+export const logout = async () => {
+  await fetch(`${API_BASE_URL}/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
 };

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { logout as apiLogout } from "../services/authServices";
 
 const AuthContext = createContext();
 
@@ -17,8 +18,14 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    // Clear UI state and inform backend to clear httpOnly cookie
     setUser(null);
     localStorage.removeItem("user");
+    try {
+      apiLogout();
+    } catch (err) {
+      // ignore network errors on logout
+    }
   };
 
   return (

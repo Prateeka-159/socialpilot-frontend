@@ -6,7 +6,6 @@ import {
   Link2,
   Calendar,
   LogOut,
-  FileText,
   ListOrdered,
   Users,
 } from "lucide-react";
@@ -56,17 +55,6 @@ function Sidebar() {
       ],
     },
     {
-      name: "Drafts",
-      path: "/drafts",
-      icon: <FileText size={18} />,
-      roles: [
-        ROLES.ADMIN,
-        ROLES.BUSINESS,
-        ROLES.MARKETING,
-        ROLES.CONTENT_CREATOR,
-      ],
-    },
-    {
       name: "Calendar",
       path: "/calendar",
       icon: <Calendar size={18} />,
@@ -78,7 +66,7 @@ function Sidebar() {
       ],
     },
     {
-      name: "Queue",
+      name: "Qued Publication",
       path: "/queue",
       icon: <ListOrdered size={18} />,
       roles: [
@@ -87,6 +75,24 @@ function Sidebar() {
         ROLES.MARKETING,
         ROLES.CONTENT_CREATOR,
       ],
+    },
+    {
+      name: "Collaborators",
+      path: "/collaborators",
+      icon: <Users size={18} />,
+      roles: [ROLES.ADMIN, ROLES.MARKETING],
+    },
+    {
+      name: "Campaigns",
+      path: "/campaigns",
+      icon: <BarChart3 size={18} />,
+      roles: [ROLES.ADMIN, ROLES.MARKETING, ROLES.BUSINESS],
+    },
+    {
+      name: "Accounts",
+      path: "/accounts",
+      icon: <Link2 size={18} />,
+      roles: [ROLES.ADMIN, ROLES.BUSINESS],
     },
     {
       name: "Analytics",
