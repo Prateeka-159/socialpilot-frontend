@@ -1,0 +1,143 @@
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  color: var(--c-dark);
+}
+
+.status-indicator {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--c-taupe);
+  font-weight: 600;
+}
+
+/* Settings Flat List (NO BOX CARDS!) */
+.settings-flat-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+}
+
+.setting-flat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 8px;
+  transition: var(--transition);
+}
+
+.setting-flat-row:hover {
+  background-color: rgba(88, 85, 78, 0.03);
+}
+
+.setting-meta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+}
+
+.setting-icon {
+  color: var(--c-dark);
+  flex-shrink: 0;
+}
+
+.danger-icon {
+  color: var(--c-dark);
+}
+
+.setting-titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.setting-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--c-dark);
+}
+
+.setting-desc {
+  font-size: 13px;
+  color: var(--c-taupe);
+  margin-top: 2px;
+}
+
+.setting-action {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Standardized Button Sizing across ALL Settings rows */
+.sp-setting-btn {
+  width: 160px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 21px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sp-setting-btn-solid {
+  background-color: var(--c-dark);
+  color: var(--c-cream);
+  border: 1px solid var(--c-dark);
+}
+
+.sp-setting-btn-solid:hover {
+  background-color: #1a1915;
+  color: var(--c-white);
+}
+
+.sp-setting-btn-outline {
+  background: transparent;
+  color: var(--c-dark);
+  border: 1px solid var(--c-taupe-40);
+}
+
+.sp-setting-btn-outline:hover {
+  border-color: var(--c-dark);
+  background-color: rgba(88, 85, 78, 0.05);
+}
+
+.toggle-switch-btn {
+  border: 1px solid var(--c-taupe-40);
+  background: transparent;
+}
+
+.toggle-switch-btn.active {
+  background: var(--c-dark);
+  border-color: var(--c-dark);
+}
+
+.toggle-slider {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--c-dark);
+  font-weight: 700;
+}
+
+.toggle-switch-btn.active .toggle-slider {
+  color: var(--c-cream);
+}
+
+.danger-btn {
+  background: transparent;
+  border: 1px solid var(--c-dark);
+  color: var(--c-dark);
+  font-weight: 700;
+}
+
+.danger-btn:hover {
+  background-color: var(--c-dark);
+  color: var(--c-cream);
+}
