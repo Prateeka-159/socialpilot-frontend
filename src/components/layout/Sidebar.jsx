@@ -10,21 +10,96 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { Users } from "lucide-react";
 import Logo from "../common/Logo";
 import "./Sidebar.css";
 
 function Sidebar() {
   const navigate = useNavigate();
-  const menu = [
-    { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={18} /> },
-    { name: "Social Accounts", path: "/social-accounts", icon: <Link2 size={18} /> },
-    { name: "Scheduler", path: "/scheduler", icon: <Calendar size={18} /> },
-    { name: "Analytics", path: "/analytics", icon: <BarChart3 size={18} /> },
-    { name: "Profile", path: "/profile", icon: <User size={18} /> },
-    { name: "Settings", path: "/settings", icon: <Settings size={18} /> },
+  const { user, logout } = useAuth();
+  const allMenu = [
+    {
+      name: "Dashboard",
+      path: "/dashboard",
+      icon: <LayoutDashboard size={18} />,
+      roles: [
+        "Administrator",
+        "Business User",
+        "Marketing Team",
+        "Content Creator",
+      ],
+    },
+
+    {
+        name: "Users",
+        path: "/users",
+        icon: <Users size={18} />,
+        roles: ["Administrator"],
+    },
+
+    {
+      name: "Social Accounts",
+      path: "/social-accounts",
+      icon: <Link2 size={18} />,
+      roles: [
+        "Administrator",
+        "Business User",
+      ],
+    },
+
+    {
+      name: "Scheduler",
+      path: "/scheduler",
+      icon: <Calendar size={18} />,
+      roles: [
+        "Administrator",
+        "Business User",
+        "Marketing Team",
+        "Content Creator",
+      ],
+    },
+
+    {
+      name: "Analytics",
+      path: "/analytics",
+      icon: <BarChart3 size={18} />,
+      roles: [
+        "Administrator",
+        "Business User",
+        "Marketing Team",
+      ],
+    },
+
+    {
+      name: "Profile",
+      path: "/profile",
+      icon: <User size={18} />,
+      roles: [
+        "Administrator",
+        "Business User",
+        "Marketing Team",
+        "Content Creator",
+      ],
+    },
+
+    {
+      name: "Settings",
+      path: "/settings",
+      icon: <Settings size={18} />,
+      roles: [
+        "Administrator",
+        "Business User",
+      ],
+    },
   ];
 
+  const menu = allMenu.filter((item) =>
+    item.roles.includes(user.role)
+  );
+
   const handleLogout = () => {
+    logout();
     navigate("/");
   };
 
@@ -59,8 +134,13 @@ function Sidebar() {
             className="user-avatar-img"
           />
           <div className="user-meta">
-            <span className="user-name">Alex Vance</span>
-            <span className="user-role">Head of Social</span>
+            <span className="user-name">
+              {user.name}
+            </span>
+
+            <span className="user-role">
+              {user.role}
+            </span>
           </div>
         </div>
 

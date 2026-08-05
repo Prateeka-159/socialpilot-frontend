@@ -11,23 +11,125 @@ import Profile from "../pages/Profile/Profile";
 import Settings from "../pages/Settings/Settings";
 
 import MainLayout from "../components/layout/MainLayout";
+import ProtectedRoute from "./ProtectedRoute";
+import UserManagement from "../pages/UserManagement/UserManagement";
 
 function AppRoutes() {
   return (
     <Routes>
 
-      {/* Public Pages */}
+      {/* Public */}
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Protected Pages */}
+      {/* Protected */}
       <Route element={<MainLayout />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/social-accounts" element={<SocialAccounts />} />
-        <Route path="/scheduler" element={<Scheduler />} />
-        <Route path="/analytics" element={<Analytics />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/settings" element={<Settings />} />
+
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Administrator",
+                "Business User",
+                "Marketing Team",
+                "Content Creator",
+              ]}
+            >
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/social-accounts"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Administrator",
+                "Business User",
+                "Marketing Team",
+              ]}
+            >
+              <SocialAccounts />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/scheduler"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Administrator",
+                "Business User",
+                "Marketing Team",
+                "Content Creator",
+              ]}
+            >
+              <Scheduler />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Administrator",
+                "Business User",
+                "Marketing Team",
+              ]}
+            >
+              <Analytics />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Administrator",
+                "Business User",
+                "Marketing Team",
+                "Content Creator",
+              ]}
+            >
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Administrator",
+                "Business User",
+              ]}
+            >
+              <Settings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "Administrator",
+              ]}
+            >
+              <UserManagement />
+            </ProtectedRoute>
+          }
+        />
+
       </Route>
 
     </Routes>

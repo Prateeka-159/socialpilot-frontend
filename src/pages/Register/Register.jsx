@@ -3,16 +3,33 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Lock, Mail, User, ShieldCheck } from "lucide-react";
 import Logo from "../../components/common/Logo";
 import "../Login/Login.css";
+import { register } from "../../services/authServices";
 
 function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate("/dashboard");
+
+    setError("");
+    setLoading(true);
+
+    try {
+      await register(name, email, password);
+
+      alert("Registration Successful!");
+
+      navigate("/");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -98,8 +115,27 @@ function Register() {
               </div>
             </div>
 
-            <button type="submit" className="sp-primary-submit">
-              <span>Create Workspace</span>
+            {error && (
+              <p
+                style={{
+                  color: "#dc2626",
+                  marginBottom: "1rem",
+                  fontSize: "14px",
+                }}
+              >
+                {error}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              className="sp-primary-submit"
+              disabled={loading}
+            >
+              <span>
+                {loading ? "Creating..." : "Create Workspace"}
+              </span>
+
               <ArrowRight size={16} />
             </button>
           </form>

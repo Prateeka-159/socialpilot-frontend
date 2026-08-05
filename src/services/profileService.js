@@ -1,9 +1,34 @@
+import API_BASE_URL, { authHeader } from "./api";
+
 export const getProfile = async () => {
-  return {
-    name: "Prateeka",
-    email: "xxx@email.com",
-    phone: "+91 ccc",
-    role: "Administrator",
-    location: "Coimbatore, India",
-  };
+  const response = await fetch(`${API_BASE_URL}/users/me`, {
+    method: "GET",
+    headers: authHeader(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to fetch profile");
+  }
+
+  return data;
+};
+
+export const updateProfile = async (name) => {
+  const response = await fetch(`${API_BASE_URL}/users/me`, {
+    method: "PUT",
+    headers: authHeader(),
+    body: JSON.stringify({
+      name,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to update profile");
+  }
+
+  return data;
 };
