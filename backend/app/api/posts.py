@@ -25,10 +25,6 @@ router = APIRouter(
 )
 
 
-# -------------------------
-# Helper Functions
-# -------------------------
-
 def get_db_user(db: Session, current_user):
     user = (
         db.query(User)
@@ -67,10 +63,6 @@ def get_post_or_404(
 
     return post
 
-
-# -------------------------
-# Create Post
-# -------------------------
 
 @router.post("/", status_code=201)
 def create_post(
@@ -161,10 +153,6 @@ def create_post(
     }
 
 
-# -------------------------
-# Get All Posts
-# -------------------------
-
 @router.get("/")
 def get_posts(
     db: Session = Depends(get_db),
@@ -201,9 +189,6 @@ def get_posts(
     }
 
 
-# -------------------------
-# Get Single Post
-# -------------------------
 
 @router.get("/{post_id}")
 def get_post(
@@ -237,10 +222,6 @@ def get_post(
         }
     }
 
-
-# -------------------------
-# Update Post
-# -------------------------
 
 @router.put("/{post_id}")
 def update_post(
@@ -346,11 +327,6 @@ def update_post(
             "updated_at": post.updated_at
         }
     }
-
-
-# -------------------------
-# Delete Post
-# -------------------------
 
 @router.delete("/{post_id}")
 def delete_post(
