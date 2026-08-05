@@ -1,13 +1,19 @@
 .users-page{
-  padding: 24px 40px 40px;
+
+padding:40px;
+
 }
 
 .page-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-top:0;
-  margin-bottom:35px;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:35px;
+
 }
 
 .users-table{

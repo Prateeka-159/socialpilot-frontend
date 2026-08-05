@@ -3,7 +3,6 @@ import API_BASE_URL, { authHeader } from "./api";
 export const getProfile = async () => {
   const response = await fetch(`${API_BASE_URL}/users/me`, {
     method: "GET",
-    credentials: "include",
     headers: authHeader(),
   });
 
@@ -19,7 +18,6 @@ export const getProfile = async () => {
 export const updateProfile = async (name) => {
   const response = await fetch(`${API_BASE_URL}/users/me`, {
     method: "PUT",
-    credentials: "include",
     headers: authHeader(),
     body: JSON.stringify({
       name,

@@ -9,11 +9,9 @@ import Scheduler from "../pages/Scheduler/Scheduler";
 import Analytics from "../pages/Analytics/Analytics";
 import Profile from "../pages/Profile/Profile";
 import Settings from "../pages/Settings/Settings";
+import Drafts from "../pages/Drafts/Drafts";
 import CalendarView from "../pages/Calendar/CalendarView";
 import Queue from "../pages/Queue/Queue";
-import Collaborators from "../pages/Collaborators/Collaborators";
-import Campaigns from "../pages/Campaigns/Campaigns";
-import Accounts from "../pages/Accounts/Accounts";
 
 import MainLayout from "../components/layout/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
@@ -74,6 +72,21 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/drafts"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                ROLES.ADMIN,
+                ROLES.BUSINESS,
+                ROLES.MARKETING,
+                ROLES.CONTENT_CREATOR,
+              ]}
+            >
+              <Drafts />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/calendar"
           element={
             <ProtectedRoute
@@ -114,36 +127,6 @@ function AppRoutes() {
               ]}
             >
               <Analytics />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/collaborators"
-          element={
-            <ProtectedRoute
-              allowedRoles={[ROLES.ADMIN, ROLES.MARKETING]}
-            >
-              <Collaborators />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/campaigns"
-          element={
-            <ProtectedRoute
-              allowedRoles={[ROLES.ADMIN, ROLES.MARKETING, ROLES.BUSINESS]}
-            >
-              <Campaigns />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/accounts"
-          element={
-            <ProtectedRoute
-              allowedRoles={[ROLES.ADMIN, ROLES.BUSINESS]}
-            >
-              <Accounts />
             </ProtectedRoute>
           }
         />
