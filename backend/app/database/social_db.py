@@ -1,1 +1,0 @@
-social_accounts_db = []

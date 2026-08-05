@@ -9,10 +9,9 @@ def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
     token = credentials.credentials
-    print("Token:", token)
+    
 
     payload = verify_access_token(token)
-    print("Payload:", payload)
     if payload is None:
         raise HTTPException(
             status_code=401,

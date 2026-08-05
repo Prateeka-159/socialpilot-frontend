@@ -1,7 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
 from app.core.security import get_current_user
 from app.schemas.auth import UpdateProfileRequest
-from app.database.fake_db import fake_users_db
+from app.core.postgres import get_db
+from app.models.sql_models import User
 from app.core.rbac import require_roles
 from app.core.roles import UserRole
 
@@ -11,10 +14,10 @@ router = APIRouter(
 )
 
 @router.get("/me")
-def get_my_profile(current_user=Depends(get_current_user)):
+def get_my_profile(current_user=Depends(get_current_user), db: Session = Depends(get_db)):
     email = current_user["sub"]
 
-    db_user = fake_users_db.get(email)
+    db_user = db.query(User).filter(User.email == email).first()
 
     if not db_user:
         raise HTTPException(
@@ -24,23 +27,25 @@ def get_my_profile(current_user=Depends(get_current_user)):
 
     return {
         "user": {
-            "name": db_user["name"],
-            "email": db_user["email"],
-            "role": db_user["role"],
-            "phone": db_user.get("phone", ""),
-            "location": db_user.get("location", ""),
-            "bio": db_user.get("bio", "")
+            "id": db_user.user_id,
+            "name": db_user.full_name,
+            "email": db_user.email,
+            "role": db_user.role.value,
+            "phone": db_user.phone or "",
+            "location": db_user.location or "",
+            "bio": db_user.bio or ""
         }
     }
 
 @router.put("/me")
 def update_profile(
     user_data: UpdateProfileRequest,
-    current_user=Depends(get_current_user)
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     email = current_user["sub"]
 
-    db_user = fake_users_db.get(email)
+    db_user = db.query(User).filter(User.email == email).first()
 
     if not db_user:
         raise HTTPException(
@@ -49,45 +54,51 @@ def update_profile(
         )
 
     if user_data.name is not None:
-        db_user["name"] = user_data.name
+        db_user.full_name = user_data.name
 
     if user_data.phone is not None:
-        db_user["phone"] = user_data.phone
+        db_user.phone = user_data.phone
 
     if user_data.location is not None:
-        db_user["location"] = user_data.location
+        db_user.location = user_data.location
 
     if user_data.bio is not None:
-        db_user["bio"] = user_data.bio
+        db_user.bio = user_data.bio
+
+    db.commit()
+    db.refresh(db_user)
 
     return {
         "message": "Profile updated successfully",
         "user": {
-            "name": db_user["name"],
-            "email": db_user["email"],
-            "role": db_user["role"],
-            "phone": db_user["phone"],
-            "location": db_user["location"],
-            "bio": db_user["bio"]
+            "id": db_user.user_id,
+            "name": db_user.full_name,
+            "email": db_user.email,
+            "role": db_user.role.value,
+            "phone": db_user.phone or "",
+            "location": db_user.location or "",
+            "bio": db_user.bio or ""
         }
     }
 
 @router.get("/")
 def get_all_users(
-    current_user=Depends(require_roles(UserRole.ADMIN))
+    current_user=Depends(require_roles(UserRole.ADMIN)),
+    db: Session = Depends(get_db)
 ):
-    users = []
-
-    for user in fake_users_db.values():
-        users.append({
-            "name": user["name"],
-            "email": user["email"],
-            "role": user["role"]
-        })
+    users = db.query(User).order_by(User.user_id).all()
 
     return {
         "total_users": len(users),
-        "users": users
+        "users": [
+            {
+                "id": user.user_id,
+                "name": user.full_name,
+                "email": user.email,
+                "role": user.role.value
+            }
+            for user in users
+        ]
     }
 
 
@@ -95,21 +106,27 @@ def get_all_users(
 @router.delete("/{email}")
 def delete_user(
     email: str,
-    current_user=Depends(require_roles(UserRole.ADMIN))
+    current_user=Depends(require_roles(UserRole.ADMIN)),
+    db: Session = Depends(get_db)
 ):
-    if email not in fake_users_db:
+    db_user = db.query(User).filter(User.email == email).first()
+
+    if not db_user:
         raise HTTPException(
             status_code=404,
             detail="User not found"
         )
 
-    deleted_user = fake_users_db.pop(email)
+    deleted_user = {
+        "name": db_user.full_name,
+        "email": db_user.email,
+        "role": db_user.role.value
+    }
+
+    db.delete(db_user)
+    db.commit()
 
     return {
         "message": "User deleted successfully",
-        "deleted_user": {
-            "name": deleted_user["name"],
-            "email": deleted_user["email"],
-            "role": deleted_user["role"]
-        }
+        "deleted_user": deleted_user
     }

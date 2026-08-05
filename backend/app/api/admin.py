@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
+from app.core.postgres import get_db
 from app.core.rbac import require_roles
 from app.core.roles import UserRole
 
-from app.database.fake_db import fake_users_db
-from app.database.social_db import social_accounts_db
+from app.models.sql_models import Campaign, Post, SocialAccount, User
 
 
 router = APIRouter(
@@ -13,14 +14,15 @@ router = APIRouter(
 )
 @router.get("/dashboard")
 def admin_dashboard(
-    current_user=Depends(require_roles(UserRole.ADMIN))
+    current_user=Depends(require_roles(UserRole.ADMIN)),
+    db: Session = Depends(get_db)
 ):
     return {
         "message": "Dashboard data fetched successfully",
         "dashboard": {
-            "total_users": len(fake_users_db),
-            "total_posts": 0,
-            "total_campaigns": 0,
-            "connected_accounts": len(social_accounts_db)
+            "total_users": db.query(User).count(),
+            "total_posts": db.query(Post).count(),
+            "total_campaigns": db.query(Campaign).count(),
+            "connected_accounts": db.query(SocialAccount).count()
         }
     }

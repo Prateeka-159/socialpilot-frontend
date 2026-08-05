@@ -1,16 +1,30 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
 from app.schemas.auth import (
     RegisterRequest,
     LoginRequest,
     TokenResponse,
 )
+from app.core.postgres import get_db
+from app.models.sql_models import User, UserRoleEnum, UserStatusEnum
 from app.utils.hashing import hash_password, verify_password
 from app.utils.jwt import create_access_token
-from app.database.fake_db import fake_users_db
-from app.core.security import get_current_user
-from fastapi import Depends
 from app.core.roles import UserRole
 
+
+ROLE_TO_DB_ROLE = {
+    UserRole.ADMIN: UserRoleEnum.ADMINISTRATOR,
+    UserRole.BUSINESS_USER: UserRoleEnum.BUSINESS_USER,
+    UserRole.MARKETING_TEAM: UserRoleEnum.MARKETING_TEAM,
+    UserRole.CONTENT_CREATOR: UserRoleEnum.CONTENT_CREATOR,
+}
+
+DB_ROLE_TO_API_ROLE = {db_role: api_role for api_role, db_role in ROLE_TO_DB_ROLE.items()}
+
+
+def _api_role_from_db_role(db_role: UserRoleEnum) -> str:
+    return DB_ROLE_TO_API_ROLE[db_role].value
 
 
 router = APIRouter(
@@ -18,30 +32,34 @@ router = APIRouter(
     tags=["Authentication"]
 )
 
- 
-@router.post("/register", status_code=201)
-def register(user: RegisterRequest):
 
-    # Check if email already exists
-    if user.email in fake_users_db:
+@router.post("/register", status_code=201)
+def register(user: RegisterRequest, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(User.email == user.email).first()
+
+    if existing_user:
         raise HTTPException(
             status_code=400,
             detail="Email already registered"
         )
 
-    # Hash password
     hashed_password = hash_password(user.password)
 
-    # Save user
-    fake_users_db[user.email] = {
-        "name": user.name,
-        "email": user.email,
-        "password": hashed_password,
-        "role": user.role,
-        "phone": "",
-        "location": "",
-        "bio": ""
-    }
+    new_user = User(
+        full_name=user.name,
+        email=user.email,
+        password_hash=hashed_password,
+        role=ROLE_TO_DB_ROLE[user.role],
+        phone="",
+        bio="",
+        location="",
+        timezone="UTC",
+        status=UserStatusEnum.ACTIVE,
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
 
     return {
         "message": "User registered successfully"
@@ -49,9 +67,8 @@ def register(user: RegisterRequest):
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(user: LoginRequest):
-
-    db_user = fake_users_db.get(user.email)
+def login(user: LoginRequest, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.email == user.email).first()
 
     if not db_user:
         raise HTTPException(
@@ -59,10 +76,7 @@ def login(user: LoginRequest):
             detail="User not found"
         )
 
-    if not verify_password(
-        user.password,
-        db_user["password"]
-    ):
+    if not verify_password(user.password, db_user.password_hash):
         raise HTTPException(
             status_code=401,
             detail="Invalid password"
@@ -70,8 +84,8 @@ def login(user: LoginRequest):
 
     token = create_access_token(
         {
-            "sub": db_user["email"],
-            "role": db_user["role"]
+            "sub": db_user.email,
+            "role": _api_role_from_db_role(db_user.role)
         }
     )
 
@@ -79,7 +93,3 @@ def login(user: LoginRequest):
         "access_token": token,
         "token_type": "bearer"
     }
-
-
-
-
