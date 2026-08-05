@@ -5,8 +5,11 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from app.core.postgres import Base
+from sqlalchemy import LargeBinary
 
 # Enums
+
+
 class UserRoleEnum(str, enum.Enum):
     CONTENT_CREATOR = "Content Creator"
     MARKETING_TEAM = "Marketing Team"
@@ -168,7 +171,9 @@ class Post(Base):
     campaign_id = Column(Integer, ForeignKey("campaigns.campaign_id", ondelete="SET NULL"), nullable=True)
     title = Column(String(255), nullable=True)
     caption = Column(Text, nullable=True)
-    media_url = Column(String(500), nullable=True)  # Primary / legacy single media URL
+    image_data = Column(LargeBinary, nullable=True)
+    image_name = Column(String(255), nullable=True)
+    image_type = Column(String(100), nullable=True)  # Primary / legacy single media URL
     post_type = Column(SQLEnum(PostTypeEnum), default=PostTypeEnum.TEXT, nullable=False)
     scheduled_time = Column(DateTime(timezone=True), nullable=True)
     published_time = Column(DateTime(timezone=True), nullable=True)
