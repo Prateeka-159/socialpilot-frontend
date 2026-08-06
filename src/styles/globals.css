@@ -1,0 +1,106 @@
+/* Global Reset & Human Typography Design System */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--c-cream);
+  color: var(--c-dark);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.65;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  selection-background-color: var(--c-dark);
+  selection-color: var(--c-cream);
+}
+
+::selection {
+  background: var(--c-dark);
+  color: var(--c-cream);
+}
+
+/* Headings with Editorial Human Styling */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--c-dark);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Form inputs & controls without box wrappers */
+input, select, textarea, button {
+  font-family: inherit;
+  color: inherit;
+  background: transparent;
+  outline: none;
+}
+
+/* Minimal hairline dividers instead of box cards */
+.hairline-b {
+  border-bottom: 1px solid var(--c-taupe-20);
+}
+
+.hairline-t {
+  border-top: 1px solid var(--c-taupe-20);
+}
+
+.hairline-l {
+  border-left: 1px solid var(--c-taupe-20);
+}
+
+.hairline-r {
+  border-right: 1px solid var(--c-taupe-20);
+}
+
+.hairline-dark-b {
+  border-bottom: 1px solid var(--c-cream-20);
+}
+
+/* Base Link */
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--c-cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--c-taupe-40);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--c-taupe);
+}
