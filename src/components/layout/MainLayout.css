@@ -1,0 +1,12 @@
+.sp-app-wrapper {
+  min-height: 100vh;
+  background-color: var(--c-cream);
+  color: var(--c-dark);
+}
+
+.sp-main-content {
+  margin-left: var(--sidebar-width);
+  min-height: calc(100vh - var(--navbar-height));
+  padding: 40px;
+  background-color: var(--c-cream);
+}

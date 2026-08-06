@@ -1,0 +1,287 @@
+.analytics-page {
+  display: flex;
+  flex-direction: column;
+  color: var(--c-dark);
+}
+
+.analytics-summary-badge {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--c-dark);
+  font-weight: 700;
+  padding: 6px 14px;
+  border: 1px solid var(--c-taupe-40);
+  border-radius: 20px;
+}
+
+/* Filter Bar */
+.filter-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 0;
+  margin-bottom: 28px;
+  font-size: 11px;
+}
+
+.filter-label {
+  color: var(--c-taupe);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+}
+
+.filter-options {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-btn {
+  padding: 4px 14px;
+  border: 1px solid var(--c-taupe-20);
+  background: transparent;
+  color: var(--c-dark);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.filter-btn:hover {
+  background: rgba(88, 85, 78, 0.05);
+}
+
+.filter-btn.is-active {
+  background: var(--c-dark);
+  color: var(--c-cream);
+  border-color: var(--c-dark);
+}
+
+/* Metrics Row */
+.analytics-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding-bottom: 32px;
+  margin-bottom: 36px;
+}
+
+.metric-box {
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px;
+  border-right: 1px solid var(--c-taupe-20);
+}
+
+.metric-box:first-child {
+  padding-left: 0;
+}
+
+.metric-box:last-child {
+  border-right: none;
+}
+
+.m-tag {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--c-taupe);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.m-number {
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--c-dark);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.m-sub {
+  font-size: 11px;
+  color: var(--c-taupe);
+}
+
+/* Charts Grid */
+.analytics-charts-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 40px;
+  margin-bottom: 48px;
+}
+
+.chart-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.chart-heading {
+  font-size: 22px;
+  color: var(--c-dark);
+}
+
+.chart-badge {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--c-taupe);
+}
+
+.chart-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.pie-chart-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pie-legend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+}
+
+.legend-color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.legend-name {
+  color: var(--c-dark);
+  flex: 1;
+}
+
+.legend-val {
+  color: var(--c-taupe);
+  font-weight: 700;
+}
+
+/* Custom Tooltip */
+.custom-chart-tooltip {
+  background: var(--c-dark);
+  color: var(--c-cream);
+  padding: 8px 14px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.tt-label {
+  opacity: 0.7;
+}
+
+.tt-value {
+  font-weight: 700;
+  color: var(--c-white);
+}
+
+/* Posts Made Section */
+.posts-made-section {
+  padding-top: 36px;
+  display: flex;
+  flex-direction: column;
+}
+
+.posts-table-header {
+  display: grid;
+  grid-template-columns: 3.5fr 1.2fr 1.4fr 1.2fr 1.4fr 1fr;
+  padding: 12px 16px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--c-taupe);
+  margin-bottom: 8px;
+}
+
+/* Header-specific style for the impressions column label */
+.col-p-imp-header {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--c-taupe);
+  font-weight: 700;
+}
+
+/* Make all posts table header labels a sane size and bold */
+.posts-table-header span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--c-taupe);
+}
+
+.posts-flat-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.post-flat-row {
+  display: grid;
+  grid-template-columns: 3.5fr 1.2fr 1.4fr 1.2fr 1.4fr 1fr;
+  align-items: center;
+  padding: 18px 16px;
+  transition: var(--transition);
+}
+
+.post-flat-row:hover {
+  background-color: rgba(88, 85, 78, 0.04);
+}
+
+.post-headline {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--c-dark);
+}
+
+.plat-tag {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border: 1px solid var(--c-taupe-20);
+  background: var(--c-dark);
+  color: var(--c-cream);
+}
+
+.col-p-date {
+  font-size: 12px;
+  color: var(--c-taupe);
+}
+
+.col-p-imp {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--c-dark);
+}
+
+.col-p-eng {
+  display: flex;
+  flex-direction: column;
+}
+
+.eng-rate {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--c-dark);
+}
+
+.likes-sub {
+  font-size: 10px;
+  color: var(--c-taupe);
+}
