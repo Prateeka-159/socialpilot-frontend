@@ -35,3 +35,13 @@ class PostResponse(BaseModel):
     updated_at: datetime
     class Config:
         from_attributes = True
+
+class CreateDraftRequest(BaseModel):
+    social_account_id: int
+    campaign_id: Optional[int] = None
+    title: Optional[str] = None
+    caption: Optional[str] = None
+    media_url: Optional[str] = None
+
+class ScheduleDraftRequest(BaseModel):
+    scheduled_time: datetime

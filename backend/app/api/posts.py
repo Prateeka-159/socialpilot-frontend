@@ -1,11 +1,8 @@
 from datetime import datetime, timezone
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
 from app.core.postgres import get_db
 from app.core.security import get_current_user
-
 from app.models.sql_models import (
     User,
     Post,
@@ -13,11 +10,14 @@ from app.models.sql_models import (
     Campaign,
     PostStatusEnum
 )
-
 from app.schemas.post import (
     CreatePostRequest,
-    UpdatePostRequest
+    UpdatePostRequest,
+    CreateDraftRequest,
+    ScheduleDraftRequest
+
 )
+
 
 router = APIRouter(
     prefix="/posts",
@@ -334,38 +334,29 @@ def delete_post(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-
     # Get logged-in user
     db_user = get_db_user(db, current_user)
-
     # Get post
     post = get_post_or_404(
         db,
         db_user.user_id,
         post_id
     )
-
     # Published posts cannot be deleted
     if post.status == PostStatusEnum.PUBLISHED:
         raise HTTPException(
             status_code=400,
             detail="Published posts cannot be deleted"
         )
-
     try:
-
         db.delete(post)
         db.commit()
-
     except Exception:
-
         db.rollback()
-
         raise HTTPException(
             status_code=500,
             detail="Failed to delete post"
         )
-
     return {
         "message": "Post deleted successfully",
         "deleted_post": {
@@ -374,3 +365,350 @@ def delete_post(
             "status": post.status.value
         }
     }
+
+
+@router.post("/draft", status_code=201)
+def create_draft(
+    draft: CreateDraftRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    db_user = get_db_user(db, current_user)
+
+    # Validate Social Account
+    social = (
+        db.query(SocialAccount)
+        .filter(
+            SocialAccount.social_account_id == draft.social_account_id,
+            SocialAccount.user_id == db_user.user_id
+        )
+        .first()
+    )
+
+    if not social:
+        raise HTTPException(
+            status_code=404,
+            detail="Social account not found"
+        )
+
+    # Validate Campaign
+    if draft.campaign_id:
+
+        campaign = (
+            db.query(Campaign)
+            .filter(
+                Campaign.campaign_id == draft.campaign_id,
+                Campaign.user_id == db_user.user_id
+            )
+            .first()
+        )
+
+        if not campaign:
+            raise HTTPException(
+                status_code=404,
+                detail="Campaign not found"
+            )
+
+    new_draft = Post(
+        user_id=db_user.user_id,
+        social_account_id=draft.social_account_id,
+        campaign_id=draft.campaign_id,
+        title=draft.title,
+        caption=draft.caption,
+        media_url=draft.media_url,
+        status=PostStatusEnum.DRAFT
+    )
+
+    try:
+        db.add(new_draft)
+        db.commit()
+        db.refresh(new_draft)
+
+    except Exception:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to save draft"
+        )
+
+    return {
+        "message": "Draft saved successfully",
+        "draft": {
+            "post_id": new_draft.post_id,
+            "title": new_draft.title,
+            "caption": new_draft.caption,
+            "status": new_draft.status.value,
+            "created_at": new_draft.created_at
+        }
+    }
+
+@router.get("/drafts")
+def get_all_drafts(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    db_user = get_db_user(db, current_user)
+
+    drafts = (
+        db.query(Post)
+        .filter(
+            Post.user_id == db_user.user_id,
+            Post.status == PostStatusEnum.DRAFT
+        )
+        .order_by(Post.created_at.desc())
+        .all()
+    )
+
+    return {
+        "total_drafts": len(drafts),
+        "drafts": [
+            {
+                "post_id": draft.post_id,
+                "title": draft.title,
+                "caption": draft.caption,
+                "media_url": draft.media_url,
+                "status": draft.status.value,
+                "social_account_id": draft.social_account_id,
+                "campaign_id": draft.campaign_id,
+                "created_at": draft.created_at,
+                "updated_at": draft.updated_at
+            }
+            for draft in drafts
+        ]
+    }
+
+@router.get("/drafts/{draft_id}")
+def get_single_draft(
+    draft_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    db_user = get_db_user(db, current_user)
+
+    draft = (
+        db.query(Post)
+        .filter(
+            Post.post_id == draft_id,
+            Post.user_id == db_user.user_id,
+            Post.status == PostStatusEnum.DRAFT
+        )
+        .first()
+    )
+
+    if not draft:
+        raise HTTPException(
+            status_code=404,
+            detail="Draft not found"
+        )
+
+    return {
+        "message": "Draft fetched successfully",
+        "draft": {
+            "post_id": draft.post_id,
+            "title": draft.title,
+            "caption": draft.caption,
+            "media_url": draft.media_url,
+            "status": draft.status.value,
+            "social_account_id": draft.social_account_id,
+            "campaign_id": draft.campaign_id,
+            "created_at": draft.created_at,
+            "updated_at": draft.updated_at
+        }
+    }
+
+@router.put("/drafts/{draft_id}")
+def update_draft(
+    draft_id: int,
+    data: UpdatePostRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    db_user = get_db_user(db, current_user)
+
+    draft = (
+        db.query(Post)
+        .filter(
+            Post.post_id == draft_id,
+            Post.user_id == db_user.user_id,
+            Post.status == PostStatusEnum.DRAFT
+        )
+        .first()
+    )
+
+    if not draft:
+        raise HTTPException(
+            status_code=404,
+            detail="Draft not found"
+        )
+
+    # Validate Social Account
+    if data.social_account_id is not None:
+
+        social = (
+            db.query(SocialAccount)
+            .filter(
+                SocialAccount.social_account_id == data.social_account_id,
+                SocialAccount.user_id == db_user.user_id
+            )
+            .first()
+        )
+
+        if not social:
+            raise HTTPException(
+                status_code=404,
+                detail="Social account not found"
+            )
+
+    # Validate Campaign
+    if data.campaign_id is not None:
+
+        campaign = (
+            db.query(Campaign)
+            .filter(
+                Campaign.campaign_id == data.campaign_id,
+                Campaign.user_id == db_user.user_id
+            )
+            .first()
+        )
+
+        if not campaign:
+            raise HTTPException(
+                status_code=404,
+                detail="Campaign not found"
+            )
+
+    update_data = data.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(draft, key, value)
+
+    try:
+        db.commit()
+        db.refresh(draft)
+
+    except Exception:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to update draft"
+        )
+
+    return {
+        "message": "Draft updated successfully",
+        "draft": {
+            "post_id": draft.post_id,
+            "title": draft.title,
+            "caption": draft.caption,
+            "media_url": draft.media_url,
+            "status": draft.status.value,
+            "social_account_id": draft.social_account_id,
+            "campaign_id": draft.campaign_id,
+            "updated_at": draft.updated_at
+        }
+    }
+
+@router.delete("/drafts/{draft_id}")
+def delete_draft(
+    draft_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    db_user = get_db_user(db, current_user)
+
+    draft = (
+        db.query(Post)
+        .filter(
+            Post.post_id == draft_id,
+            Post.user_id == db_user.user_id,
+            Post.status == PostStatusEnum.DRAFT
+        )
+        .first()
+    )
+
+    if not draft:
+        raise HTTPException(
+            status_code=404,
+            detail="Draft not found"
+        )
+
+    try:
+        db.delete(draft)
+        db.commit()
+
+    except Exception:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to delete draft"
+        )
+
+    return {
+        "message": "Draft deleted successfully",
+        "deleted_draft": {
+            "post_id": draft.post_id,
+            "title": draft.title,
+            "status": draft.status.value
+        }
+    }
+
+@router.post("/drafts/{draft_id}/schedule")
+def schedule_draft(
+    draft_id: int,
+    request: ScheduleDraftRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    db_user = get_db_user(db, current_user)
+
+    draft = (
+        db.query(Post)
+        .filter(
+            Post.post_id == draft_id,
+            Post.user_id == db_user.user_id,
+            Post.status == PostStatusEnum.DRAFT
+        )
+        .first()
+    )
+
+    if not draft:
+        raise HTTPException(
+            status_code=404,
+            detail="Draft not found"
+        )
+
+    # Validate scheduled time
+    if request.scheduled_time <= datetime.now(timezone.utc):
+        raise HTTPException(
+            status_code=400,
+            detail="Scheduled time must be in the future"
+        )
+
+    draft.scheduled_time = request.scheduled_time
+    draft.status = PostStatusEnum.SCHEDULED
+
+    try:
+        db.commit()
+        db.refresh(draft)
+
+    except Exception:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to schedule draft"
+        )
+
+    return {
+        "message": "Draft scheduled successfully",
+        "post": {
+            "post_id": draft.post_id,
+            "title": draft.title,
+            "caption": draft.caption,
+            "status": draft.status.value,
+            "scheduled_time": draft.scheduled_time
+        }
+    }
+
