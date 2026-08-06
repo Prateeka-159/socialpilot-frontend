@@ -8,13 +8,19 @@ from app.models.sql_models import (
     Post,
     SocialAccount,
     Campaign,
-    PostStatusEnum
+    PostStatusEnum,
+    RecurringFrequencyEnum,
+    RecurringPostRule,
+    
 )
 from app.schemas.post import (
     CreatePostRequest,
     UpdatePostRequest,
     CreateDraftRequest,
-    ScheduleDraftRequest
+    ScheduleDraftRequest,
+    CreateRecurringRequest,
+    UpdateRecurringRequest,
+    ToggleRecurringRequest
 
 )
 
@@ -712,3 +718,349 @@ def schedule_draft(
         }
     }
 
+@router.post("/{post_id}/recurring", status_code=201)
+def create_recurring_post(
+    post_id: int,
+    request: CreateRecurringRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    # Get logged-in user
+    db_user = get_db_user(db, current_user)
+
+    # Check whether post exists and belongs to current user
+    post = (
+        db.query(Post)
+        .filter(
+            Post.post_id == post_id,
+            Post.user_id == db_user.user_id
+        )
+        .first()
+    )
+
+    if not post:
+        raise HTTPException(
+            status_code=404,
+            detail="Post not found"
+        )
+
+    # Optional: Only Draft or Scheduled posts can have recurring rules
+    if post.status not in [
+        PostStatusEnum.DRAFT,
+        PostStatusEnum.SCHEDULED
+    ]:
+        raise HTTPException(
+            status_code=400,
+            detail="Recurring rule can only be created for Draft or Scheduled posts"
+        )
+
+    # Validate dates
+    if request.end_date:
+
+        if request.end_date <= request.start_date:
+
+            raise HTTPException(
+                status_code=400,
+                detail="End date must be greater than start date"
+            )
+
+    # Check duplicate recurring rule
+    existing_rule = (
+        db.query(RecurringPostRule)
+        .filter(
+            RecurringPostRule.post_id == post.post_id
+        )
+        .first()
+    )
+
+    if existing_rule:
+        raise HTTPException(
+            status_code=400,
+            detail="Recurring rule already exists for this post"
+        )
+
+    # Create recurring rule
+    recurring_rule = RecurringPostRule(
+        post_id=post.post_id,
+        frequency=request.frequency,
+        cron_expression=request.cron_expression,
+        start_date=request.start_date,
+        end_date=request.end_date,
+        is_active=True
+    )
+
+    try:
+        db.add(recurring_rule)
+        db.commit()
+        db.refresh(recurring_rule)
+
+    except Exception:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to create recurring rule"
+        )
+
+    return {
+        "message": "Recurring rule created successfully",
+        "rule": {
+            "rule_id": recurring_rule.rule_id,
+            "post_id": recurring_rule.post_id,
+            "frequency": recurring_rule.frequency.value,
+            "cron_expression": recurring_rule.cron_expression,
+            "start_date": recurring_rule.start_date,
+            "end_date": recurring_rule.end_date,
+            "is_active": recurring_rule.is_active,
+            "created_at": recurring_rule.created_at
+        }
+    }
+
+@router.get("/recurring")
+def get_all_recurring_posts(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    # Get logged-in user
+    db_user = get_db_user(db, current_user)
+
+    # Fetch all recurring rules for user's posts
+    recurring_rules = (
+        db.query(RecurringPostRule)
+        .join(Post, Post.post_id == RecurringPostRule.post_id)
+        .filter(Post.user_id == db_user.user_id)
+        .order_by(RecurringPostRule.created_at.desc())
+        .all()
+    )
+
+    return {
+        "total_rules": len(recurring_rules),
+        "rules": [
+            {
+                "rule_id": rule.rule_id,
+                "post_id": rule.post_id,
+                "frequency": rule.frequency.value,
+                "cron_expression": rule.cron_expression,
+                "start_date": rule.start_date,
+                "end_date": rule.end_date,
+                "is_active": rule.is_active,
+                "created_at": rule.created_at,
+                "updated_at": rule.updated_at
+            }
+            for rule in recurring_rules
+        ]
+    }
+
+@router.get("/recurring/{rule_id}")
+def get_recurring_rule(
+    rule_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    # Get logged-in user
+    db_user = get_db_user(db, current_user)
+
+    # Fetch recurring rule
+    rule = (
+        db.query(RecurringPostRule)
+        .join(Post, Post.post_id == RecurringPostRule.post_id)
+        .filter(
+            RecurringPostRule.rule_id == rule_id,
+            Post.user_id == db_user.user_id
+        )
+        .first()
+    )
+
+    if not rule:
+        raise HTTPException(
+            status_code=404,
+            detail="Recurring rule not found"
+        )
+
+    return {
+        "message": "Recurring rule fetched successfully",
+        "rule": {
+            "rule_id": rule.rule_id,
+            "post_id": rule.post_id,
+            "frequency": rule.frequency.value,
+            "cron_expression": rule.cron_expression,
+            "start_date": rule.start_date,
+            "end_date": rule.end_date,
+            "is_active": rule.is_active,
+            "created_at": rule.created_at,
+            "updated_at": rule.updated_at
+        }
+    } 
+
+
+@router.put("/recurring/{rule_id}")
+def update_recurring_rule(
+    rule_id: int,
+    request: UpdateRecurringRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    # Get logged-in user
+    db_user = get_db_user(db, current_user)
+
+    # Find recurring rule
+    rule = (
+        db.query(RecurringPostRule)
+        .join(Post, Post.post_id == RecurringPostRule.post_id)
+        .filter(
+            RecurringPostRule.rule_id == rule_id,
+            Post.user_id == db_user.user_id
+        )
+        .first()
+    )
+
+    if not rule:
+        raise HTTPException(
+            status_code=404,
+            detail="Recurring rule not found"
+        )
+
+    # Validate dates
+    start_date = request.start_date if request.start_date else rule.start_date
+    end_date = request.end_date if request.end_date else rule.end_date
+
+    if end_date and end_date <= start_date:
+        raise HTTPException(
+            status_code=400,
+            detail="End date must be greater than start date"
+        )
+
+    # Update only provided fields
+    update_data = request.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(rule, key, value)
+
+    try:
+        db.commit()
+        db.refresh(rule)
+
+    except Exception:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to update recurring rule"
+        )
+
+    return {
+        "message": "Recurring rule updated successfully",
+        "rule": {
+            "rule_id": rule.rule_id,
+            "post_id": rule.post_id,
+            "frequency": rule.frequency.value,
+            "cron_expression": rule.cron_expression,
+            "start_date": rule.start_date,
+            "end_date": rule.end_date,
+            "is_active": rule.is_active,
+            "updated_at": rule.updated_at
+        }
+    }
+
+@router.delete("/recurring/{rule_id}")
+def delete_recurring_rule(
+    rule_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    # Get logged-in user
+    db_user = get_db_user(db, current_user)
+
+    # Find recurring rule
+    rule = (
+        db.query(RecurringPostRule)
+        .join(Post, Post.post_id == RecurringPostRule.post_id)
+        .filter(
+            RecurringPostRule.rule_id == rule_id,
+            Post.user_id == db_user.user_id
+        )
+        .first()
+    )
+
+    if not rule:
+        raise HTTPException(
+            status_code=404,
+            detail="Recurring rule not found"
+        )
+
+    try:
+        db.delete(rule)
+        db.commit()
+
+    except Exception:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to delete recurring rule"
+        )
+
+    return {
+        "message": "Recurring rule deleted successfully",
+        "deleted_rule": {
+            "rule_id": rule.rule_id,
+            "post_id": rule.post_id,
+            "frequency": rule.frequency.value
+        }
+    }
+
+@router.patch("/recurring/{rule_id}/toggle")
+def toggle_recurring_rule(
+    rule_id: int,
+    request: ToggleRecurringRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    # Get logged-in user
+    db_user = get_db_user(db, current_user)
+
+    # Find recurring rule
+    rule = (
+        db.query(RecurringPostRule)
+        .join(Post, Post.post_id == RecurringPostRule.post_id)
+        .filter(
+            RecurringPostRule.rule_id == rule_id,
+            Post.user_id == db_user.user_id
+        )
+        .first()
+    )
+
+    if not rule:
+        raise HTTPException(
+            status_code=404,
+            detail="Recurring rule not found"
+        )
+
+    rule.is_active = request.is_active
+
+    try:
+        db.commit()
+        db.refresh(rule)
+
+    except Exception:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to update recurring rule"
+        )
+
+    return {
+        "message": (
+            "Recurring rule enabled successfully"
+            if rule.is_active
+            else "Recurring rule disabled successfully"
+        ),
+        "rule": {
+            "rule_id": rule.rule_id,
+            "post_id": rule.post_id,
+            "frequency": rule.frequency.value,
+            "is_active": rule.is_active,
+            "updated_at": rule.updated_at
+        }
+    }

@@ -58,6 +58,12 @@ class PostStatusEnum(str, enum.Enum):
     PENDING_APPROVAL = "Pending Approval"
     DRAFT = "Draft"
 
+class RecurringFrequencyEnum(str, enum.Enum):
+    DAILY = "Daily"
+    WEEKLY = "Weekly"
+    MONTHLY = "Monthly"
+    YEARLY = "Yearly"
+
 # Models
 class User(Base):
     __tablename__ = "users"

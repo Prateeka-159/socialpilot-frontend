@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
-
 from pydantic import BaseModel, Field
+from app.models.sql_models import RecurringFrequencyEnum
 
 
 class CreatePostRequest(BaseModel):
@@ -45,3 +45,19 @@ class CreateDraftRequest(BaseModel):
 
 class ScheduleDraftRequest(BaseModel):
     scheduled_time: datetime
+
+class CreateRecurringRequest(BaseModel):
+    frequency: RecurringFrequencyEnum
+    start_date: datetime
+    end_date: Optional[datetime] = None
+    cron_expression: Optional[str] = None
+
+class UpdateRecurringRequest(BaseModel):
+    frequency: Optional[RecurringFrequencyEnum] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    cron_expression: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class ToggleRecurringRequest(BaseModel):
+    is_active: bool

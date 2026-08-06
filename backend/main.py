@@ -11,6 +11,7 @@ import time
 from app.api.posts import router as posts_router
 
 
+
 app = FastAPI()
 
 app.add_middleware(
@@ -29,6 +30,7 @@ app.include_router(admin_router)
 app.include_router(users_router)
 app.include_router(social_router)
 app.include_router(posts_router)
+
 
 @app.on_event("startup")
 def startup_event():
