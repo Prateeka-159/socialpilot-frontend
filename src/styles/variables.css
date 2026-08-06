@@ -1,0 +1,44 @@
+:root {
+  /* Strictly Allowed Palette */
+  --c-cream: #f7f0e5;
+  --c-taupe: #58554e;
+  --c-dark: #27251f;
+  --c-white: #ffffff;
+
+  /* Translucent & Functional Variations */
+  --c-taupe-10: rgba(88, 85, 78, 0.1);
+  --c-taupe-20: rgba(88, 85, 78, 0.2);
+  --c-taupe-40: rgba(88, 85, 78, 0.4);
+  --c-dark-80: rgba(39, 37, 31, 0.8);
+  --c-dark-10: rgba(39, 37, 31, 0.1);
+  --c-cream-80: rgba(247, 240, 229, 0.8);
+  --c-cream-20: rgba(247, 240, 229, 0.2);
+
+  /* System Semantics mapped strictly to allowed palette */
+  --primary: var(--c-dark);
+  --primary-hover: #1a1915;
+  --sidebar-bg: var(--c-dark);
+  --sidebar-text: var(--c-cream);
+  --sidebar-muted: var(--c-taupe);
+  --background: var(--c-cream);
+  --surface: var(--c-white);
+  --border: var(--c-taupe-20);
+  --border-dark: var(--c-cream-20);
+
+  --text: var(--c-dark);
+  --text-muted: var(--c-taupe);
+  --text-light: var(--c-white);
+
+  --status-active: var(--c-dark);
+  --status-inactive: var(--c-taupe);
+
+  --font-sans: "Plus Jakarta Sans", -apple-system, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-mono: "Space Grotesk", monospace;
+
+  --navbar-height: 76px;
+  --sidebar-width: 260px;
+  --page-padding: 40px;
+
+  --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
