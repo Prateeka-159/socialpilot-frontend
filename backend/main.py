@@ -8,6 +8,8 @@ import app.models.sql_models  # noqa: F401  # Register SQLAlchemy models for tab
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import OperationalError
 import time
+from app.api.posts import router as posts_router
+
 
 app = FastAPI()
 
@@ -26,7 +28,7 @@ app.include_router(auth_router)
 app.include_router(admin_router)
 app.include_router(users_router)
 app.include_router(social_router)
-
+app.include_router(posts_router)
 
 @app.on_event("startup")
 def startup_event():
