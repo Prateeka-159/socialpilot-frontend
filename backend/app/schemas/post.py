@@ -61,3 +61,6 @@ class UpdateRecurringRequest(BaseModel):
 
 class ToggleRecurringRequest(BaseModel):
     is_active: bool
+
+class UpdateQueuePriorityRequest(BaseModel):
+    priority: int = Field(..., ge=1, le=10)

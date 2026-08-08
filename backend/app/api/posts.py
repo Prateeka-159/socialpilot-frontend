@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.postgres import get_db
 from app.core.security import get_current_user
+from app.services.queue_service import add_post_to_queue
 from app.models.sql_models import (
     User,
     Post,
@@ -133,6 +134,12 @@ def create_post(
         db.add(new_post)
         db.commit()
         db.refresh(new_post)
+        # Add scheduled post to publishing queue
+        add_post_to_queue(
+            db=db,
+            post=new_post,
+            priority=1
+        )
 
     except Exception:
 

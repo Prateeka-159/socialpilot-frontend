@@ -1,18 +1,35 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.exc import OperationalError
+
+import time
+
 from app.api.auth import router as auth_router
 from app.api.admin import router as admin_router
 from app.api.users import router as users_router
 from app.api.social_accounts import router as social_router
-from app.core.postgres import Base, engine
-import app.models.sql_models  # noqa: F401  # Register SQLAlchemy models for table creation
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.exc import OperationalError
-import time
 from app.api.posts import router as posts_router
-from app.background.scheduler import start_scheduler, stop_scheduler
+from app.api.publishing_queue import router as publishing_queue_router
+
+from app.core.postgres import Base, engine
+
+from app.background.scheduler import (
+    start_scheduler,
+    stop_scheduler
+)
+
+import app.models.sql_models  # noqa: F401
 
 
-app = FastAPI()
+app = FastAPI(
+    title="Social Media Scheduler API",
+    version="1.0.0"
+)
+
+
+# ---------------------------------------------------------
+# CORS
+# ---------------------------------------------------------
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,43 +42,78 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# ---------------------------------------------------------
+# Routers
+# ---------------------------------------------------------
+
 app.include_router(auth_router)
 app.include_router(admin_router)
 app.include_router(users_router)
 app.include_router(social_router)
 app.include_router(posts_router)
+app.include_router(publishing_queue_router)
 
+
+# ---------------------------------------------------------
+# Startup
+# ---------------------------------------------------------
 
 @app.on_event("startup")
 def startup_event():
+
+    # Database table creation / connection check
     max_attempts = 10
     delay_seconds = 2
 
     for attempt in range(1, max_attempts + 1):
+
         try:
-            Base.metadata.create_all(bind=engine)
-            return
+
+            Base.metadata.create_all(
+                bind=engine
+            )
+
+            print(
+                "[Database] PostgreSQL connected successfully."
+            )
+
+            break
+
         except OperationalError as exc:
+
             if attempt == max_attempts:
                 raise exc
 
             print(
-                f"PostgreSQL not ready yet (attempt {attempt}/{max_attempts}). "
+                f"PostgreSQL not ready yet "
+                f"(attempt {attempt}/{max_attempts}). "
                 f"Retrying in {delay_seconds} seconds..."
             )
+
             time.sleep(delay_seconds)
 
-@app.get("/")
-def root():
-    return {
-        "message": "Welcome to Social Media Scheduler API"
-    }
-
-@app.on_event("startup")
-def startup_event():
+    # Start background publishing scheduler
     start_scheduler()
 
 
+# ---------------------------------------------------------
+# Shutdown
+# ---------------------------------------------------------
+
 @app.on_event("shutdown")
 def shutdown_event():
+
     stop_scheduler()
+
+
+# ---------------------------------------------------------
+# Root
+# ---------------------------------------------------------
+
+@app.get("/")
+def root():
+
+    return {
+        "message": "Welcome to Social Media Scheduler API"
+    }
