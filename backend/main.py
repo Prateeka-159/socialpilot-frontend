@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import OperationalError
 import time
 from app.api.posts import router as posts_router
-
+from app.background.scheduler import start_scheduler, stop_scheduler
 
 
 app = FastAPI()
@@ -56,3 +56,12 @@ def root():
     return {
         "message": "Welcome to Social Media Scheduler API"
     }
+
+@app.on_event("startup")
+def startup_event():
+    start_scheduler()
+
+
+@app.on_event("shutdown")
+def shutdown_event():
+    stop_scheduler()
