@@ -1,18 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import OperationalError
-
+from app.api.publishing_logs import router as publishing_logs_router
 import time
-
 from app.api.auth import router as auth_router
 from app.api.admin import router as admin_router
 from app.api.users import router as users_router
 from app.api.social_accounts import router as social_router
 from app.api.posts import router as posts_router
 from app.api.publishing_queue import router as publishing_queue_router
-
 from app.core.postgres import Base, engine
-
 from app.background.scheduler import (
     start_scheduler,
     stop_scheduler
@@ -20,16 +17,13 @@ from app.background.scheduler import (
 
 import app.models.sql_models  # noqa: F401
 
-
 app = FastAPI(
     title="Social Media Scheduler API",
     version="1.0.0"
 )
 
 
-# ---------------------------------------------------------
 # CORS
-# ---------------------------------------------------------
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,9 +37,7 @@ app.add_middleware(
 )
 
 
-# ---------------------------------------------------------
 # Routers
-# ---------------------------------------------------------
 
 app.include_router(auth_router)
 app.include_router(admin_router)
@@ -53,12 +45,11 @@ app.include_router(users_router)
 app.include_router(social_router)
 app.include_router(posts_router)
 app.include_router(publishing_queue_router)
+app.include_router(publishing_logs_router)
 
 
-# ---------------------------------------------------------
+
 # Startup
-# ---------------------------------------------------------
-
 @app.on_event("startup")
 def startup_event():
 
@@ -97,9 +88,7 @@ def startup_event():
     start_scheduler()
 
 
-# ---------------------------------------------------------
 # Shutdown
-# ---------------------------------------------------------
 
 @app.on_event("shutdown")
 def shutdown_event():
@@ -107,10 +96,7 @@ def shutdown_event():
     stop_scheduler()
 
 
-# ---------------------------------------------------------
 # Root
-# ---------------------------------------------------------
-
 @app.get("/")
 def root():
 
