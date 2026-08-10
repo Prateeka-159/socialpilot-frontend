@@ -51,6 +51,7 @@ def _get_current_db_user(current_user, db: Session) -> User:
 
     return db_user
 
+# Frontend: Connect a new social account for the signed-in user.
 @router.post("/connect")
 def connect_account(
     account: SocialAccountRequest,
@@ -84,6 +85,7 @@ def connect_account(
         }
     }
 
+# Frontend: Fetch all connected social accounts for the current user.
 @router.get("/")
 def get_accounts(
     current_user=Depends(get_current_user),
@@ -108,6 +110,7 @@ def get_accounts(
         ]
     }
 
+# Frontend: Delete a connected social account by ID.
 @router.delete("/{account_id}")
 def delete_account(
     account_id: int,

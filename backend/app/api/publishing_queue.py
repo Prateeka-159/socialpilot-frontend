@@ -6,8 +6,9 @@ from app.core.security import get_current_user
 from app.schemas.post import UpdateQueuePriorityRequest
 from app.models.sql_models import (
     User,
+    Post,
     PublishingQueue,
-    Post
+    PostStatusEnum
 )
 
 router = APIRouter(
@@ -15,6 +16,7 @@ router = APIRouter(
     tags=["Publishing Queue"]
 )
 
+# Frontend: Get the current user's publishing queue.
 @router.get("/")
 def get_publishing_queue(
     db: Session = Depends(get_db),
@@ -69,6 +71,7 @@ def get_publishing_queue(
         ]
     }
 
+# Frontend: Fetch a single queue item by ID.
 @router.get("/{queue_id}")
 def get_queue_item(
     queue_id: int,
@@ -124,6 +127,7 @@ def get_queue_item(
         }
     }
 
+# Frontend: Update the priority of a queue item.
 @router.patch("/{queue_id}/priority")
 def update_queue_priority(
     queue_id: int,
@@ -201,6 +205,7 @@ def update_queue_priority(
         }
     }
 
+# Frontend: Cancel a queued post before it is published.
 @router.patch("/{queue_id}/cancel")
 def cancel_queue_item(
     queue_id: int,
@@ -273,12 +278,13 @@ def cancel_queue_item(
 
         db.refresh(queue_item)
 
-    except Exception:
+    except Exception as exc:
         db.rollback()
 
+        print(f"Cancel queue item error: {exc}")
         raise HTTPException(
             status_code=500,
-            detail="Failed to cancel queue item"
+            detail=str(exc)
         )
 
     return {
@@ -299,6 +305,7 @@ def cancel_queue_item(
         )
     }
 
+# Frontend: Retry a failed queue item.
 @router.post("/{queue_id}/retry")
 def retry_queue_item(
     queue_id: int,
@@ -385,8 +392,10 @@ def retry_queue_item(
 
         db.refresh(queue_item)
 
-    except Exception:
+    except Exception as exc:
         db.rollback()
+
+        print(f"Retry queue item error: {exc}")
 
         raise HTTPException(
             status_code=500,

@@ -12,6 +12,7 @@ router = APIRouter(
     prefix="/admin",
     tags=["Admin"]
 )
+# Frontend: Get admin dashboard statistics for overview screens.
 @router.get("/dashboard")
 def admin_dashboard(
     current_user=Depends(require_roles(UserRole.ADMIN)),
