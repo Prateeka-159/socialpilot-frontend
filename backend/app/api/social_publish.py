@@ -39,6 +39,7 @@ router = APIRouter(
     tags=["Social Media"]
 )
 
+# Frontend: Publish a post to its connected social platform.
 @router.post("/publish/{post_id}")
 def publish_post(
     post_id: int,

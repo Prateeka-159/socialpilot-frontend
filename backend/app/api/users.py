@@ -13,6 +13,7 @@ router = APIRouter(
     tags=["Users"]
 )
 
+# Frontend: Get the currently logged-in user's profile details.
 @router.get("/me")
 def get_my_profile(current_user=Depends(get_current_user), db: Session = Depends(get_db)):
     email = current_user["sub"]
@@ -37,6 +38,7 @@ def get_my_profile(current_user=Depends(get_current_user), db: Session = Depends
         }
     }
 
+# Frontend: Update the current user's profile information.
 @router.put("/me")
 def update_profile(
     user_data: UpdateProfileRequest,
@@ -81,6 +83,7 @@ def update_profile(
         }
     }
 
+# Frontend: List all users for admin management screens.
 @router.get("/")
 def get_all_users(
     current_user=Depends(require_roles(UserRole.ADMIN)),
@@ -103,6 +106,7 @@ def get_all_users(
 
 
 
+# Frontend: Remove a user account by email from the system.
 @router.delete("/{email}")
 def delete_user(
     email: str,

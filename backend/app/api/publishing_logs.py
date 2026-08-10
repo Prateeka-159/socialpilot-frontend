@@ -17,6 +17,7 @@ router = APIRouter(
 )
 
 
+# Frontend: Get publishing history for the current user.
 @router.get("/")
 def get_publishing_logs(
     db: Session = Depends(get_db),
@@ -71,6 +72,7 @@ def get_publishing_logs(
 
 
 
+# Frontend: Fetch one publishing log entry by ID.
 @router.get("/{log_id}")
 def get_publishing_log(
     log_id: int,
@@ -128,6 +130,7 @@ def get_publishing_log(
 
 
 # Get publishing logs for a specific post 
+# Frontend: Get all publishing attempts for a specific post.
 @router.get("/post/{post_id}")
 def get_post_publishing_logs(
     post_id: int,
@@ -196,6 +199,7 @@ def get_post_publishing_logs(
 
 
 # Get publishing logs by status
+# Frontend: Filter publishing logs by status such as SUCCESS or FAILED.
 @router.get("/status/{status}")
 def get_publishing_logs_by_status(
     status: str,

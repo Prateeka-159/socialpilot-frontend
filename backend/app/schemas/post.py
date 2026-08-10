@@ -10,7 +10,6 @@ class UpdatePostRequest(BaseModel):
     campaign_id: Optional[int] = None
     title: Optional[str] = None
     caption: Optional[str] = None
-    media_url: Optional[str] = None
     scheduled_time: Optional[datetime] = None
 
 class PostResponse(BaseModel):
@@ -34,7 +33,7 @@ class CreateDraftRequest(BaseModel):
     campaign_id: Optional[int] = None
     title: Optional[str] = None
     caption: Optional[str] = None
-    media_url: Optional[str] = None
+    
 
 class ScheduleDraftRequest(BaseModel):
     scheduled_time: datetime

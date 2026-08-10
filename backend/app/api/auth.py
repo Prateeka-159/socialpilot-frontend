@@ -33,6 +33,7 @@ router = APIRouter(
 )
 
 
+# Frontend: Register a new user account with role-based profile details.
 @router.post("/register", status_code=201)
 def register(user: RegisterRequest, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()
@@ -66,6 +67,7 @@ def register(user: RegisterRequest, db: Session = Depends(get_db)):
     }
 
 
+# Frontend: Sign in with email and password and receive a JWT token.
 @router.post("/login", response_model=TokenResponse)
 def login(user: LoginRequest, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user.email).first()
