@@ -4,13 +4,6 @@ from pydantic import BaseModel, Field
 from app.models.sql_models import RecurringFrequencyEnum
 
 
-class CreatePostRequest(BaseModel):
-    social_account_id: int
-    campaign_id: Optional[int] = None
-    title: Optional[str] = Field(None, max_length=255)
-    caption: str = Field(..., min_length=1)
-    media_url: Optional[str] = None   
-    scheduled_time: datetime
 
 class UpdatePostRequest(BaseModel):
     social_account_id: Optional[int] = None

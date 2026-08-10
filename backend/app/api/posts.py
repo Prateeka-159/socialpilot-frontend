@@ -4,6 +4,15 @@ from sqlalchemy.orm import Session
 from app.core.postgres import get_db
 from app.core.security import get_current_user
 from app.services.queue_service import add_post_to_queue
+from typing import Optional
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    UploadFile,
+    File,
+    Form,
+)
 from app.models.sql_models import (
     User,
     Post,
@@ -15,7 +24,6 @@ from app.models.sql_models import (
     
 )
 from app.schemas.post import (
-    CreatePostRequest,
     UpdatePostRequest,
     CreateDraftRequest,
     ScheduleDraftRequest,
@@ -72,24 +80,32 @@ def get_post_or_404(
 
 
 @router.post("/", status_code=201)
-def create_post(
-    post: CreatePostRequest,
+async def create_post(
+    social_account_id: int = Form(...),
+    campaign_id: Optional[int] = Form(None),
+    title: Optional[str] = Form(None),
+    caption: str = Form(...),
+    scheduled_time: datetime = Form(...),
+    image: Optional[UploadFile] = File(None),
+
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-
+    # Get logged-in user
     db_user = get_db_user(db, current_user)
 
-    if post.scheduled_time <= datetime.now(timezone.utc):
+    # Validate scheduled time
+    if scheduled_time <= datetime.now(timezone.utc):
         raise HTTPException(
             status_code=400,
             detail="Scheduled time must be in the future"
         )
 
+    # Validate social account
     social = (
         db.query(SocialAccount)
         .filter(
-            SocialAccount.social_account_id == post.social_account_id,
+            SocialAccount.social_account_id == social_account_id,
             SocialAccount.user_id == db_user.user_id
         )
         .first()
@@ -101,12 +117,13 @@ def create_post(
             detail="Social account not found"
         )
 
-    if post.campaign_id:
+    # Validate campaign
+    if campaign_id:
 
         campaign = (
             db.query(Campaign)
             .filter(
-                Campaign.campaign_id == post.campaign_id,
+                Campaign.campaign_id == campaign_id,
                 Campaign.user_id == db_user.user_id
             )
             .first()
@@ -118,22 +135,63 @@ def create_post(
                 detail="Campaign not found"
             )
 
+    # Process image
+    image_data = None
+    image_name = None
+    image_type = None
+
+    if image:
+
+        allowed_types = {
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        }
+
+        if image.content_type not in allowed_types:
+            raise HTTPException(
+                status_code=400,
+                detail="Only JPEG, PNG and WEBP images are allowed"
+            )
+
+        image_data = await image.read()
+
+        # Maximum image size = 5 MB
+        max_size = 5 * 1024 * 1024
+
+        if len(image_data) > max_size:
+            raise HTTPException(
+                status_code=400,
+                detail="Image size must be less than 5 MB"
+            )
+
+        image_name = image.filename
+        image_type = image.content_type
+
+    # Create post
     new_post = Post(
         user_id=db_user.user_id,
-        social_account_id=post.social_account_id,
-        campaign_id=post.campaign_id,
-        title=post.title,
-        caption=post.caption,
-        media_url=post.media_url,
-        scheduled_time=post.scheduled_time,
+        social_account_id=social_account_id,
+        campaign_id=campaign_id,
+        title=title,
+        caption=caption,
+
+        # Image stored in database
+        image_data=image_data,
+        image_name=image_name,
+        image_type=image_type,
+
+        scheduled_time=scheduled_time,
         status=PostStatusEnum.SCHEDULED
     )
 
+    # Save post + queue
     try:
 
         db.add(new_post)
         db.commit()
         db.refresh(new_post)
+
         # Add scheduled post to publishing queue
         add_post_to_queue(
             db=db,
@@ -141,30 +199,39 @@ def create_post(
             priority=1
         )
 
-    except Exception:
+    except Exception as exc:
 
         db.rollback()
+
+        print(f"Create post error: {exc}")
 
         raise HTTPException(
             status_code=500,
             detail="Failed to create post"
         )
 
+    # Response
     return {
         "message": "Post scheduled successfully",
+
         "post": {
             "post_id": new_post.post_id,
             "title": new_post.title,
             "caption": new_post.caption,
-            "media_url": new_post.media_url,
+
+            "image_name": new_post.image_name,
+            "image_type": new_post.image_type,
+            "has_image": new_post.image_data is not None,
+
             "status": new_post.status.value,
             "scheduled_time": new_post.scheduled_time,
+
             "social_account_id": new_post.social_account_id,
             "campaign_id": new_post.campaign_id,
+
             "created_at": new_post.created_at
         }
     }
-
 
 @router.get("/")
 def get_posts(
