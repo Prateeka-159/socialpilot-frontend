@@ -7,25 +7,81 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import "./Dashboard.css";
 
 function Dashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const stats = [
-    {
-      title: "AGGREGATE AUDIENCE",
-      value: "12.4K",
-      change: "+14.2% growth",
-      icon: <Users size={20} />,
-    },
-    {
-      title: "AVERAGE ENGAGEMENT",
-      value: "8.6%",
-      change: "+1.8% benchmark",
-      icon: <BarChart3 size={20} />,
-    },
-  ];
+  let stats = [];
+  if (user.role === "Administrator") {
+    stats = [
+      {
+        title: "TOTAL USERS",
+        value: "125",
+        change: "+8 New Users",
+        icon: <Users size={20} />,
+      },
+      {
+        title: "SYSTEM HEALTH",
+        value: "99.9%",
+        change: "Operational",
+        icon: <Activity size={20} />,
+      },
+    ];
+  }
+
+  else if (user.role === "Business User") {
+    stats = [
+      {
+        title: "CONNECTED BRANDS",
+        value: "12",
+        change: "+2 this month",
+        icon: <Users size={20} />,
+      },
+      {
+        title: "ACTIVE CAMPAIGNS",
+        value: "8",
+        change: "Running",
+        icon: <BarChart3 size={20} />,
+      },
+    ];
+  }
+
+  else if (user.role === "Marketing Team") {
+    stats = [
+      {
+        title: "CAMPAIGNS",
+        value: "24",
+        change: "6 Scheduled",
+        icon: <BarChart3 size={20} />,
+      },
+      {
+        title: "ENGAGEMENT",
+        value: "12.8%",
+        change: "+3%",
+        icon: <TrendingUp size={20} />,
+      },
+    ];
+  }
+
+  else {
+    stats = [
+      {
+        title: "DRAFT POSTS",
+        value: "18",
+        change: "5 Pending Review",
+        icon: <Sparkles size={20} />,
+      },
+      {
+        title: "SCHEDULED POSTS",
+        value: "42",
+        change: "This Week",
+        icon: <BarChart3 size={20} />,
+      },
+    ];
+  }
 
   const recentActivity = [
     {
@@ -81,9 +137,9 @@ function Dashboard() {
       <div className="dash-hero-header hairline-b">
         <div className="dash-header-titles">
           <span className="eyebrow-text font-mono">AUTOMATE YOUR POST</span>
-          <h1 className="dash-title font-serif">Social Media Dashboard</h1>
+          <h1 className="dash-title font-serif">Welcome, {user.name}</h1>
           <p className="dash-subtitle">
-            Curating your digital voice through continuous editorial scheduling and high-fidelity metrics.
+            Logged in as <strong>{user.role}</strong>
           </p>
         </div>
       </div>

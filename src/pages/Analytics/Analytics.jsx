@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { BarChart3, PieChart as PieIcon, Layers } from "lucide-react";
 import "./Analytics.css";
+import { useAuth } from "../../context/AuthContext";
 
 // Initial list of published posts with metrics
 const initialPosts = [
@@ -93,6 +94,7 @@ function CustomTooltip({ active, payload, label }) {
 }
 
 function Analytics() {
+  const { user } = useAuth();
   const [selectedPlatform, setSelectedPlatform] = useState("ALL");
   const postsList = initialPosts;
 
@@ -160,9 +162,12 @@ function Analytics() {
       <div className="page-header hairline-b">
         <div>
           <span className="eyebrow-text font-mono">PERFORMANCE AUDIT</span>
-          <h1 className="page-title font-serif">Analytics & Intelligence</h1>
+          <h1 className="page-title font-serif">
+              {user.role} Analytics
+          </h1>
+
           <p className="page-subtitle">
-            Auditing cross-network growth trajectories and engagement benchmarks.
+              Welcome {user.name}. Showing analytics available for the {user.role} role.
           </p>
         </div>
 
@@ -189,21 +194,151 @@ function Analytics() {
 
       {/* Dynamic Top Stat Highlights (NO BOX CARDS) */}
       <div className="analytics-metrics-row hairline-b">
-        <div className="metric-box">
-          <span className="m-tag font-mono">POSTS MADE</span>
-          <span className="m-number font-serif">{totalPostsCount}</span>
-          <span className="m-sub font-mono">Published on selected platform(s)</span>
-        </div>
-        <div className="metric-box">
-          <span className="m-tag font-mono">AVG ENGAGEMENT RATE</span>
-          <span className="m-number font-serif">{avgEngagement}</span>
-          <span className="m-sub font-mono">Calculated across selected posts</span>
-        </div>
-        <div className="metric-box">
-          <span className="m-tag font-mono">TOTAL IMPRESSIONS</span>
-          <span className="m-number font-serif">{totalImpressionsSum}</span>
-          <span className="m-sub font-mono">Cumulative reach count</span>
-        </div>
+
+        {user.role === "Administrator" && (
+          <>
+            <div className="metric-box">
+              <span className="m-tag font-mono">TOTAL USERS</span>
+              <span className="m-number font-serif">125</span>
+              <span className="m-sub font-mono">
+                Registered users
+              </span>
+            </div>
+
+            <div className="metric-box">
+              <span className="m-tag font-mono">ACTIVE USERS</span>
+              <span className="m-number font-serif">84</span>
+              <span className="m-sub font-mono">
+                Online today
+              </span>
+            </div>
+
+            <div className="metric-box">
+              <span className="m-tag font-mono">SYSTEM HEALTH</span>
+              <span className="m-number font-serif">99.9%</span>
+              <span className="m-sub font-mono">
+                Platform uptime
+              </span>
+            </div>
+          </>
+        )}
+
+        {user.role === "Business User" && (
+          <>
+            <div className="metric-box">
+              <span className="m-tag font-mono">TOTAL POSTS</span>
+              <span className="m-number font-serif">{totalPostsCount}</span>
+              <span className="m-sub font-mono">
+                Published posts
+              </span>
+            </div>
+
+            <div className="metric-box">
+              <span className="m-tag font-mono">
+                ENGAGEMENT
+              </span>
+              <span className="m-number font-serif">
+                {avgEngagement}
+              </span>
+              <span className="m-sub font-mono">
+                Average rate
+              </span>
+            </div>
+
+            <div className="metric-box">
+              <span className="m-tag font-mono">
+                IMPRESSIONS
+              </span>
+              <span className="m-number font-serif">
+                {totalImpressionsSum}
+              </span>
+              <span className="m-sub font-mono">
+                Total reach
+              </span>
+            </div>
+          </>
+        )}
+
+        {user.role === "Marketing Team" && (
+          <>
+            <div className="metric-box">
+              <span className="m-tag font-mono">
+                ACTIVE CAMPAIGNS
+              </span>
+              <span className="m-number font-serif">
+                12
+              </span>
+              <span className="m-sub font-mono">
+                Running now
+              </span>
+            </div>
+
+            <div className="metric-box">
+              <span className="m-tag font-mono">
+                REACH
+              </span>
+              <span className="m-number font-serif">
+                248K
+              </span>
+              <span className="m-sub font-mono">
+                Campaign audience
+              </span>
+            </div>
+
+            <div className="metric-box">
+              <span className="m-tag font-mono">
+                CONVERSIONS
+              </span>
+              <span className="m-number font-serif">
+                1,240
+              </span>
+              <span className="m-sub font-mono">
+                Successful conversions
+              </span>
+            </div>
+          </>
+        )}
+
+        {user.role === "Content Creator" && (
+          <>
+            <div className="metric-box">
+              <span className="m-tag font-mono">
+                POSTS CREATED
+              </span>
+              <span className="m-number font-serif">
+                {totalPostsCount}
+              </span>
+              <span className="m-sub font-mono">
+                Created by you
+              </span>
+            </div>
+
+            <div className="metric-box">
+              <span className="m-tag font-mono">
+                ENGAGEMENT
+              </span>
+              <span className="m-number font-serif">
+                {avgEngagement}
+              </span>
+              <span className="m-sub font-mono">
+                Personal engagement
+              </span>
+            </div>
+
+            <div className="metric-box">
+              <span className="m-tag font-mono">
+                IMPRESSIONS
+              </span>
+              <span className="m-number font-serif">
+                {totalImpressionsSum}
+              </span>
+              <span className="m-sub font-mono">
+                Personal reach
+              </span>
+            </div>
+          </>
+        )}
+
       </div>
 
       {/* Dynamic Graphs Section */}
@@ -288,10 +423,10 @@ function Analytics() {
         <div className="section-title-row hairline-b">
           <div className="title-with-icon">
             <Layers size={20} />
-            <h2 className="section-heading font-serif">Posts Published Audit Log</h2>
+            <h2 className="section-heading font-serif">{user.role} Activity</h2>
           </div>
           <span className="section-count font-mono">
-            SHOWING {filteredPosts.length} POST RECORD(S)
+            {user.role} • {filteredPosts.length} RECORDS
           </span>
         </div>
 

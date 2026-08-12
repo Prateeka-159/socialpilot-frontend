@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Mail,
   Shield,
@@ -8,17 +8,49 @@ import {
   Check,
 } from "lucide-react";
 import "./Profile.css";
+import { useAuth } from "../../context/AuthContext";
+
+import {
+  getProfile,
+  updateProfile,
+} from "../../services/profileService";
 
 function Profile() {
+  const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [profile, setProfile] = useState({
-    name: "Alex Vance",
-    role: "Head of Social Media Architecture",
-    email: "alex.vance@studio-sp.com",
-    phone: "+1 (555) 234-8901",
-    location: "New York, USA // Studio HQ",
-    bio: "Curating multi-platform editorial presence, high-velocity campaign scheduling, and visual brand identity.",
+    name: user.name,
+    role: user.role,
+    email: user.email,
+    phone: user.phone,
+    location: user.location,
+    bio: user.bio,
   });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getProfile();
+
+        setProfile({
+          name: data.user.name || "",
+          email: data.user.email || "",
+          role: data.user.role || "",
+          phone: data.user.phone || "",
+          location: data.user.location || "",
+          bio: data.user.bio || "",
+        });
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleSave = () => {
     setIsEditing(false);
