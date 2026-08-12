@@ -1,0 +1,131 @@
+.campaigns-page {
+  padding: 32px;
+  background-color: #f9f8f6;
+  min-height: 100vh;
+  box-sizing: border-box;
+  color: #111111;
+  font-family: inherit;
+}
+
+.campaigns-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.section-label {
+  font-size: 11px;
+  font-family: monospace;
+  letter-spacing: 0.1em;
+  color: #555555;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.campaigns-header h2 {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 4px 0 0 0;
+  letter-spacing: -0.02em;
+}
+
+.campaigns-header p {
+  font-size: 14px;
+  color: #555555;
+  margin-top: 4px;
+}
+
+.create-btn {
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.campaigns-search-bar {
+  margin-bottom: 20px;
+}
+
+.campaigns-search-bar input {
+  width: 100%;
+  max-width: 480px;
+  padding: 12px 16px;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  background-color: #f0eee9;
+  font-size: 14px;
+  outline: none;
+}
+
+.campaigns-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.campaign-card {
+  background-color: #eeebe3;
+  border: 1px solid #e2ded5;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.campaign-card:hover {
+  background-color: #e6e2d7;
+  transform: translateY(-1px);
+}
+
+.card-info h3 {
+  margin: 0 0 6px 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.card-info p {
+  margin: 0;
+  font-size: 13px;
+  color: #666666;
+}
+
+.card-info span {
+  font-weight: 600;
+  color: #222222;
+}
+
+.card-badge {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.status-pill {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.status-pill.active {
+  background-color: #e6f4ea;
+  color: #137333;
+}
+
+.status-pill.scheduled {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.arrow {
+  font-size: 18px;
+  color: #888888;
+}

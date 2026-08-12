@@ -5,6 +5,7 @@ import {
   Send,
   Sparkles,
   Layers,
+  CheckCircle,
 } from "lucide-react";
 import { FaLinkedin, FaInstagram, FaFacebook } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
@@ -16,8 +17,9 @@ function Scheduler() {
     "Synthesizing architectural rhythm and structural minimalism across urban spaces. New series launching tomorrow."
   );
   const [selectedPlatforms, setSelectedPlatforms] = useState(["linkedin", "instagram"]);
-  const [scheduledDate, setScheduledDate] = useState("2026-07-30");
+  const [scheduledDate, setScheduledDate] = useState("2026-08-15");
   const [scheduledTime, setScheduledTime] = useState("18:00");
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const publicImages = [
     { id: 1, src: "/biking-over-bridge.jpg", name: "Biking over Bridge" },
@@ -25,7 +27,7 @@ function Scheduler() {
     { id: 3, src: "/ripples-of-sand-in-black-and-white.jpg", name: "Ripples of Sand" },
   ];
 
-  const queuedPosts = [
+  const [queuedPosts, setQueuedPosts] = useState([
     {
       id: 101,
       date: "TOMORROW, 18:00 UTC",
@@ -36,7 +38,7 @@ function Scheduler() {
     },
     {
       id: 102,
-      date: "AUG 01, 12:30 UTC",
+      date: "AUG 12, 12:30 UTC",
       platforms: [<FaInstagram key="i" />, <FaXTwitter key="x" />],
       caption: "Monochrome textures in organic movement: Sand ripples and temporal geometry.",
       image: "/ripples-of-sand-in-black-and-white.jpg",
@@ -44,13 +46,13 @@ function Scheduler() {
     },
     {
       id: 103,
-      date: "AUG 03, 09:00 UTC",
+      date: "AUG 14, 09:00 UTC",
       platforms: [<FaLinkedin key="l" />, <FaFacebook key="f" />],
       caption: "Case study preview on modern workflow frameworks and studio delegation.",
       image: "/images.jpg",
       status: "DRAFT",
     },
-  ];
+  ]);
 
   const togglePlatform = (key) => {
     setSelectedPlatforms((prev) =>
@@ -58,9 +60,41 @@ function Scheduler() {
     );
   };
 
+  const getPlatformIcon = (key) => {
+    switch (key) {
+      case "linkedin":
+        return <FaLinkedin key="l" />;
+      case "instagram":
+        return <FaInstagram key="i" />;
+      case "facebook":
+        return <FaFacebook key="f" />;
+      case "twitter":
+        return <FaXTwitter key="x" />;
+      default:
+        return null;
+    }
+  };
+
   const handleQueuePost = (e) => {
     e.preventDefault();
-    alert("Post added to SP Studio queue successfully!");
+
+    if (selectedPlatforms.length === 0) {
+      alert("Please select at least one platform.");
+      return;
+    }
+
+    const newPost = {
+      id: Date.now(),
+      date: `${scheduledDate}, ${scheduledTime} UTC`,
+      platforms: selectedPlatforms.map((p) => getPlatformIcon(p)),
+      caption: caption,
+      image: selectedMedia,
+      status: "QUEUED",
+    };
+
+    setQueuedPosts([newPost, ...queuedPosts]);
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 3000);
   };
 
   return (
@@ -76,13 +110,20 @@ function Scheduler() {
         </div>
 
         <div className="header-meta font-mono">
-          <span>ACTIVE QUEUE: 03 POSTS</span>
+          <span>ACTIVE QUEUE: {String(queuedPosts.length).padStart(2, "0")} POSTS</span>
           <span>·</span>
           <span>NEXT: TOMORROW 18:00 UTC</span>
         </div>
       </div>
 
-      {/* Scheduler Split Studio Canvas (No Box Cards) */}
+      {showSuccess && (
+        <div className="success-toast font-mono">
+          <CheckCircle size={16} />
+          <span>Post scheduled and appended to current queue successfully!</span>
+        </div>
+      )}
+
+      {/* Scheduler Split Studio Canvas */}
       <div className="scheduler-grid">
         {/* Left Column: Composer Studio */}
         <div className="composer-column hairline-r">
@@ -143,12 +184,13 @@ function Scheduler() {
                 onChange={(e) => setCaption(e.target.value)}
                 placeholder="Write your editorial caption here..."
                 className="bare-textarea hairline-b"
+                required
               />
             </div>
 
             {/* Media Asset Selector */}
             <div className="form-section">
-              <span className="form-label font-mono">TOPIC TO POST ABOUT</span>
+              <span className="form-label font-mono">SELECT ATTACHED MEDIA</span>
               <div className="media-selector-grid">
                 {publicImages.map((img) => (
                   <div
@@ -174,6 +216,7 @@ function Scheduler() {
                     value={scheduledDate}
                     onChange={(e) => setScheduledDate(e.target.value)}
                     className="bare-input"
+                    required
                   />
                 </div>
               </div>
@@ -187,6 +230,7 @@ function Scheduler() {
                     value={scheduledTime}
                     onChange={(e) => setScheduledTime(e.target.value)}
                     className="bare-input"
+                    required
                   />
                 </div>
               </div>
@@ -226,7 +270,7 @@ function Scheduler() {
                     <span className={`status-pill ${post.status.toLowerCase()}`}>
                       {post.status}
                     </span>
-                    <button className="queue-edit-link">Edit Post →</button>
+                    <button type="button" className="queue-edit-link">Edit Post →</button>
                   </div>
                 </div>
               </div>

@@ -7,7 +7,8 @@ import {
   Calendar,
   LogOut,
   FileText,
-  ListOrdered
+  ListOrdered,
+  Megaphone
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import Logo from "../common/Logo";
@@ -23,6 +24,7 @@ function Sidebar() {
     { name: "Calendar", path: "/calendar", icon: <Calendar size={18} /> },
     { name: "Queue", path: "/queue", icon: <ListOrdered size={18} /> },
     { name: "Analytics", path: "/analytics", icon: <BarChart3 size={18} /> },
+    { name: "Campaigns", path: "/campaigns", icon: <Megaphone size={18} /> },
     { name: "Profile", path: "/profile", icon: <User size={18} /> },
     { name: "Settings", path: "/settings", icon: <Settings size={18} /> },
   ];
