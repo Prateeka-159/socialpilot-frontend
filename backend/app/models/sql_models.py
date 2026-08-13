@@ -132,6 +132,17 @@ class SocialAccount(Base):
 
     social_account_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
+    user = relationship("User", back_populates="social_accounts")
+    posts = relationship(
+        "Post",
+        back_populates="social_account",
+        cascade="all, delete-orphan"
+    )
+    audience_growth = relationship(
+        "AudienceGrowth",
+        back_populates="social_account",
+        cascade="all, delete-orphan"
+    )
     platform_name = Column(SQLEnum(PlatformEnum), nullable=False)
     platform_user_id = Column(String(100), nullable=False)
     username = Column(String(100), nullable=False)
@@ -154,6 +165,18 @@ class Campaign(Base):
 
     campaign_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
+    user = relationship("User", back_populates="campaigns")
+    posts = relationship("Post", back_populates="campaign")
+    performance = relationship(
+        "CampaignPerformance",
+        back_populates="campaign",
+        cascade="all, delete-orphan"
+    )
+    roi_records = relationship(
+        "CampaignROI",
+        back_populates="campaign",
+        cascade="all, delete-orphan"
+    )
     campaign_name = Column(String(100), nullable=False)
     objective = Column(String(255), nullable=True)
     budget = Column(Numeric(12, 2), nullable=True)
@@ -279,3 +302,207 @@ class RecurringPostRule(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
     post = relationship("Post", back_populates="recurring_rules")
+
+
+class CampaignPerformance(Base):
+    __tablename__ = "campaign_performance"
+
+    performance_id = Column(
+        Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+
+    campaign_id = Column(
+        Integer,
+        ForeignKey("campaigns.campaign_id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    platform = Column(
+        SQLEnum(CampaignPlatformEnum),
+        nullable=False
+    )
+
+    impressions = Column(BigInteger, default=0, nullable=False)
+    reach = Column(BigInteger, default=0, nullable=False)
+    likes = Column(Integer, default=0, nullable=False)
+    comments = Column(Integer, default=0, nullable=False)
+    shares = Column(Integer, default=0, nullable=False)
+    clicks = Column(Integer, default=0, nullable=False)
+    saves = Column(Integer, default=0, nullable=False)
+    video_views = Column(BigInteger, default=0, nullable=False)
+
+    engagement_rate = Column(
+        Numeric(8, 2),
+        default=0,
+        nullable=False
+    )
+
+    conversions = Column(Integer, default=0, nullable=False)
+
+    record_date = Column(
+        Date,
+        server_default=func.current_date(),
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False
+    )
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False
+    )
+
+    campaign = relationship(
+        "Campaign",
+        back_populates="performance"
+    )
+
+
+class AudienceGrowth(Base):
+    __tablename__ = "audience_growth"
+
+    audience_growth_id = Column(
+        Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+
+    social_account_id = Column(
+        Integer,
+        ForeignKey(
+            "social_accounts.social_account_id",
+            ondelete="CASCADE"
+        ),
+        nullable=False
+    )
+
+    record_date = Column(
+        Date,
+        server_default=func.current_date(),
+        nullable=False
+    )
+
+    followers_count = Column(
+        BigInteger,
+        default=0,
+        nullable=False
+    )
+
+    followers_gained = Column(
+        Integer,
+        default=0,
+        nullable=False
+    )
+
+    followers_lost = Column(
+        Integer,
+        default=0,
+        nullable=False
+    )
+
+    net_growth = Column(
+        Integer,
+        default=0,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False
+    )
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False
+    )
+
+    social_account = relationship(
+        "SocialAccount",
+        back_populates="audience_growth"
+    )
+
+
+class CampaignROI(Base):
+    __tablename__ = "campaign_roi"
+
+    roi_id = Column(
+        Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+
+    campaign_id = Column(
+        Integer,
+        ForeignKey(
+            "campaigns.campaign_id",
+            ondelete="CASCADE"
+        ),
+        nullable=False
+    )
+
+    total_spend = Column(
+        Numeric(12, 2),
+        default=0,
+        nullable=False
+    )
+
+    revenue = Column(
+        Numeric(12, 2),
+        default=0,
+        nullable=False
+    )
+
+    conversions = Column(
+        Integer,
+        default=0,
+        nullable=False
+    )
+
+    cost_per_conversion = Column(
+        Numeric(12, 2),
+        default=0,
+        nullable=False
+    )
+
+    roi_percentage = Column(
+        Numeric(8, 2),
+        default=0,
+        nullable=False
+    )
+
+    record_date = Column(
+        Date,
+        server_default=func.current_date(),
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False
+    )
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False
+    )
+
+    campaign = relationship(
+        "Campaign",
+        back_populates="roi_records"
+    )
+
+
