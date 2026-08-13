@@ -21,6 +21,7 @@ from app.models.sql_models import (
     PostStatusEnum,
     RecurringFrequencyEnum,
     RecurringPostRule,
+    PublishingQueue,
     
 )
 from app.schemas.post import (
@@ -962,6 +963,7 @@ def delete_draft(
     }
 
 # Frontend: Schedule a draft post for future publishing.
+# Frontend: Schedule a draft post for future publishing.
 @router.post("/drafts/{draft_id}/schedule")
 def schedule_draft(
     draft_id: int,
@@ -994,10 +996,33 @@ def schedule_draft(
             detail="Scheduled time must be in the future"
         )
 
-    draft.scheduled_time = request.scheduled_time
-    draft.status = PostStatusEnum.SCHEDULED
-
     try:
+        # Update post
+        draft.scheduled_time = request.scheduled_time
+        draft.status = PostStatusEnum.SCHEDULED
+
+        # Check whether queue item already exists
+        existing_queue = (
+            db.query(PublishingQueue)
+            .filter(
+                PublishingQueue.post_id == draft.post_id,
+                PublishingQueue.status == "QUEUED"
+            )
+            .first()
+        )
+
+        # Add to publishing queue if not already queued
+        if not existing_queue:
+            queue_item = PublishingQueue(
+                post_id=draft.post_id,
+                priority=1,
+                attempts=0,
+                scheduled_at=request.scheduled_time,
+                status="QUEUED"
+            )
+
+            db.add(queue_item)
+
         db.commit()
         db.refresh(draft)
 
@@ -1020,6 +1045,7 @@ def schedule_draft(
         }
     }
 
+    
 # Frontend: Create a recurring posting rule for an existing post.
 @router.post("/{post_id}/recurring", status_code=201)
 def create_recurring_post(
