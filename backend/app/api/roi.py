@@ -133,7 +133,8 @@ def get_campaign_roi(
     }
 
 
-@router.get("/compare")
+# Frontend: Compare ROI across multiple campaigns for benchmarking and reporting.
+@router.get("/compare")  
 def compare_campaign_roi(
     campaign_ids: list[int] = Query(...),
     db: Session = Depends(get_db),

@@ -19,6 +19,7 @@ router = APIRouter(
 )
 
 
+# Frontend: Generate a full campaign report with totals, engagement, and summary metrics.
 @router.get("/campaigns/{campaign_id}")
 def get_campaign_report(
     campaign_id: int,
@@ -222,6 +223,7 @@ def get_campaign_report(
         }
     }
 
+# Frontend: Get a compact campaign summary for dashboard cards and overview widgets.
 @router.get("/campaigns/{campaign_id}/summary")
 def get_campaign_summary(
     campaign_id: int,

@@ -22,6 +22,7 @@ router = APIRouter(
     tags=["Campaigns"]
 )
 
+# Frontend: Create a new campaign with objectives, dates, and platform targeting.
 @router.post("/")
 def create_campaign(
     data: CampaignCreateRequest,
@@ -85,6 +86,7 @@ def create_campaign(
         }
     }
 
+# Frontend: List all campaigns for the signed-in user.
 @router.get("/")
 def get_all_campaigns(
     db: Session = Depends(get_db),
@@ -131,6 +133,7 @@ def get_all_campaigns(
     }
 
 
+# Frontend: Get a campaign summary with total reach, engagement, and performance metrics.
 @router.get("/{campaign_id}/tracking/summary")
 def get_campaign_tracking_summary(
     campaign_id: int,
@@ -240,6 +243,7 @@ def get_campaign_tracking_summary(
     }
 
 
+# Frontend: Get time-series performance data for a campaign.
 @router.get("/{campaign_id}/performance")
 def get_campaign_performance(
     campaign_id: int,
@@ -308,6 +312,7 @@ def get_campaign_performance(
         ]
     }
 
+# Frontend: Get detailed tracking metrics for the campaign over time.
 @router.get("/{campaign_id}/tracking")
 def get_campaign_tracking(
     campaign_id: int,
@@ -383,6 +388,7 @@ def get_campaign_tracking(
     }
 
 
+# Frontend: Fetch a single campaign record and its metadata.
 @router.get("/{campaign_id}")
 def get_campaign(
     campaign_id: int,
@@ -432,6 +438,7 @@ def get_campaign(
         }
     }
 
+# Frontend: Update campaign fields such as budget, dates, and objective.
 @router.put("/{campaign_id}")
 def update_campaign(
     campaign_id: int,
@@ -514,6 +521,7 @@ def update_campaign(
         }
     }
 
+# Frontend: Delete a campaign after confirmation from the current user.
 @router.delete("/{campaign_id}")
 def delete_campaign(
     campaign_id: int,

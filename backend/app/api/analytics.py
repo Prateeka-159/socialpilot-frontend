@@ -20,6 +20,7 @@ router = APIRouter(
 )
 
 
+# Frontend: Get historical analytics for one post across all recorded dates.
 @router.get("/posts/{post_id}")
 def get_post_analytics(
     post_id: int,
@@ -92,6 +93,7 @@ def get_post_analytics(
     }
 
 
+# Frontend: Get total engagement metrics and engagement rate for one post.
 @router.get("/posts/{post_id}/engagement")
 def get_post_engagement(
     post_id: int,
@@ -177,6 +179,7 @@ def get_post_engagement(
         }
     }
 
+# Frontend: Get aggregated campaign engagement metrics across all linked posts.
 @router.get("/campaigns/{campaign_id}/engagement")
 def get_campaign_engagement(
     campaign_id: int,
@@ -279,6 +282,7 @@ def get_campaign_engagement(
     }
 
 
+# Frontend: Get follower growth history for a connected social account.
 @router.get("/social-accounts/{social_account_id}/audience-growth")
 def get_audience_growth(
     social_account_id: int,
@@ -342,6 +346,7 @@ def get_audience_growth(
         ]
     }
 
+# Frontend: Get performance records for a campaign over time.
 @router.get("/campaigns/{campaign_id}/performance")
 def get_campaign_performance(
     campaign_id: int,
