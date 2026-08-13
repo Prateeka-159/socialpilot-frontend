@@ -17,7 +17,7 @@ from app.background.scheduler import (
 from app.api.campaigns import router as campaigns_router
 import app.models.sql_models  # noqa: F401
 from app.api.analytics import router as analytics_router
-
+from app.api.reports import router as reports_router
 
 app = FastAPI(
     title="Social Media Scheduler API",
@@ -50,7 +50,7 @@ app.include_router(publishing_queue_router)
 app.include_router(publishing_logs_router)
 app.include_router(campaigns_router)
 app.include_router(analytics_router)
-
+app.include_router(reports_router)
 
 # Startup
 @app.on_event("startup")
