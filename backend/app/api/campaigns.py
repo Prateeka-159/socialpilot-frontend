@@ -6,6 +6,7 @@ from app.core.security import get_current_user
 
 from app.models.sql_models import (
     Campaign,
+    CampaignPerformance,
     CampaignStatusEnum,
     User
 )
@@ -128,6 +129,259 @@ def get_all_campaigns(
             for campaign in campaigns
         ]
     }
+
+
+@router.get("/{campaign_id}/tracking/summary")
+def get_campaign_tracking_summary(
+    campaign_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    db_user = (
+        db.query(User)
+        .filter(User.email == current_user["sub"])
+        .first()
+    )
+
+    if not db_user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    campaign = (
+        db.query(Campaign)
+        .filter(
+            Campaign.campaign_id == campaign_id,
+            Campaign.user_id == db_user.user_id
+        )
+        .first()
+    )
+
+    if not campaign:
+        raise HTTPException(
+            status_code=404,
+            detail="Campaign not found"
+        )
+
+    performance = (
+        db.query(CampaignPerformance)
+        .filter(
+            CampaignPerformance.campaign_id == campaign_id
+        )
+        .all()
+    )
+
+    total_impressions = sum(
+        item.impressions or 0 for item in performance
+    )
+
+    total_reach = sum(
+        item.reach or 0 for item in performance
+    )
+
+    total_likes = sum(
+        item.likes or 0 for item in performance
+    )
+
+    total_comments = sum(
+        item.comments or 0 for item in performance
+    )
+
+    total_shares = sum(
+        item.shares or 0 for item in performance
+    )
+
+    total_clicks = sum(
+        item.clicks or 0 for item in performance
+    )
+
+    total_saves = sum(
+        item.saves or 0 for item in performance
+    )
+
+    total_video_views = sum(
+        item.video_views or 0 for item in performance
+    )
+
+    total_conversions = sum(
+        item.conversions or 0 for item in performance
+    )
+
+    average_engagement_rate = (
+        sum(
+            float(item.engagement_rate or 0)
+            for item in performance
+        ) / len(performance)
+        if performance
+        else 0
+    )
+
+    return {
+        "campaign_id": campaign.campaign_id,
+        "campaign_name": campaign.campaign_name,
+        "platform": campaign.platform.value,
+        "status": campaign.status.value,
+        "summary": {
+            "impressions": total_impressions,
+            "reach": total_reach,
+            "likes": total_likes,
+            "comments": total_comments,
+            "shares": total_shares,
+            "clicks": total_clicks,
+            "saves": total_saves,
+            "video_views": total_video_views,
+            "conversions": total_conversions,
+            "average_engagement_rate": round(
+                average_engagement_rate,
+                2
+            )
+        }
+    }
+
+
+@router.get("/{campaign_id}/performance")
+def get_campaign_performance(
+    campaign_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    db_user = (
+        db.query(User)
+        .filter(User.email == current_user["sub"])
+        .first()
+    )
+
+    if not db_user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    campaign = (
+        db.query(Campaign)
+        .filter(
+            Campaign.campaign_id == campaign_id,
+            Campaign.user_id == db_user.user_id
+        )
+        .first()
+    )
+
+    if not campaign:
+        raise HTTPException(
+            status_code=404,
+            detail="Campaign not found"
+        )
+
+    performance = (
+        db.query(CampaignPerformance)
+        .filter(
+            CampaignPerformance.campaign_id == campaign_id
+        )
+        .order_by(
+            CampaignPerformance.record_date.asc()
+        )
+        .all()
+    )
+
+    return {
+        "campaign_id": campaign.campaign_id,
+        "campaign_name": campaign.campaign_name,
+        "total_records": len(performance),
+        "performance": [
+            {
+                "performance_id": item.performance_id,
+                "platform": item.platform.value,
+                "record_date": item.record_date,
+                "impressions": item.impressions,
+                "reach": item.reach,
+                "likes": item.likes,
+                "comments": item.comments,
+                "shares": item.shares,
+                "clicks": item.clicks,
+                "saves": item.saves,
+                "video_views": item.video_views,
+                "engagement_rate": item.engagement_rate,
+                "conversions": item.conversions
+            }
+            for item in performance
+        ]
+    }
+
+@router.get("/{campaign_id}/tracking")
+def get_campaign_tracking(
+    campaign_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    db_user = (
+        db.query(User)
+        .filter(User.email == current_user["sub"])
+        .first()
+    )
+
+    if not db_user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    campaign = (
+        db.query(Campaign)
+        .filter(
+            Campaign.campaign_id == campaign_id,
+            Campaign.user_id == db_user.user_id
+        )
+        .first()
+    )
+
+    if not campaign:
+        raise HTTPException(
+            status_code=404,
+            detail="Campaign not found"
+        )
+
+    performance = (
+        db.query(CampaignPerformance)
+        .filter(
+            CampaignPerformance.campaign_id == campaign_id
+        )
+        .order_by(
+            CampaignPerformance.record_date.desc()
+        )
+        .all()
+    )
+
+    return {
+        "message": "Campaign tracking data fetched successfully",
+        "campaign": {
+            "campaign_id": campaign.campaign_id,
+            "campaign_name": campaign.campaign_name,
+            "platform": campaign.platform.value,
+            "status": campaign.status.value,
+            "start_date": campaign.start_date,
+            "end_date": campaign.end_date
+        },
+        "performance": [
+            {
+                "performance_id": item.performance_id,
+                "platform": item.platform.value,
+                "impressions": item.impressions,
+                "reach": item.reach,
+                "likes": item.likes,
+                "comments": item.comments,
+                "shares": item.shares,
+                "clicks": item.clicks,
+                "saves": item.saves,
+                "video_views": item.video_views,
+                "engagement_rate": item.engagement_rate,
+                "conversions": item.conversions,
+                "record_date": item.record_date
+            }
+            for item in performance
+        ]
+    }
+
 
 @router.get("/{campaign_id}")
 def get_campaign(
@@ -309,3 +563,6 @@ def delete_campaign(
         "message": "Campaign deleted successfully",
         "deleted_campaign_id": campaign_id
     }
+
+
+    
