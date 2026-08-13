@@ -14,7 +14,7 @@ from app.background.scheduler import (
     start_scheduler,
     stop_scheduler
 )
-
+from app.api.campaigns import router as campaigns_router
 import app.models.sql_models  # noqa: F401
 
 app = FastAPI(
@@ -46,6 +46,7 @@ app.include_router(social_router)
 app.include_router(posts_router)
 app.include_router(publishing_queue_router)
 app.include_router(publishing_logs_router)
+app.include_router(campaigns_router)
 
 
 
