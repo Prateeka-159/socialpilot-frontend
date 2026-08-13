@@ -7,7 +7,10 @@ from app.models.sql_models import (
     User,
     Post,
     Campaign,
-    PostAnalytics
+    PostAnalytics,
+    AudienceGrowth,
+    SocialAccount,
+    CampaignPerformance
 )
 
 
@@ -273,4 +276,141 @@ def get_campaign_engagement(
             )
         },
         "total_analytics_records": len(analytics)
+    }
+
+
+@router.get("/social-accounts/{social_account_id}/audience-growth")
+def get_audience_growth(
+    social_account_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    db_user = (
+        db.query(User)
+        .filter(User.email == current_user["sub"])
+        .first()
+    )
+
+    if not db_user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    social_account = (
+        db.query(SocialAccount)
+        .filter(
+            SocialAccount.social_account_id == social_account_id,
+            SocialAccount.user_id == db_user.user_id
+        )
+        .first()
+    )
+
+    if not social_account:
+        raise HTTPException(
+            status_code=404,
+            detail="Social account not found"
+        )
+
+    growth_records = (
+        db.query(AudienceGrowth)
+        .filter(
+            AudienceGrowth.social_account_id == social_account_id
+        )
+        .order_by(
+            AudienceGrowth.record_date.desc()
+        )
+        .all()
+    )
+
+    return {
+        "message": "Audience growth fetched successfully",
+        "social_account": {
+            "social_account_id": social_account.social_account_id
+        },
+        "total_records": len(growth_records),
+        "audience_growth": [
+            {
+                "audience_growth_id": item.audience_growth_id,
+                "record_date": item.record_date,
+                "followers_count": item.followers_count,
+                "followers_gained": item.followers_gained,
+                "followers_lost": item.followers_lost,
+                "net_growth": item.net_growth
+            }
+            for item in growth_records
+        ]
+    }
+
+@router.get("/campaigns/{campaign_id}/performance")
+def get_campaign_performance(
+    campaign_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    db_user = (
+        db.query(User)
+        .filter(User.email == current_user["sub"])
+        .first()
+    )
+
+    if not db_user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    campaign = (
+        db.query(Campaign)
+        .filter(
+            Campaign.campaign_id == campaign_id,
+            Campaign.user_id == db_user.user_id
+        )
+        .first()
+    )
+
+    if not campaign:
+        raise HTTPException(
+            status_code=404,
+            detail="Campaign not found"
+        )
+
+    performance_records = (
+        db.query(CampaignPerformance)
+        .filter(
+            CampaignPerformance.campaign_id == campaign_id
+        )
+        .order_by(
+            CampaignPerformance.record_date.desc()
+        )
+        .all()
+    )
+
+    return {
+        "message": "Campaign performance fetched successfully",
+        "campaign": {
+            "campaign_id": campaign.campaign_id,
+            "campaign_name": campaign.campaign_name,
+            "platform": campaign.platform.value,
+            "status": campaign.status.value
+        },
+        "total_records": len(performance_records),
+        "performance": [
+            {
+                "performance_id": item.performance_id,
+                "platform": item.platform.value,
+                "impressions": item.impressions,
+                "reach": item.reach,
+                "likes": item.likes,
+                "comments": item.comments,
+                "shares": item.shares,
+                "clicks": item.clicks,
+                "saves": item.saves,
+                "video_views": item.video_views,
+                "engagement_rate": item.engagement_rate,
+                "conversions": item.conversions,
+                "record_date": item.record_date
+            }
+            for item in performance_records
+        ]
     }
