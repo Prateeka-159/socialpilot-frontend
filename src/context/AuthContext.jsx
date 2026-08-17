@@ -1,46 +1,31 @@
-import { createContext, useContext, useState } from "react";
-import { logout as apiLogout } from "../services/authServices";
+import  { createContext, useContext, useState } from 'react';
 
-const AuthContext = createContext();
+// eslint-disable-next-line react-refresh/only-export-components
+export const AuthContext = createContext(null);
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem("user");
-    return saved ? JSON.parse(saved) : null;
-  });
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
 
-  const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem(
-        "user",
-        JSON.stringify(userData)
-    );
+  const login = async (userData) => {
+    // Mock login or process payload
+    setUser(userData || { email: 'admin@socialpilot.com', role: 'Administrator' });
+    return true;
   };
 
   const logout = () => {
-    // Clear UI state and inform backend to clear httpOnly cookie
     setUser(null);
-    localStorage.removeItem("user");
-    try {
-      apiLogout();
-    } catch (err) {
-      // ignore network errors on logout
-    }
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        login,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={{ user, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAuth = () => {
   return useContext(AuthContext);
-}
+};
+
+export default AuthProvider;
