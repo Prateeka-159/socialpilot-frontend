@@ -1,190 +1,46 @@
 import { Routes, Route } from "react-router-dom";
 
+// Public Pages
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 
+// Protected Pages
 import Dashboard from "../pages/Dashboard/Dashboard";
 import SocialAccounts from "../pages/SocialAccounts/SocialAccounts";
 import Scheduler from "../pages/Scheduler/Scheduler";
-import Analytics from "../pages/Analytics/Analytics";
+import AnalyticsDashboard from "../pages/AnalyticsDashboard/AnalyticsDashboard";
+import Campaigns from "../pages/Campaigns/Campaigns";
+import CampaignTracker from "../pages/Campaigns/CampaignTracker";
 import Profile from "../pages/Profile/Profile";
 import Settings from "../pages/Settings/Settings";
+import Drafts from "../pages/Drafts/Drafts";
 import CalendarView from "../pages/Calendar/CalendarView";
 import Queue from "../pages/Queue/Queue";
-import Collaborators from "../pages/Collaborators/Collaborators";
-import Campaigns from "../pages/Campaigns/Campaigns";
-import Accounts from "../pages/Accounts/Accounts";
 
+// Layout
 import MainLayout from "../components/layout/MainLayout";
-import ProtectedRoute from "./ProtectedRoute";
-import UserManagement from "../pages/UserManagement/UserManagement";
-import { ROLES } from "../utils/roles";
 
 function AppRoutes() {
   return (
     <Routes>
-      {/* Public Pages */}
+      {/* Public Routes */}
       <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Protected */}
+      {/* Protected Routes (wrapped in MainLayout) */}
       <Route element={<MainLayout />}>
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute
-              allowedRoles={[
-                ROLES.ADMIN,
-                ROLES.BUSINESS,
-                ROLES.MARKETING,
-                ROLES.CONTENT_CREATOR,
-              ]}
-            >
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/social-accounts"
-          element={
-            <ProtectedRoute
-              allowedRoles={[
-                ROLES.ADMIN,
-                ROLES.BUSINESS,
-                ROLES.MARKETING,
-              ]}
-            >
-              <SocialAccounts />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/scheduler"
-          element={
-            <ProtectedRoute
-              allowedRoles={[
-                ROLES.ADMIN,
-                ROLES.BUSINESS,
-                ROLES.MARKETING,
-                ROLES.CONTENT_CREATOR,
-              ]}
-            >
-              <Scheduler />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/calendar"
-          element={
-            <ProtectedRoute
-              allowedRoles={[
-                ROLES.ADMIN,
-                ROLES.BUSINESS,
-                ROLES.MARKETING,
-                ROLES.CONTENT_CREATOR,
-              ]}
-            >
-              <CalendarView />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/queue"
-          element={
-            <ProtectedRoute
-              allowedRoles={[
-                ROLES.ADMIN,
-                ROLES.BUSINESS,
-                ROLES.MARKETING,
-                ROLES.CONTENT_CREATOR,
-              ]}
-            >
-              <Queue />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/analytics"
-          element={
-            <ProtectedRoute
-              allowedRoles={[
-                ROLES.ADMIN,
-                ROLES.BUSINESS,
-                ROLES.MARKETING,
-              ]}
-            >
-              <Analytics />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/collaborators"
-          element={
-            <ProtectedRoute
-              allowedRoles={[ROLES.ADMIN, ROLES.MARKETING]}
-            >
-              <Collaborators />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/campaigns"
-          element={
-            <ProtectedRoute
-              allowedRoles={[ROLES.ADMIN, ROLES.MARKETING, ROLES.BUSINESS]}
-            >
-              <Campaigns />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/accounts"
-          element={
-            <ProtectedRoute
-              allowedRoles={[ROLES.ADMIN, ROLES.BUSINESS]}
-            >
-              <Accounts />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute
-              allowedRoles={[
-                ROLES.ADMIN,
-                ROLES.BUSINESS,
-                ROLES.MARKETING,
-                ROLES.CONTENT_CREATOR,
-              ]}
-            >
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute
-              allowedRoles={[
-                ROLES.ADMIN,
-                ROLES.BUSINESS,
-              ]}
-            >
-              <Settings />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/users"
-          element={
-            <ProtectedRoute
-              allowedRoles={[ROLES.ADMIN]}
-            >
-              <UserManagement />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/social-accounts" element={<SocialAccounts />} />
+        <Route path="/scheduler" element={<Scheduler />} />
+        <Route path="/analytics" element={<AnalyticsDashboard />} />
+        <Route path="/campaigns" element={<Campaigns />} />
+        <Route path="/campaigns/track" element={<CampaignTracker />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/drafts" element={<Drafts />} />
+        <Route path="/calendar" element={<CalendarView />} />
+        <Route path="/queue" element={<Queue />} />
       </Route>
     </Routes>
   );

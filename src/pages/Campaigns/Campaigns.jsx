@@ -1,61 +1,86 @@
-import "./Campaigns.css";
+import "./CampaignTracker.css";
 
-const campaigns = [
-  {
-    id: 1,
-    name: "Summer Launch Series",
-    status: "Live",
-    budget: "$24,000",
-    reach: "520k",
-  },
-  {
-    id: 2,
-    name: "Influencer Growth Push",
-    status: "Draft",
-    budget: "$9,500",
-    reach: "48k",
-  },
-  {
-    id: 3,
-    name: "Holiday Brand Refresh",
-    status: "Scheduled",
-    budget: "$16,200",
-    reach: "312k",
-  },
-];
-
-export default function Campaigns() {
+export default function CampaignTracker() {
   return (
-    <div className="campaigns-page">
-      <header className="marketing-page-header">
+    <div className="tracker-container">
+      {/* Header */}
+      <div className="tracker-header">
         <div>
-          <p className="eyebrow-text">MARKETING TEAM</p>
-          <h1>Manage Campaigns</h1>
-          <p className="page-copy">
-            Track campaign performance, edit launch plans, and publish high-impact briefs.
-          </p>
-        </div>
-        <button className="primary-button">Create Campaign</button>
-      </header>
-
-      <section className="campaigns-table-wrapper">
-        <div className="campaigns-table-header">
-          <span>Campaign</span>
-          <span>Status</span>
-          <span>Budget</span>
-          <span>Reach</span>
-          <span></span>
-        </div>
-        {campaigns.map((campaign) => (
-          <div key={campaign.id} className="campaign-row">
-            <div className="campaign-name">{campaign.name}</div>
-            <div className={`campaign-status ${campaign.status.toLowerCase()}`}>{campaign.status}</div>
-            <div>{campaign.budget}</div>
-            <div>{campaign.reach}</div>
-            <button className="secondary-button">View</button>
+          <button className="back-btn">&larr; Back to Campaigns</button>
+          <div className="live-tracker-tag">LIVE TRACKER</div>
+          <h1 className="campaign-title">Summer Product Launch</h1>
+          <div className="status-row">
+            Platform: <strong>Instagram</strong> &bull; Status: <span className="status-badge">Active</span>
           </div>
-        ))}
-      </section>
+        </div>
+        <button className="edit-btn">Edit Campaign</button>
+      </div>
+
+      {/* Metrics Row */}
+      <div className="metrics-grid">
+        <div className="metric-card">
+          <div className="metric-label">BUDGET ALLOCATED</div>
+          <p className="metric-value">$5,000</p>
+        </div>
+        <div className="metric-card">
+          <div className="metric-label">TOTAL SPENT</div>
+          <p className="metric-value">$2,450</p>
+        </div>
+        <div className="metric-card">
+          <div className="metric-label">TOTAL REACH</div>
+          <p className="metric-value">12.4K</p>
+        </div>
+        <div className="metric-card">
+          <div className="metric-label">CONVERSIONS</div>
+          <p className="metric-value">142</p>
+        </div>
+      </div>
+
+      {/* Logs Table */}
+      <div className="logs-card">
+        <h3>Daily Performance Logs</h3>
+        <table className="logs-table">
+          <thead>
+            <tr>
+              <th>DATE</th>
+              <th>IMPRESSIONS</th>
+              <th>CLICKS</th>
+              <th>CTR</th>
+              <th>SPEND</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>10 Aug 2026</td>
+              <td>2,400</td>
+              <td>180</td>
+              <td>7.5%</td>
+              <td>$120</td>
+            </tr>
+            <tr>
+              <td>09 Aug 2026</td>
+              <td>3,100</td>
+              <td>240</td>
+              <td>7.7%</td>
+              <td>$150</td>
+            </tr>
+            <tr>
+              <td>08 Aug 2026</td>
+              <td>1,800</td>
+              <td>110</td>
+              <td>6.1%</td>
+              <td>$90</td>
+            </tr>
+            <tr>
+              <td>07 Aug 2026</td>
+              <td>5,100</td>
+              <td>420</td>
+              <td>8.2%</td>
+              <td>$280</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -6,125 +6,30 @@ import {
   Link2,
   Calendar,
   LogOut,
+  FileText,
   ListOrdered,
-  Users,
+  Megaphone
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import { ROLES } from "../../utils/roles";
 import Logo from "../common/Logo";
 import "./Sidebar.css";
 
 function Sidebar() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
-
-  const allMenu = [
-    {
-      name: "Dashboard",
-      path: "/dashboard",
-      icon: <LayoutDashboard size={18} />,
-      roles: [
-        ROLES.ADMIN,
-        ROLES.BUSINESS,
-        ROLES.MARKETING,
-        ROLES.CONTENT_CREATOR,
-      ],
-    },
-    {
-      name: "Users",
-      path: "/users",
-      icon: <Users size={18} />,
-      roles: [ROLES.ADMIN],
-    },
-    {
-      name: "Social Accounts",
-      path: "/social-accounts",
-      icon: <Link2 size={18} />,
-      roles: [ROLES.ADMIN, ROLES.BUSINESS, ROLES.MARKETING],
-    },
-    {
-      name: "Scheduler",
-      path: "/scheduler",
-      icon: <Calendar size={18} />,
-      roles: [
-        ROLES.ADMIN,
-        ROLES.BUSINESS,
-        ROLES.MARKETING,
-        ROLES.CONTENT_CREATOR,
-      ],
-    },
-    {
-      name: "Calendar",
-      path: "/calendar",
-      icon: <Calendar size={18} />,
-      roles: [
-        ROLES.ADMIN,
-        ROLES.BUSINESS,
-        ROLES.MARKETING,
-        ROLES.CONTENT_CREATOR,
-      ],
-    },
-    {
-      name: "Qued Publication",
-      path: "/queue",
-      icon: <ListOrdered size={18} />,
-      roles: [
-        ROLES.ADMIN,
-        ROLES.BUSINESS,
-        ROLES.MARKETING,
-        ROLES.CONTENT_CREATOR,
-      ],
-    },
-    {
-      name: "Collaborators",
-      path: "/collaborators",
-      icon: <Users size={18} />,
-      roles: [ROLES.ADMIN, ROLES.MARKETING],
-    },
-    {
-      name: "Campaigns",
-      path: "/campaigns",
-      icon: <BarChart3 size={18} />,
-      roles: [ROLES.ADMIN, ROLES.MARKETING, ROLES.BUSINESS],
-    },
-    {
-      name: "Accounts",
-      path: "/accounts",
-      icon: <Link2 size={18} />,
-      roles: [ROLES.ADMIN, ROLES.BUSINESS],
-    },
-    {
-      name: "Analytics",
-      path: "/analytics",
-      icon: <BarChart3 size={18} />,
-      roles: [ROLES.ADMIN, ROLES.BUSINESS, ROLES.MARKETING],
-    },
-    {
-      name: "Profile",
-      path: "/profile",
-      icon: <User size={18} />,
-      roles: [
-        ROLES.ADMIN,
-        ROLES.BUSINESS,
-        ROLES.MARKETING,
-        ROLES.CONTENT_CREATOR,
-      ],
-    },
-    {
-      name: "Settings",
-      path: "/settings",
-      icon: <Settings size={18} />,
-      roles: [ROLES.ADMIN, ROLES.BUSINESS],
-    },
+  const menu = [
+    { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={18} /> },
+    { name: "Social Accounts", path: "/social-accounts", icon: <Link2 size={18} /> },
+    { name: "Scheduler", path: "/scheduler", icon: <Calendar size={18} /> },
+    { name: "Drafts", path: "/drafts", icon: <FileText size={18} /> },
+    { name: "Calendar", path: "/calendar", icon: <Calendar size={18} /> },
+    { name: "Queue", path: "/queue", icon: <ListOrdered size={18} /> },
+    { name: "Analytics", path: "/analytics", icon: <BarChart3 size={18} /> },
+    { name: "Campaigns", path: "/campaigns", icon: <Megaphone size={18} /> },
+    { name: "Profile", path: "/profile", icon: <User size={18} /> },
+    { name: "Settings", path: "/settings", icon: <Settings size={18} /> },
   ];
 
-  const menu = user
-    ? allMenu.filter((item) => item.roles.includes(user.role))
-    : [];
-
   const handleLogout = () => {
-    logout();
     navigate("/");
   };
 
@@ -159,13 +64,8 @@ function Sidebar() {
             className="user-avatar-img"
           />
           <div className="user-meta">
-            <span className="user-name">
-              {user.name}
-            </span>
-
-            <span className="user-role">
-              {user.role}
-            </span>
+            <span className="user-name">Alex Vance</span>
+            <span className="user-role">Head of Social</span>
           </div>
         </div>
 

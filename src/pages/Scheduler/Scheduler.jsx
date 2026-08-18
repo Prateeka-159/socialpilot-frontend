@@ -4,6 +4,8 @@ import {
   Clock,
   Send,
   Sparkles,
+  Layers,
+  CheckCircle,
 } from "lucide-react";
 import { FaLinkedin, FaInstagram, FaFacebook } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
@@ -15,8 +17,9 @@ function Scheduler() {
     "Synthesizing architectural rhythm and structural minimalism across urban spaces. New series launching tomorrow."
   );
   const [selectedPlatforms, setSelectedPlatforms] = useState(["linkedin", "instagram"]);
-  const [scheduledDate, setScheduledDate] = useState("2026-07-30");
+  const [scheduledDate, setScheduledDate] = useState("2026-08-15");
   const [scheduledTime, setScheduledTime] = useState("18:00");
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const publicImages = [
     { id: 1, src: "/biking-over-bridge.jpg", name: "Biking over Bridge" },
@@ -24,11 +27,32 @@ function Scheduler() {
     { id: 3, src: "/ripples-of-sand-in-black-and-white.jpg", name: "Ripples of Sand" },
   ];
 
-  const draftItems = [
-    { id: 1, title: 'Q3 Product Roadmap Announcement', targetPlatform: 'LinkedIn', lastSaved: '10 mins ago', author: 'Alex Vance' },
-    { id: 2, title: 'Cyberpunk Theme Launch Assets', targetPlatform: 'Instagram', lastSaved: '2 hours ago', author: 'Alex Vance' },
-    { id: 3, title: 'Weekly Tech Insights Thread', targetPlatform: 'X (Twitter)', lastSaved: 'Yesterday', author: 'Alex Vance' },
-  ];
+  const [queuedPosts, setQueuedPosts] = useState([
+    {
+      id: 101,
+      date: "TOMORROW, 18:00 UTC",
+      platforms: [<FaLinkedin key="l" />, <FaInstagram key="i" />],
+      caption: "Synthesizing architectural rhythm and structural minimalism across urban spaces.",
+      image: "/biking-over-bridge.jpg",
+      status: "QUEUED",
+    },
+    {
+      id: 102,
+      date: "AUG 12, 12:30 UTC",
+      platforms: [<FaInstagram key="i" />, <FaXTwitter key="x" />],
+      caption: "Monochrome textures in organic movement: Sand ripples and temporal geometry.",
+      image: "/ripples-of-sand-in-black-and-white.jpg",
+      status: "SCHEDULED",
+    },
+    {
+      id: 103,
+      date: "AUG 14, 09:00 UTC",
+      platforms: [<FaLinkedin key="l" />, <FaFacebook key="f" />],
+      caption: "Case study preview on modern workflow frameworks and studio delegation.",
+      image: "/images.jpg",
+      status: "DRAFT",
+    },
+  ]);
 
   const togglePlatform = (key) => {
     setSelectedPlatforms((prev) =>
@@ -36,9 +60,41 @@ function Scheduler() {
     );
   };
 
+  const getPlatformIcon = (key) => {
+    switch (key) {
+      case "linkedin":
+        return <FaLinkedin key="l" />;
+      case "instagram":
+        return <FaInstagram key="i" />;
+      case "facebook":
+        return <FaFacebook key="f" />;
+      case "twitter":
+        return <FaXTwitter key="x" />;
+      default:
+        return null;
+    }
+  };
+
   const handleQueuePost = (e) => {
     e.preventDefault();
-    alert("Post added to SP Studio queue successfully!");
+
+    if (selectedPlatforms.length === 0) {
+      alert("Please select at least one platform.");
+      return;
+    }
+
+    const newPost = {
+      id: Date.now(),
+      date: `${scheduledDate}, ${scheduledTime} UTC`,
+      platforms: selectedPlatforms.map((p) => getPlatformIcon(p)),
+      caption: caption,
+      image: selectedMedia,
+      status: "QUEUED",
+    };
+
+    setQueuedPosts([newPost, ...queuedPosts]);
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 3000);
   };
 
   return (
@@ -54,13 +110,20 @@ function Scheduler() {
         </div>
 
         <div className="header-meta font-mono">
-          <span>ACTIVE QUEUE: 03 POSTS</span>
+          <span>ACTIVE QUEUE: {String(queuedPosts.length).padStart(2, "0")} POSTS</span>
           <span>·</span>
           <span>NEXT: TOMORROW 18:00 UTC</span>
         </div>
       </div>
 
-      {/* Scheduler Split Studio Canvas (No Box Cards) */}
+      {showSuccess && (
+        <div className="success-toast font-mono">
+          <CheckCircle size={16} />
+          <span>Post scheduled and appended to current queue successfully!</span>
+        </div>
+      )}
+
+      {/* Scheduler Split Studio Canvas */}
       <div className="scheduler-grid">
         {/* Left Column: Composer Studio */}
         <div className="composer-column hairline-r">
@@ -121,12 +184,13 @@ function Scheduler() {
                 onChange={(e) => setCaption(e.target.value)}
                 placeholder="Write your editorial caption here..."
                 className="bare-textarea hairline-b"
+                required
               />
             </div>
 
             {/* Media Asset Selector */}
             <div className="form-section">
-              <span className="form-label font-mono">ADD PICTURES:</span>
+              <span className="form-label font-mono">SELECT ATTACHED MEDIA</span>
               <div className="media-selector-grid">
                 {publicImages.map((img) => (
                   <div
@@ -152,6 +216,7 @@ function Scheduler() {
                     value={scheduledDate}
                     onChange={(e) => setScheduledDate(e.target.value)}
                     className="bare-input"
+                    required
                   />
                 </div>
               </div>
@@ -165,6 +230,7 @@ function Scheduler() {
                     value={scheduledTime}
                     onChange={(e) => setScheduledTime(e.target.value)}
                     className="bare-input"
+                    required
                   />
                 </div>
               </div>
@@ -178,39 +244,36 @@ function Scheduler() {
           </form>
         </div>
 
-        <div className="drafts-column">
+        {/* Right Column: Queued Media Timeline */}
+        <div className="timeline-column">
           <div className="column-title-row hairline-b">
-            <Sparkles size={18} />
-            <h2 className="column-heading font-serif">Drafts</h2>
+            <Layers size={18} />
+            <h2 className="column-heading font-serif">Queued Publications</h2>
           </div>
 
-          <div className="drafts-header">
-            <div>
-              <h3 className="drafts-heading">Saved drafts</h3>
-              <p className="drafts-subtitle">Quickly review your drafts and keep the queue full.</p>
-            </div>
-            <button className="new-draft-btn">+ Create Draft</button>
-          </div>
+          <div className="queue-flat-list">
+            {queuedPosts.map((post) => (
+              <div key={post.id} className="queue-flat-row hairline-b">
+                <div className="queue-thumb-wrap">
+                  <img src={post.image} alt="Queued attachment" />
+                </div>
 
-          <div className="drafts-cards-grid">
-            {draftItems.map((item) => (
-              <article key={item.id} className="draft-card">
-                <div className="draft-card-main">
-                  <div className="draft-card-top">
-                    <h3 className="draft-card-title">{item.title}</h3>
-                    <span className="draft-chip">Draft</span>
+                <div className="queue-content-wrap">
+                  <div className="queue-meta-row font-mono">
+                    <span className="queue-date">{post.date}</span>
+                    <div className="queue-icons">{post.platforms}</div>
                   </div>
-                  <div className="draft-meta-row">
-                    <span className="platform-tag">{item.targetPlatform}</span>
-                    <span className="draft-author">{item.author}</span>
+
+                  <p className="queue-caption">{post.caption}</p>
+
+                  <div className="queue-footer-row font-mono">
+                    <span className={`status-pill ${post.status.toLowerCase()}`}>
+                      {post.status}
+                    </span>
+                    <button type="button" className="queue-edit-link">Edit Post →</button>
                   </div>
-                  <p className="sub-text">Last saved {item.lastSaved}</p>
                 </div>
-                <div className="draft-card-actions">
-                  <button className="action-btn edit-btn">Edit</button>
-                  <button className="action-btn delete-btn">Delete</button>
-                </div>
-              </article>
+              </div>
             ))}
           </div>
         </div>
