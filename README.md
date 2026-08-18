@@ -88,3 +88,4 @@ The frontend UI is complete and structured for future backend integration.
 ## License
 
 This project is developed for academic and learning purposes.
+
