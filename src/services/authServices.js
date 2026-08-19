@@ -1,53 +1,27 @@
-import API_BASE_URL from "./api";
+import { apiRequest, removeToken, setToken, toApiRole } from "./api";
 
 export const login = async (email, password) => {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+  const data = await apiRequest("/auth/login", {
     method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email,
-      password,
-    }),
+    body: JSON.stringify({ email, password }),
   });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.detail || "Login failed");
-  }
-
-  // Token is stored in an httpOnly cookie; no localStorage usage anymore.
+  setToken(data.access_token);
   return data;
 };
 
-export const register = async (name, email, password) => {
-  const response = await fetch(`${API_BASE_URL}/auth/register`, {
+export const register = async (name, email, password, role = "Content Creator") => {
+  return apiRequest("/auth/register", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify({
       name,
       email,
       password,
+      role: toApiRole(role),
     }),
   });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.detail || "Registration failed");
-  }
-
-  return data;
 };
 
 export const logout = async () => {
-  await fetch(`${API_BASE_URL}/auth/logout`, {
-    method: "POST",
-    credentials: "include",
-  });
+  removeToken();
 };

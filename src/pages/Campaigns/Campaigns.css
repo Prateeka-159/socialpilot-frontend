@@ -1,10 +1,10 @@
 .campaigns-page {
-  padding: 32px;
-  background-color: #f9f8f6;
+  padding: var(--page-padding);
+  background-color: var(--background);
   min-height: 100vh;
   box-sizing: border-box;
-  color: #111111;
-  font-family: inherit;
+  color: var(--c-dark);
+  font-family: var(--font-sans);
 }
 
 .campaigns-header {
@@ -15,36 +15,45 @@
 }
 
 .section-label {
-  font-size: 11px;
-  font-family: monospace;
-  letter-spacing: 0.1em;
-  color: #555555;
-  font-weight: 700;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.15em;
+  color: var(--c-taupe);
+  font-weight: 600;
   text-transform: uppercase;
 }
 
 .campaigns-header h2 {
   font-size: 28px;
-  font-weight: 800;
+  font-weight: 700;
   margin: 4px 0 0 0;
   letter-spacing: -0.02em;
+  font-family: var(--font-sans);
 }
 
 .campaigns-header p {
   font-size: 14px;
-  color: #555555;
+  color: var(--c-taupe);
   margin-top: 4px;
+  font-family: var(--font-sans);
 }
 
 .create-btn {
-  background-color: #000000;
-  color: #ffffff;
+  background-color: var(--c-dark);
+  color: var(--c-cream);
   border: none;
-  border-radius: 6px;
+  border-radius: 30px;
   padding: 10px 18px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  font-family: var(--font-sans);
+  transition: var(--transition);
+}
+
+.create-btn:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
 }
 
 .campaigns-search-bar {
@@ -55,11 +64,18 @@
   width: 100%;
   max-width: 480px;
   padding: 12px 16px;
-  border: 1px solid #dcdcdc;
+  border: 1px solid var(--c-taupe-20);
   border-radius: 8px;
-  background-color: #f0eee9;
+  background-color: var(--c-cream-80);
   font-size: 14px;
   outline: none;
+  font-family: var(--font-sans);
+  transition: var(--transition);
+}
+
+.campaigns-search-bar input:focus {
+  border-color: var(--c-dark);
+  box-shadow: 0 0 0 3px var(--c-dark-10);
 }
 
 .campaigns-list {
@@ -69,37 +85,41 @@
 }
 
 .campaign-card {
-  background-color: #eeebe3;
-  border: 1px solid #e2ded5;
+  background-color: var(--c-cream-80);
+  border: 1px solid var(--c-taupe-20);
   border-radius: 12px;
   padding: 20px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: var(--transition);
 }
 
 .campaign-card:hover {
-  background-color: #e6e2d7;
+  background-color: var(--c-cream);
   transform: translateY(-1px);
+  border-color: var(--c-dark);
 }
 
 .card-info h3 {
   margin: 0 0 6px 0;
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
+  font-family: var(--font-sans);
 }
 
 .card-info p {
   margin: 0;
   font-size: 13px;
-  color: #666666;
+  color: var(--c-taupe);
+  font-family: var(--font-sans);
 }
 
 .card-info span {
   font-weight: 600;
-  color: #222222;
+  color: var(--c-dark);
+  font-family: var(--font-sans);
 }
 
 .card-badge {
@@ -111,21 +131,24 @@
 .status-pill {
   padding: 4px 12px;
   border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .status-pill.active {
-  background-color: #e6f4ea;
-  color: #137333;
+  background-color: var(--c-dark);
+  color: var(--c-cream);
 }
 
 .status-pill.scheduled {
-  background-color: #fef3c7;
-  color: #b45309;
+  background-color: var(--c-cream-20);
+  color: var(--c-dark);
 }
 
 .arrow {
   font-size: 18px;
-  color: #888888;
+  color: var(--c-taupe);
 }

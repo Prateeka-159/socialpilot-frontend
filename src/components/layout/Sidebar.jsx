@@ -8,14 +8,17 @@ import {
   LogOut,
   FileText,
   ListOrdered,
-  Megaphone
+  Megaphone,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import Logo from "../common/Logo";
+import { useAuth } from "../../context/AuthContext";
 import "./Sidebar.css";
 
 function Sidebar() {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
   const menu = [
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={18} /> },
     { name: "Social Accounts", path: "/social-accounts", icon: <Link2 size={18} /> },
@@ -29,7 +32,8 @@ function Sidebar() {
     { name: "Settings", path: "/settings", icon: <Settings size={18} /> },
   ];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logout();
     navigate("/");
   };
 
@@ -60,12 +64,12 @@ function Sidebar() {
         <div className="user-strip">
           <img
             src="/images.jpg"
-            alt="User avatar"
+            alt={user?.name || "User avatar"}
             className="user-avatar-img"
           />
           <div className="user-meta">
-            <span className="user-name">Alex Vance</span>
-            <span className="user-role">Head of Social</span>
+            <span className="user-name">{user?.name || "User"}</span>
+            <span className="user-role">{user?.role || "Member"}</span>
           </div>
         </div>
 

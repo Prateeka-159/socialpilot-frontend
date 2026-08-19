@@ -1,61 +1,99 @@
-import './CampaignTracker.css';
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  getCampaign,
+  getCampaignTracking,
+  getCampaignTrackingSummary,
+} from "../../services/campaignService";
+import "./CampaignTracker.css";
 
-export default function CampaignTracker({ campaign, onBack }) {
-  // Use passed props or default fallback data
-  const name = campaign?.name || 'Summer Product Launch';
-  const platform = campaign?.platform || 'Instagram';
-  const status = campaign?.status || 'Active';
-  const budget = campaign?.budget || '$5,000';
-  const spent = campaign?.spent || '$2,450';
-  const reach = campaign?.reach || '12.4K';
-  const conversions = campaign?.conversions || '142';
+export default function CampaignTracker() {
+  const { campaignId } = useParams();
+  const navigate = useNavigate();
+  const [campaign, setCampaign] = useState(null);
+  const [summary, setSummary] = useState(null);
+  const [performance, setPerformance] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadTracking = async () => {
+      try {
+        setError("");
+        const [campaignData, summaryData, trackingData] = await Promise.all([
+          getCampaign(campaignId),
+          getCampaignTrackingSummary(campaignId),
+          getCampaignTracking(campaignId),
+        ]);
+
+        setCampaign(campaignData.campaign);
+        setSummary(summaryData.summary);
+        setPerformance(trackingData.performance || []);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTracking();
+  }, [campaignId]);
+
+  if (loading) {
+    return <div className="tracker-page">Loading campaign tracker...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="tracker-page">
+        <p style={{ color: "#dc2626" }}>{error}</p>
+        <button className="back-btn" onClick={() => navigate("/campaigns")}>
+          Back to Campaigns
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="tracker-page">
-      {/* Top Bar with Back Button */}
       <div className="tracker-top-bar">
-        <button className="back-btn" onClick={onBack}>
+        <button className="back-btn" onClick={() => navigate("/campaigns")}>
           ← Back to Campaigns
         </button>
       </div>
 
-      {/* Campaign Details Header */}
       <div className="tracker-header">
         <div>
           <span className="section-label">LIVE TRACKER</span>
-          <h2>{name}</h2>
+          <h2>{campaign?.campaign_name}</h2>
           <p>
-            Platform: <strong>{platform}</strong> • Status:{' '}
-            <span className={`status-pill ${status.toLowerCase()}`}>
-              {status}
+            Platform: <strong>{campaign?.platform}</strong> • Status:{" "}
+            <span className={`status-pill ${campaign?.status?.toLowerCase()}`}>
+              {campaign?.status}
             </span>
           </p>
         </div>
-
-        <button className="edit-btn">Edit Campaign</button>
       </div>
 
-      {/* KPI Cards */}
       <div className="tracker-stats-grid">
         <div className="stat-card">
           <p className="stat-label">Budget Allocated</p>
-          <span className="stat-value">{budget}</span>
-        </div>
-        <div className="stat-card">
-          <p className="stat-label">Total Spent</p>
-          <span className="stat-value">{spent}</span>
+          <span className="stat-value">${campaign?.budget || 0}</span>
         </div>
         <div className="stat-card">
           <p className="stat-label">Total Reach</p>
-          <span className="stat-value">{reach}</span>
+          <span className="stat-value">{summary?.reach || 0}</span>
+        </div>
+        <div className="stat-card">
+          <p className="stat-label">Impressions</p>
+          <span className="stat-value">{summary?.impressions || 0}</span>
         </div>
         <div className="stat-card">
           <p className="stat-label">Conversions</p>
-          <span className="stat-value">{conversions}</span>
+          <span className="stat-value">{summary?.conversions || 0}</span>
         </div>
       </div>
 
-      {/* Tracking Table Section */}
       <div className="tracker-table-card">
         <h3>Daily Performance Logs</h3>
         <table className="tracker-table">
@@ -64,39 +102,26 @@ export default function CampaignTracker({ campaign, onBack }) {
               <th>Date</th>
               <th>Impressions</th>
               <th>Clicks</th>
-              <th>CTR</th>
-              <th>Spend</th>
+              <th>Engagement Rate</th>
+              <th>Conversions</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>10 Aug 2026</td>
-              <td>2,400</td>
-              <td>180</td>
-              <td>7.5%</td>
-              <td>$120</td>
-            </tr>
-            <tr>
-              <td>09 Aug 2026</td>
-              <td>3,100</td>
-              <td>240</td>
-              <td>7.7%</td>
-              <td>$150</td>
-            </tr>
-            <tr>
-              <td>08 Aug 2026</td>
-              <td>1,800</td>
-              <td>110</td>
-              <td>6.1%</td>
-              <td>$90</td>
-            </tr>
-            <tr>
-              <td>07 Aug 2026</td>
-              <td>5,100</td>
-              <td>420</td>
-              <td>8.2%</td>
-              <td>$280</td>
-            </tr>
+            {performance.length === 0 ? (
+              <tr>
+                <td colSpan="5">No performance records yet.</td>
+              </tr>
+            ) : (
+              performance.map((item) => (
+                <tr key={item.performance_id}>
+                  <td>{item.record_date}</td>
+                  <td>{item.impressions || 0}</td>
+                  <td>{item.clicks || 0}</td>
+                  <td>{item.engagement_rate || 0}%</td>
+                  <td>{item.conversions || 0}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

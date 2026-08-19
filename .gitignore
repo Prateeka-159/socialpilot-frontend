@@ -14,6 +14,8 @@ dist-ssr/
 .env
 .env.*
 !.env.example
+backend/.env
+backend/.env.*
 
 # Editor directories and files
 .vscode/
@@ -44,3 +46,13 @@ yarn-error.log*
 !.yarn/sdks
 !.yarn/versions
 
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# OS
+.DS_Store
+Thumbs.db

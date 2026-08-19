@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Search, Bell, Settings, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import "./Navbar.css";
 
 function Navbar() {
   const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <header className="sp-navbar">
@@ -62,7 +64,7 @@ function Navbar() {
             alt="Alex Vance"
             className="nav-avatar-img"
           />
-          <span className="nav-user-name">Alex V.</span>
+          <span className="nav-user-name">{user?.name?.split(" ")[0] || "User"}</span>
         </div>
       </div>
     </header>

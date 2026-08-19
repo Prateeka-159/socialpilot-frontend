@@ -9,6 +9,7 @@ function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("Content Creator");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ function Register() {
     setLoading(true);
 
     try {
-      await register(name, email, password);
+      await register(name, email, password, role);
 
       alert("Registration Successful!");
 
@@ -112,6 +113,22 @@ function Register() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="bare-input"
                 />
+              </div>
+            </div>
+
+            <div className="field-group">
+              <label className="field-label font-mono">WORKSPACE ROLE</label>
+              <div className="input-hairline-box">
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="bare-input"
+                >
+                  <option>Content Creator</option>
+                  <option>Business User</option>
+                  <option>Marketing Team</option>
+                  <option>Administrator</option>
+                </select>
               </div>
             </div>
 

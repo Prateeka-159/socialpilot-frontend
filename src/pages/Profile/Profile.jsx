@@ -21,12 +21,12 @@ function Profile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [profile, setProfile] = useState({
-    name: user.name,
-    role: user.role,
-    email: user.email,
-    phone: user.phone,
-    location: user.location,
-    bio: user.bio,
+    name: user?.name || "",
+    role: user?.role || "",
+    email: user?.email || "",
+    phone: "",
+    location: "",
+    bio: "",
   });
 
   useEffect(() => {
@@ -52,12 +52,35 @@ function Profile() {
     fetchProfile();
   }, []);
 
-  const handleSave = () => {
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      setError("");
+      const data = await updateProfile({
+        name: profile.name,
+        phone: profile.phone,
+        location: profile.location,
+        bio: profile.bio,
+      });
+
+      setProfile({
+        name: data.user.name || "",
+        email: data.user.email || "",
+        role: data.user.role || "",
+        phone: data.user.phone || "",
+        location: data.user.location || "",
+        bio: data.user.bio || "",
+      });
+      setIsEditing(false);
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
     <div className="profile-page">
+      {loading && <p>Loading profile...</p>}
+      {error && <p style={{ color: "#dc2626", padding: "1rem" }}>{error}</p>}
+
       {/* Cover Photography Hero Frame */}
       <div className="profile-cover-frame hairline-b">
         <img

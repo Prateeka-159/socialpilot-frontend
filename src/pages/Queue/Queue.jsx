@@ -1,33 +1,65 @@
-﻿import './Queue.css';
-
-const QUEUE_ITEMS = [
-  {
-    id: 101,
-    scheduledTime: 'Tomorrow • 18:00 UTC',
-    headline: 'Synthesizing architectural rhythm and structural minimalism across urban spaces.',
-    status: 'QUEUED',
-  },
-  {
-    id: 102,
-    scheduledTime: 'Aug 01 • 12:30 UTC',
-    headline: 'Monochrome textures in organic movement: Sand ripples and temporal geometry.',
-    status: 'SCHEDULED',
-  },
-  {
-    id: 103,
-    scheduledTime: 'Aug 03 • 09:00 UTC',
-    headline: 'Case study preview on modern workflow frameworks and studio delegation.',
-    status: 'DRAFT',
-  },
-];
+﻿import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getPosts } from "../../services/postService";
+import { cancelQueueItem, getPublishingQueue } from "../../services/queueService";
+import "./Queue.css";
 
 const statusStyles = {
-  QUEUED: 'badge-queued',
-  SCHEDULED: 'badge-scheduled',
-  DRAFT: 'badge-draft',
+  QUEUED: "badge-queued",
+  SCHEDULED: "badge-scheduled",
+  DRAFT: "badge-draft",
+  CANCELLED: "badge-draft",
+  FAILED: "badge-draft",
 };
 
 export default function Queue() {
+  const navigate = useNavigate();
+  const [queueItems, setQueueItems] = useState([]);
+  const [postsById, setPostsById] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const loadQueue = async () => {
+    try {
+      setError("");
+      const [queueData, postsData] = await Promise.all([
+        getPublishingQueue(),
+        getPosts(),
+      ]);
+
+      const postMap = {};
+      (postsData.posts || []).forEach((post) => {
+        postMap[post.post_id] = post;
+      });
+
+      setPostsById(postMap);
+      setQueueItems(queueData.queue || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadQueue();
+  }, []);
+
+  const handleCancel = async (queueId) => {
+    const confirmed = window.confirm("Remove this item from the queue?");
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await cancelQueueItem(queueId);
+      await loadQueue();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   return (
     <div className="queue-container">
       <div className="queue-header">
@@ -38,23 +70,51 @@ export default function Queue() {
             Review upcoming posts, update scheduling details, and keep your content pipeline moving.
           </p>
         </div>
-        <button className="queue-action-btn">+ Add Publication</button>
+        <button className="queue-action-btn" onClick={() => navigate("/scheduler")}>
+          + Add Publication
+        </button>
       </div>
 
+      {loading && <p>Loading queue...</p>}
+      {error && <p style={{ color: "#dc2626" }}>{error}</p>}
+
       <div className="queue-list">
-        {QUEUE_ITEMS.map((item) => (
-          <article key={item.id} className="queue-card">
-            <div className="queue-card-head">
-              <span className="queue-time">{item.scheduledTime}</span>
-              <span className={`queue-badge ${statusStyles[item.status]}`}>{item.status}</span>
-            </div>
-            <p className="queue-body">{item.headline}</p>
-            <div className="queue-card-footer">
-              <button className="card-btn secondary">Edit</button>
-              <button className="card-btn muted">Remove</button>
-            </div>
-          </article>
-        ))}
+        {queueItems.length === 0 && !loading ? (
+          <p>No queued publications yet.</p>
+        ) : (
+          queueItems.map((item) => {
+            const post = postsById[item.post_id];
+
+            return (
+              <article key={item.queue_id} className="queue-card">
+                <div className="queue-card-head">
+                  <span className="queue-time">
+                    {item.scheduled_at
+                      ? new Date(item.scheduled_at).toLocaleString()
+                      : "Not scheduled"}
+                  </span>
+                  <span className={`queue-badge ${statusStyles[item.status] || "badge-queued"}`}>
+                    {item.status}
+                  </span>
+                </div>
+                <p className="queue-body">
+                  {post?.caption || post?.title || `Post #${item.post_id}`}
+                </p>
+                <div className="queue-card-footer">
+                  <button className="card-btn secondary" onClick={() => navigate("/scheduler")}>
+                    Edit
+                  </button>
+                  <button
+                    className="card-btn muted"
+                    onClick={() => handleCancel(item.queue_id)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              </article>
+            );
+          })
+        )}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -9,17 +9,29 @@ import {
 } from "lucide-react";
 import { FaLinkedin, FaInstagram, FaFacebook } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import { getAccounts } from "../../services/socialService";
+import { createPost, getPosts } from "../../services/postService";
 import "./Scheduler.css";
+
+const PLATFORM_KEYS = {
+  linkedin: "LinkedIn",
+  instagram: "Instagram",
+  facebook: "Facebook",
+  twitter: "Twitter",
+};
 
 function Scheduler() {
   const [selectedMedia, setSelectedMedia] = useState("/biking-over-bridge.jpg");
-  const [caption, setCaption] = useState(
-    "Synthesizing architectural rhythm and structural minimalism across urban spaces. New series launching tomorrow."
-  );
-  const [selectedPlatforms, setSelectedPlatforms] = useState(["linkedin", "instagram"]);
-  const [scheduledDate, setScheduledDate] = useState("2026-08-15");
-  const [scheduledTime, setScheduledTime] = useState("18:00");
+  const [caption, setCaption] = useState("");
+  const [selectedPlatforms, setSelectedPlatforms] = useState(["linkedin"]);
+  const [scheduledDate, setScheduledDate] = useState("");
+  const [scheduledTime, setScheduledTime] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
+  const [accounts, setAccounts] = useState([]);
+  const [queuedPosts, setQueuedPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   const publicImages = [
     { id: 1, src: "/biking-over-bridge.jpg", name: "Biking over Bridge" },
@@ -27,41 +39,39 @@ function Scheduler() {
     { id: 3, src: "/ripples-of-sand-in-black-and-white.jpg", name: "Ripples of Sand" },
   ];
 
-  const [queuedPosts, setQueuedPosts] = useState([
-    {
-      id: 101,
-      date: "TOMORROW, 18:00 UTC",
-      platforms: [<FaLinkedin key="l" />, <FaInstagram key="i" />],
-      caption: "Synthesizing architectural rhythm and structural minimalism across urban spaces.",
-      image: "/biking-over-bridge.jpg",
-      status: "QUEUED",
-    },
-    {
-      id: 102,
-      date: "AUG 12, 12:30 UTC",
-      platforms: [<FaInstagram key="i" />, <FaXTwitter key="x" />],
-      caption: "Monochrome textures in organic movement: Sand ripples and temporal geometry.",
-      image: "/ripples-of-sand-in-black-and-white.jpg",
-      status: "SCHEDULED",
-    },
-    {
-      id: 103,
-      date: "AUG 14, 09:00 UTC",
-      platforms: [<FaLinkedin key="l" />, <FaFacebook key="f" />],
-      caption: "Case study preview on modern workflow frameworks and studio delegation.",
-      image: "/images.jpg",
-      status: "DRAFT",
-    },
-  ]);
+  const loadData = async () => {
+    try {
+      setError("");
+      const [accountData, postData] = await Promise.all([
+        getAccounts(),
+        getPosts(),
+      ]);
+
+      setAccounts(accountData.accounts || []);
+      setQueuedPosts(
+        (postData.posts || []).filter((post) =>
+          ["SCHEDULED", "QUEUED", "DRAFT"].includes(post.status)
+        )
+      );
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const togglePlatform = (key) => {
     setSelectedPlatforms((prev) =>
-      prev.includes(key) ? prev.filter((p) => p !== key) : [...prev, key]
+      prev.includes(key) ? prev.filter((platform) => platform !== key) : [...prev, key]
     );
   };
 
-  const getPlatformIcon = (key) => {
-    switch (key) {
+  const getPlatformIcon = (platformName) => {
+    switch (platformName?.toLowerCase()) {
       case "linkedin":
         return <FaLinkedin key="l" />;
       case "instagram":
@@ -75,31 +85,62 @@ function Scheduler() {
     }
   };
 
-  const handleQueuePost = (e) => {
-    e.preventDefault();
+  const findAccountForPlatform = (platformKey) => {
+    const platformName = PLATFORM_KEYS[platformKey];
+
+    return accounts.find(
+      (account) => account.platform.toLowerCase() === platformName.toLowerCase()
+    );
+  };
+
+  const handleQueuePost = async (event) => {
+    event.preventDefault();
 
     if (selectedPlatforms.length === 0) {
       alert("Please select at least one platform.");
       return;
     }
 
-    const newPost = {
-      id: Date.now(),
-      date: `${scheduledDate}, ${scheduledTime} UTC`,
-      platforms: selectedPlatforms.map((p) => getPlatformIcon(p)),
-      caption: caption,
-      image: selectedMedia,
-      status: "QUEUED",
-    };
+    if (!scheduledDate || !scheduledTime) {
+      alert("Please choose a publish date and time.");
+      return;
+    }
 
-    setQueuedPosts([newPost, ...queuedPosts]);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
+    const scheduledDateTime = `${scheduledDate}T${scheduledTime}:00`;
+
+    try {
+      setSubmitting(true);
+      setError("");
+
+      for (const platformKey of selectedPlatforms) {
+        const account = findAccountForPlatform(platformKey);
+
+        if (!account) {
+          throw new Error(
+            `Connect your ${PLATFORM_KEYS[platformKey]} account before scheduling.`
+          );
+        }
+
+        await createPost({
+          social_account_id: account.id,
+          caption,
+          title: caption.slice(0, 80),
+          scheduled_time: scheduledDateTime,
+        });
+      }
+
+      await loadData();
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div className="scheduler-page">
-      {/* Page Header */}
       <div className="page-header hairline-b">
         <div>
           <span className="eyebrow-text font-mono">CONTENT RHYTHM</span>
@@ -111,8 +152,6 @@ function Scheduler() {
 
         <div className="header-meta font-mono">
           <span>ACTIVE QUEUE: {String(queuedPosts.length).padStart(2, "0")} POSTS</span>
-          <span>·</span>
-          <span>NEXT: TOMORROW 18:00 UTC</span>
         </div>
       </div>
 
@@ -123,9 +162,11 @@ function Scheduler() {
         </div>
       )}
 
-      {/* Scheduler Split Studio Canvas */}
+      {error && (
+        <p style={{ color: "#dc2626", padding: "0 0 1rem 0" }}>{error}</p>
+      )}
+
       <div className="scheduler-grid">
-        {/* Left Column: Composer Studio */}
         <div className="composer-column hairline-r">
           <div className="column-title-row hairline-b">
             <Sparkles size={18} />
@@ -133,62 +174,35 @@ function Scheduler() {
           </div>
 
           <form onSubmit={handleQueuePost} className="composer-form">
-            {/* Target Networks selection */}
             <div className="form-section">
               <span className="form-label font-mono">SELECT TARGET PLATFORMS</span>
               <div className="platform-toggle-row">
-                <button
-                  type="button"
-                  className={`plat-toggle-btn ${selectedPlatforms.includes("linkedin") ? "is-selected" : ""}`}
-                  onClick={() => togglePlatform("linkedin")}
-                >
-                  <FaLinkedin size={16} />
-                  <span>LinkedIn</span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`plat-toggle-btn ${selectedPlatforms.includes("instagram") ? "is-selected" : ""}`}
-                  onClick={() => togglePlatform("instagram")}
-                >
-                  <FaInstagram size={16} />
-                  <span>Instagram</span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`plat-toggle-btn ${selectedPlatforms.includes("facebook") ? "is-selected" : ""}`}
-                  onClick={() => togglePlatform("facebook")}
-                >
-                  <FaFacebook size={16} />
-                  <span>Facebook</span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`plat-toggle-btn ${selectedPlatforms.includes("twitter") ? "is-selected" : ""}`}
-                  onClick={() => togglePlatform("twitter")}
-                >
-                  <FaXTwitter size={16} />
-                  <span>X (Twitter)</span>
-                </button>
+                {["linkedin", "instagram", "facebook", "twitter"].map((platform) => (
+                  <button
+                    key={platform}
+                    type="button"
+                    className={`plat-toggle-btn ${selectedPlatforms.includes(platform) ? "is-selected" : ""}`}
+                    onClick={() => togglePlatform(platform)}
+                  >
+                    {getPlatformIcon(platform)}
+                    <span>{PLATFORM_KEYS[platform]}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Caption Textarea */}
             <div className="form-section">
               <span className="form-label font-mono">CAPTION & EDITORIAL BODY</span>
               <textarea
                 rows={4}
                 value={caption}
-                onChange={(e) => setCaption(e.target.value)}
+                onChange={(event) => setCaption(event.target.value)}
                 placeholder="Write your editorial caption here..."
                 className="bare-textarea hairline-b"
                 required
               />
             </div>
 
-            {/* Media Asset Selector */}
             <div className="form-section">
               <span className="form-label font-mono">SELECT ATTACHED MEDIA</span>
               <div className="media-selector-grid">
@@ -205,7 +219,6 @@ function Scheduler() {
               </div>
             </div>
 
-            {/* Timing Inputs */}
             <div className="form-section timing-row hairline-t">
               <div className="time-field">
                 <span className="form-label font-mono">PUBLISH DATE</span>
@@ -214,7 +227,7 @@ function Scheduler() {
                   <input
                     type="date"
                     value={scheduledDate}
-                    onChange={(e) => setScheduledDate(e.target.value)}
+                    onChange={(event) => setScheduledDate(event.target.value)}
                     className="bare-input"
                     required
                   />
@@ -228,7 +241,7 @@ function Scheduler() {
                   <input
                     type="time"
                     value={scheduledTime}
-                    onChange={(e) => setScheduledTime(e.target.value)}
+                    onChange={(event) => setScheduledTime(event.target.value)}
                     className="bare-input"
                     required
                   />
@@ -236,46 +249,63 @@ function Scheduler() {
               </div>
             </div>
 
-            {/* Submit Button */}
-            <button type="submit" className="sp-primary-submit">
+            <button type="submit" className="sp-primary-submit" disabled={submitting}>
               <Send size={16} />
-              <span>Add to Publication Queue</span>
+              <span>{submitting ? "Scheduling..." : "Add to Publication Queue"}</span>
             </button>
           </form>
         </div>
 
-        {/* Right Column: Queued Media Timeline */}
         <div className="timeline-column">
           <div className="column-title-row hairline-b">
             <Layers size={18} />
             <h2 className="column-heading font-serif">Queued Publications</h2>
           </div>
 
-          <div className="queue-flat-list">
-            {queuedPosts.map((post) => (
-              <div key={post.id} className="queue-flat-row hairline-b">
-                <div className="queue-thumb-wrap">
-                  <img src={post.image} alt="Queued attachment" />
-                </div>
+          {loading ? (
+            <p>Loading scheduled posts...</p>
+          ) : (
+            <div className="queue-flat-list">
+              {queuedPosts.length === 0 ? (
+                <p>No scheduled posts yet.</p>
+              ) : (
+                queuedPosts.map((post) => {
+                  const account = accounts.find(
+                    (item) => item.id === post.social_account_id
+                  );
 
-                <div className="queue-content-wrap">
-                  <div className="queue-meta-row font-mono">
-                    <span className="queue-date">{post.date}</span>
-                    <div className="queue-icons">{post.platforms}</div>
-                  </div>
+                  return (
+                    <div key={post.post_id} className="queue-flat-row hairline-b">
+                      <div className="queue-thumb-wrap">
+                        <img src={selectedMedia} alt="Queued attachment" />
+                      </div>
 
-                  <p className="queue-caption">{post.caption}</p>
+                      <div className="queue-content-wrap">
+                        <div className="queue-meta-row font-mono">
+                          <span className="queue-date">
+                            {post.scheduled_time
+                              ? new Date(post.scheduled_time).toLocaleString()
+                              : "Draft"}
+                          </span>
+                          <div className="queue-icons">
+                            {getPlatformIcon(account?.platform)}
+                          </div>
+                        </div>
 
-                  <div className="queue-footer-row font-mono">
-                    <span className={`status-pill ${post.status.toLowerCase()}`}>
-                      {post.status}
-                    </span>
-                    <button type="button" className="queue-edit-link">Edit Post →</button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                        <p className="queue-caption">{post.caption}</p>
+
+                        <div className="queue-footer-row font-mono">
+                          <span className={`status-pill ${post.status.toLowerCase()}`}>
+                            {post.status}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

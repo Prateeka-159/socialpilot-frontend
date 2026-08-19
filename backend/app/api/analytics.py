@@ -419,3 +419,234 @@ def get_campaign_performance(
             for item in performance_records
         ]
     }
+
+# Frontend: Get overall analytics for the current user across all campaigns
+@router.get("/overall")
+def get_overall_analytics(
+    time_range: str = "7d",
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    db_user = (
+        db.query(User)
+        .filter(User.email == current_user["sub"])
+        .first()
+    )
+
+    if not db_user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    # Get all user campaigns
+    campaigns = (
+        db.query(Campaign)
+        .filter(Campaign.user_id == db_user.user_id)
+        .all()
+    )
+
+    if not campaigns:
+        return {
+            "message": "No campaigns found for user",
+            "overall_metrics": {
+                "total_impressions": 0,
+                "total_engagements": 0,
+                "total_clicks": 0,
+                "total_conversions": 0,
+                "total_reach": 0,
+                "average_engagement_rate": 0,
+                "total_budget": 0,
+                "total_campaigns": 0
+            },
+            "campaigns": []
+        }
+
+    # Calculate time range filter
+    from datetime import datetime, timedelta
+    time_map = {
+        "7d": timedelta(days=7),
+        "30d": timedelta(days=30),
+        "90d": timedelta(days=90),
+        "1y": timedelta(days=365)
+    }
+    date_filter = datetime.now() - time_map.get(time_range, timedelta(days=7))
+
+    # Get performance data for all campaigns within time range
+    campaign_ids = [campaign.campaign_id for campaign in campaigns]
+    
+    performance_data = (
+        db.query(CampaignPerformance)
+        .filter(
+            CampaignPerformance.campaign_id.in_(campaign_ids),
+            CampaignPerformance.record_date >= date_filter
+        )
+        .all()
+    )
+
+    # Calculate overall metrics
+    total_impressions = sum(item.impressions or 0 for item in performance_data)
+    total_reach = sum(item.reach or 0 for item in performance_data)
+    total_likes = sum(item.likes or 0 for item in performance_data)
+    total_comments = sum(item.comments or 0 for item in performance_data)
+    total_shares = sum(item.shares or 0 for item in performance_data)
+    total_clicks = sum(item.clicks or 0 for item in performance_data)
+    total_saves = sum(item.saves or 0 for item in performance_data)
+    total_conversions = sum(item.conversions or 0 for item in performance_data)
+    total_budget = sum(campaign.budget or 0 for campaign in campaigns)
+
+    total_engagements = total_likes + total_comments + total_shares + total_clicks + total_saves
+    
+    average_engagement_rate = (
+        sum(float(item.engagement_rate or 0) for item in performance_data) / len(performance_data)
+        if performance_data else 0
+    )
+
+    return {
+        "message": "Overall analytics fetched successfully",
+        "time_range": time_range,
+        "overall_metrics": {
+            "total_impressions": total_impressions,
+            "total_engagements": total_engagements,
+            "total_clicks": total_clicks,
+            "total_conversions": total_conversions,
+            "total_reach": total_reach,
+            "average_engagement_rate": round(average_engagement_rate, 2),
+            "total_budget": total_budget,
+            "total_campaigns": len(campaigns)
+        },
+        "campaigns": [
+            {
+                "campaign_id": campaign.campaign_id,
+                "campaign_name": campaign.campaign_name,
+                "platform": campaign.platform.value,
+                "status": campaign.status.value,
+                "budget": campaign.budget
+            }
+            for campaign in campaigns
+        ]
+    }
+
+# Frontend: Get user performance metrics summary
+@router.get("/user/performance")
+def get_user_performance_metrics(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    db_user = (
+        db.query(User)
+        .filter(User.email == current_user["sub"])
+        .first()
+    )
+
+    if not db_user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    # Get all user campaigns
+    campaigns = (
+        db.query(Campaign)
+        .filter(Campaign.user_id == db_user.user_id)
+        .all()
+    )
+
+    campaign_ids = [campaign.campaign_id for campaign in campaigns]
+
+    # Get all performance data
+    performance_data = (
+        db.query(CampaignPerformance)
+        .filter(CampaignPerformance.campaign_id.in_(campaign_ids))
+        .all()
+    )
+
+    # Calculate metrics
+    total_impressions = sum(item.impressions or 0 for item in performance_data)
+    total_engagements = sum(
+        (item.likes or 0) + (item.comments or 0) + (item.shares or 0) + 
+        (item.clicks or 0) + (item.saves or 0)
+        for item in performance_data
+    )
+    total_conversions = sum(item.conversions or 0 for item in performance_data)
+    
+    return {
+        "message": "User performance metrics fetched successfully",
+        "metrics": {
+            "total_impressions": total_impressions,
+            "total_engagements": total_engagements,
+            "total_conversions": total_conversions,
+            "total_campaigns": len(campaigns),
+            "active_campaigns": len([c for c in campaigns if c.status.value == "active"])
+        }
+    }
+
+# Frontend: Get cross-platform analytics
+@router.get("/cross-platform")
+def get_cross_platform_analytics(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    db_user = (
+        db.query(User)
+        .filter(User.email == current_user["sub"])
+        .first()
+    )
+
+    if not db_user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    # Get campaigns grouped by platform
+    campaigns = (
+        db.query(Campaign)
+        .filter(Campaign.user_id == db_user.user_id)
+        .all()
+    )
+
+    platform_stats = {}
+    campaign_ids = [campaign.campaign_id for campaign in campaigns]
+
+    # Get performance data
+    performance_data = (
+        db.query(CampaignPerformance)
+        .filter(CampaignPerformance.campaign_id.in_(campaign_ids))
+        .all()
+    )
+
+    # Group by platform
+    for campaign in campaigns:
+        platform = campaign.platform.value
+        if platform not in platform_stats:
+            platform_stats[platform] = {
+                "platform": platform,
+                "campaign_count": 0,
+                "total_budget": 0,
+                "total_impressions": 0,
+                "total_engagements": 0,
+                "total_conversions": 0
+            }
+        
+        platform_stats[platform]["campaign_count"] += 1
+        platform_stats[platform]["total_budget"] += campaign.budget or 0
+
+    # Add performance data to platform stats
+    for perf in performance_data:
+        # Find the campaign for this performance record
+        campaign = next((c for c in campaigns if c.campaign_id == perf.campaign_id), None)
+        if campaign:
+            platform = campaign.platform.value
+            if platform in platform_stats:
+                platform_stats[platform]["total_impressions"] += perf.impressions or 0
+                platform_stats[platform]["total_engagements"] += (
+                    (perf.likes or 0) + (perf.comments or 0) + (perf.shares or 0) + 
+                    (perf.clicks or 0) + (perf.saves or 0)
+                )
+                platform_stats[platform]["total_conversions"] += perf.conversions or 0
+
+    return {
+        "message": "Cross-platform analytics fetched successfully",
+        "platform_stats": list(platform_stats.values())
+    }

@@ -1,18 +1,69 @@
-import './Drafts.css';
-
-const DRAFTS_DATA = [
-  { id: 1, title: 'Q3 Product Roadmap Announcement', targetPlatform: 'LinkedIn', lastSaved: '10 mins ago', author: 'Alex Vance' },
-  { id: 2, title: 'Cyberpunk Theme Launch Assets', targetPlatform: 'Instagram', lastSaved: '2 hours ago', author: 'Alex Vance' },
-  { id: 3, title: 'Weekly Tech Insights Thread', targetPlatform: 'X (Twitter)', lastSaved: 'Yesterday', author: 'Alex Vance' },
-];
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { deleteDraft, getDrafts } from "../../services/postService";
+import { getAccounts } from "../../services/socialService";
+import "./Drafts.css";
 
 export default function Drafts() {
+  const navigate = useNavigate();
+  const [drafts, setDrafts] = useState([]);
+  const [accounts, setAccounts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const loadDrafts = async () => {
+    try {
+      setError("");
+      const [draftData, accountData] = await Promise.all([
+        getDrafts(),
+        getAccounts(),
+      ]);
+
+      setDrafts(draftData.drafts || []);
+      setAccounts(accountData.accounts || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadDrafts();
+  }, []);
+
+  const getPlatformName = (socialAccountId) => {
+    const account = accounts.find((item) => item.id === socialAccountId);
+    return account?.platform || "Unknown";
+  };
+
+  const handleDelete = async (draftId) => {
+    const confirmed = window.confirm("Delete this draft?");
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteDraft(draftId);
+      await loadDrafts();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   return (
     <div className="drafts-container">
       <div className="drafts-header">
         <h2>Drafts</h2>
-        <button className="new-draft-btn">+ Create Draft</button>
+        <button className="new-draft-btn" onClick={() => navigate("/scheduler")}>
+          + Create Draft
+        </button>
       </div>
+
+      {loading && <p>Loading drafts...</p>}
+      {error && <p style={{ color: "#dc2626" }}>{error}</p>}
+
       <div className="drafts-table-wrapper">
         <table className="drafts-table">
           <thead>
@@ -20,23 +71,49 @@ export default function Drafts() {
               <th>TITLE</th>
               <th>PLATFORM</th>
               <th>LAST SAVED</th>
-              <th>AUTHOR</th>
+              <th>STATUS</th>
               <th>ACTIONS</th>
             </tr>
           </thead>
           <tbody>
-            {DRAFTS_DATA.map((item) => (
-              <tr key={item.id}>
-                <td className="draft-title">{item.title}</td>
-                <td><span className="platform-tag">{item.targetPlatform}</span></td>
-                <td className="sub-text">{item.lastSaved}</td>
-                <td className="sub-text">{item.author}</td>
-                <td>
-                  <button className="action-btn edit-btn">Edit</button>
-                  <button className="action-btn delete-btn">Delete</button>
-                </td>
+            {drafts.length === 0 && !loading ? (
+              <tr>
+                <td colSpan="5">No drafts found.</td>
               </tr>
-            ))}
+            ) : (
+              drafts.map((item) => (
+                <tr key={item.post_id}>
+                  <td className="draft-title">
+                    {item.title || item.caption || "Untitled draft"}
+                  </td>
+                  <td>
+                    <span className="platform-tag">
+                      {getPlatformName(item.social_account_id)}
+                    </span>
+                  </td>
+                  <td className="sub-text">
+                    {item.updated_at
+                      ? new Date(item.updated_at).toLocaleString()
+                      : "—"}
+                  </td>
+                  <td className="sub-text">{item.status}</td>
+                  <td>
+                    <button
+                      className="action-btn edit-btn"
+                      onClick={() => navigate("/scheduler")}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="action-btn delete-btn"
+                      onClick={() => handleDelete(item.post_id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
