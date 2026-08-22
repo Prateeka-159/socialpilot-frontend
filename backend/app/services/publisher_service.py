@@ -130,9 +130,14 @@ def publish_scheduled_post(
 
     try:
 
+        media_url = None
+
+        if post.post_media:
+            media_url = post.post_media[0].media_url
+
         response = service.publish_post(
             caption=post.caption or "",
-            media_url=post.media_url
+            media_url=media_url
         )
 
     except Exception as e:
