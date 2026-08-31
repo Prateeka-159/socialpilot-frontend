@@ -1,7 +1,6 @@
 import './CampaignTracker.css';
 
 export default function CampaignTracker({ campaign, onBack }) {
-  // Use passed props or default fallback data
   const name = campaign?.name || 'Summer Product Launch';
   const platform = campaign?.platform || 'Instagram';
   const status = campaign?.status || 'Active';
@@ -10,95 +9,80 @@ export default function CampaignTracker({ campaign, onBack }) {
   const reach = campaign?.reach || '12.4K';
   const conversions = campaign?.conversions || '142';
 
-  return (
-    <div className="tracker-page">
-      {/* Top Bar with Back Button */}
-      <div className="tracker-top-bar">
-        <button className="back-btn" onClick={onBack}>
-          ← Back to Campaigns
-        </button>
-      </div>
+  const logs = campaign?.logs || [
+    { date: '10 Aug 2026', impressions: '2,400', clicks: '180', ctr: '7.5%', spend: '$120' },
+    { date: '09 Aug 2026', impressions: '3,100', clicks: '240', ctr: '7.7%', spend: '$150' },
+    { date: '08 Aug 2026', impressions: '1,800', clicks: '110', ctr: '6.1%', spend: '$90' },
+    { date: '07 Aug 2026', impressions: '5,100', clicks: '420', ctr: '8.2%', spend: '$280' },
+  ];
 
-      {/* Campaign Details Header */}
-      <div className="tracker-header">
-        <div>
-          <span className="section-label">LIVE TRACKER</span>
-          <h2>{name}</h2>
-          <p>
+  return (
+    <div className="tracker-wrapper">
+      <div className="tracker-card">
+        {/* Top Controls Row */}
+        <div className="tracker-header">
+          <button className="back-btn" onClick={onBack}>
+            ← Back to Campaigns
+          </button>
+          <button className="edit-btn">Edit Campaign</button>
+        </div>
+
+        {/* Campaign Info */}
+        <div className="campaign-meta">
+          <span className="live-tracker-label">LIVE TRACKER</span>
+          <h1 className="campaign-title">{name}</h1>
+          <p className="platform-status">
             Platform: <strong>{platform}</strong> • Status:{' '}
-            <span className={`status-pill ${status.toLowerCase()}`}>
-              {status}
-            </span>
+            <span className={`status-badge ${status.toLowerCase()}`}>{status}</span>
           </p>
         </div>
 
-        <button className="edit-btn">Edit Campaign</button>
-      </div>
+        {/* Top 4 Metrics Cards */}
+        <div className="metrics-grid">
+          <div className="metric-card">
+            <span className="metric-label">BUDGET ALLOCATED</span>
+            <h2 className="metric-value">{budget}</h2>
+          </div>
+          <div className="metric-card">
+            <span className="metric-label">TOTAL SPENT</span>
+            <h2 className="metric-value">{spent}</h2>
+          </div>
+          <div className="metric-card">
+            <span className="metric-label">TOTAL REACH</span>
+            <h2 className="metric-value">{reach}</h2>
+          </div>
+          <div className="metric-card">
+            <span className="metric-label">CONVERSIONS</span>
+            <h2 className="metric-value">{conversions}</h2>
+          </div>
+        </div>
 
-      {/* KPI Cards */}
-      <div className="tracker-stats-grid">
-        <div className="stat-card">
-          <p className="stat-label">Budget Allocated</p>
-          <span className="stat-value">{budget}</span>
+        {/* Bottom Table Card */}
+        <div className="logs-card">
+          <h3 className="logs-title">Daily Performance Logs</h3>
+          <table className="logs-table">
+            <thead>
+              <tr>
+                <th>DATE</th>
+                <th>IMPRESSIONS</th>
+                <th>CLICKS</th>
+                <th>CTR</th>
+                <th>SPEND</th>
+              </tr>
+            </thead>
+            <tbody>
+              {logs.map((log, index) => (
+                <tr key={index}>
+                  <td>{log.date}</td>
+                  <td>{log.impressions}</td>
+                  <td>{log.clicks}</td>
+                  <td>{log.ctr}</td>
+                  <td>{log.spend}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <div className="stat-card">
-          <p className="stat-label">Total Spent</p>
-          <span className="stat-value">{spent}</span>
-        </div>
-        <div className="stat-card">
-          <p className="stat-label">Total Reach</p>
-          <span className="stat-value">{reach}</span>
-        </div>
-        <div className="stat-card">
-          <p className="stat-label">Conversions</p>
-          <span className="stat-value">{conversions}</span>
-        </div>
-      </div>
-
-      {/* Tracking Table Section */}
-      <div className="tracker-table-card">
-        <h3>Daily Performance Logs</h3>
-        <table className="tracker-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Impressions</th>
-              <th>Clicks</th>
-              <th>CTR</th>
-              <th>Spend</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>10 Aug 2026</td>
-              <td>2,400</td>
-              <td>180</td>
-              <td>7.5%</td>
-              <td>$120</td>
-            </tr>
-            <tr>
-              <td>09 Aug 2026</td>
-              <td>3,100</td>
-              <td>240</td>
-              <td>7.7%</td>
-              <td>$150</td>
-            </tr>
-            <tr>
-              <td>08 Aug 2026</td>
-              <td>1,800</td>
-              <td>110</td>
-              <td>6.1%</td>
-              <td>$90</td>
-            </tr>
-            <tr>
-              <td>07 Aug 2026</td>
-              <td>5,100</td>
-              <td>420</td>
-              <td>8.2%</td>
-              <td>$280</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
     </div>
   );

@@ -1,131 +1,188 @@
-.campaigns-page {
+.campaigns-wrapper {
   padding: 32px;
-  background-color: #f9f8f6;
+  background-color: transparent;
   min-height: 100vh;
   box-sizing: border-box;
-  color: #111111;
-  font-family: inherit;
+}
+
+.campaigns-card {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 36px;
+  max-width: 1100px;
+  margin: 0 auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
 }
 
 .campaigns-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 24px;
 }
 
-.section-label {
-  font-size: 11px;
-  font-family: monospace;
-  letter-spacing: 0.1em;
-  color: #555555;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
 .campaigns-header h2 {
-  font-size: 28px;
-  font-weight: 800;
-  margin: 4px 0 0 0;
-  letter-spacing: -0.02em;
-}
-
-.campaigns-header p {
-  font-size: 14px;
-  color: #555555;
-  margin-top: 4px;
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+  color: #111827;
 }
 
 .create-btn {
-  background-color: #000000;
+  background-color: #111827;
   color: #ffffff;
   border: none;
-  border-radius: 6px;
   padding: 10px 18px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.campaigns-search-bar {
-  margin-bottom: 20px;
-}
-
-.campaigns-search-bar input {
-  width: 100%;
-  max-width: 480px;
-  padding: 12px 16px;
-  border: 1px solid #dcdcdc;
   border-radius: 8px;
-  background-color: #f0eee9;
-  font-size: 14px;
-  outline: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
 }
 
-.campaigns-list {
+.create-btn:hover {
+  opacity: 0.9;
+}
+
+.campaigns-grid {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .campaign-card {
-  background-color: #eeebe3;
-  border: 1px solid #e2ded5;
-  border-radius: 12px;
-  padding: 20px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 22px 28px;
+  background-color: #f8f9fa;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease;
 }
 
 .campaign-card:hover {
-  background-color: #e6e2d7;
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
   transform: translateY(-1px);
 }
 
-.card-info h3 {
-  margin: 0 0 6px 0;
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.card-info p {
+.campaign-card h3 {
   margin: 0;
-  font-size: 13px;
-  color: #666666;
-}
-
-.card-info span {
+  font-size: 16px;
   font-weight: 600;
-  color: #222222;
+  color: #111827;
 }
 
-.card-badge {
+.card-right-group {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.status-pill {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
+.campaign-details {
+  font-size: 14px;
+  color: #4b5563;
+  font-weight: 500;
 }
 
-.status-pill.active {
-  background-color: #e6f4ea;
-  color: #137333;
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.2s ease, background-color 0.2s ease;
 }
 
-.status-pill.scheduled {
-  background-color: #fef3c7;
-  color: #b45309;
+.delete-btn:hover {
+  color: #ef4444;
+  background-color: #fee2e2;
 }
 
-.arrow {
+/* Modal Popup Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-card {
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.modal-card h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
   font-size: 18px;
-  color: #888888;
+  color: #111827;
+}
+
+.form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.form-group input,
+.form-group select {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #111827;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.cancel-btn {
+  background: transparent;
+  border: 1px solid #d1d5db;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #374151;
+}
+
+.submit-btn {
+  background: #111827;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
 }
