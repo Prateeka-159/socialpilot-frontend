@@ -1,6 +1,8 @@
 .profile-page {
   display: flex;
   flex-direction: column;
+  margin: 0;
+  padding: 0;
   color: var(--c-dark);
 }
 
@@ -40,6 +42,31 @@
   padding: 4px 12px;
 }
 
+.image-change-control {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2;
+  padding: 8px 12px;
+  border: 1px solid var(--c-cream);
+  border-radius: 20px;
+  background: var(--c-dark);
+  color: var(--c-cream);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.image-change-control:hover {
+  background: var(--primary-hover);
+}
+
+.image-change-control input,
+.avatar-image-control input {
+  display: none;
+}
+
 /* Header Row */
 .profile-header-row {
   display: flex;
@@ -67,6 +94,27 @@
   width: 90px;
   height: 90px;
   flex-shrink: 0;
+}
+
+.avatar-image-control {
+  position: absolute;
+  right: -4px;
+  bottom: 2px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--c-cream);
+  border-radius: 50%;
+  background: var(--c-dark);
+  color: var(--c-cream);
+  cursor: pointer;
+}
+
+.avatar-image-control:hover {
+  background: var(--primary-hover);
 }
 
 .avatar-photo {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Lock,
   Bell,
@@ -8,20 +8,122 @@ import {
   Sliders,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import {
+  changePassword,
+  deleteAccount,
+  getPermissions,
+  getPreferences,
+  updatePreferences,
+} from "../../services/settingsService";
 import "./Settings.css";
 
 function Settings() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [notifications, setNotifications] = useState(true);
   const [autoSync, setAutoSync] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
-  const handleLogout = () => {
+  useEffect(() => {
+    const loadPreferences = async () => {
+      try {
+        const data = await getPreferences();
+        const emailEnabled = data.preferences?.email_notification ?? true;
+        const pushEnabled = data.preferences?.push_notification ?? true;
+        setNotifications(emailEnabled && pushEnabled);
+        setAutoSync(data.preferences?.auto_sync ?? true);
+      } catch (err) {
+        setError(err.message || "Unable to load settings.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPreferences();
+  }, []);
+
+  const savePreferences = async (preferences, rollback) => {
+    try {
+      setError("");
+      setMessage("");
+      await updatePreferences(preferences);
+      setMessage("Settings saved.");
+    } catch (err) {
+      rollback();
+      setError(err.message || "Unable to save settings.");
+    }
+  };
+
+  const handleNotificationsToggle = () => {
+    const nextValue = !notifications;
+    setNotifications(nextValue);
+    savePreferences(
+      { email_notification: nextValue, push_notification: nextValue },
+      () => setNotifications(!nextValue)
+    );
+  };
+
+  const handleAutoSyncToggle = () => {
+    const nextValue = !autoSync;
+    setAutoSync(nextValue);
+    savePreferences({ auto_sync: nextValue }, () => setAutoSync(!nextValue));
+  };
+
+  const handlePasswordUpdate = async () => {
+    const currentPassword = window.prompt("Enter your current password:");
+    if (currentPassword === null) return;
+
+    const newPassword = window.prompt("Enter your new password (minimum 8 characters):");
+    if (newPassword === null) return;
+
+    const confirmation = window.prompt("Confirm your new password:");
+    if (confirmation !== newPassword) {
+      setError("New passwords do not match.");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setError("");
+      await changePassword({ current_password: currentPassword, new_password: newPassword });
+      setMessage("Password updated successfully.");
+    } catch (err) {
+      setError(err.message || "Unable to update password.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handlePermissions = async () => {
+    try {
+      const data = await getPermissions();
+      window.alert(`Role: ${data.role}\n\nPermissions:\n- ${data.permissions.join("\n- ")}`);
+    } catch (err) {
+      setError(err.message || "Unable to load permissions.");
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
     navigate("/");
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm("Are you sure you want to purge this studio workspace?")) {
-      navigate("/");
+      try {
+        setSaving(true);
+        await deleteAccount();
+        await logout();
+        navigate("/");
+      } catch (err) {
+        setError(err.message || "Unable to purge workspace data.");
+      } finally {
+        setSaving(false);
+      }
     }
   };
 
@@ -38,9 +140,12 @@ function Settings() {
         </div>
 
         <div className="status-indicator font-mono">
-          <span>SYSTEM VERSION: SP-v1.2.0</span>
+          <span>{loading ? "LOADING SETTINGS" : "SETTINGS SYNCHRONIZED"}</span>
         </div>
       </div>
+
+      {error && <p className="settings-feedback settings-error">{error}</p>}
+      {message && <p className="settings-feedback">{message}</p>}
 
       {/* Settings Flat List (NO BOX CARDS!) */}
       <div className="settings-flat-list">
@@ -56,7 +161,8 @@ function Settings() {
           <div className="setting-action">
             <button
               className="sp-setting-btn sp-setting-btn-outline"
-              onClick={() => alert("Password reset link generated.")}
+              onClick={handlePasswordUpdate}
+              disabled={saving}
             >
               Update Password
             </button>
@@ -75,7 +181,8 @@ function Settings() {
           <div className="setting-action">
             <button
               className={`sp-setting-btn toggle-switch-btn ${notifications ? "active" : ""}`}
-              onClick={() => setNotifications(!notifications)}
+              onClick={handleNotificationsToggle}
+              disabled={loading || saving}
             >
               <span className="toggle-slider font-mono">
                 {notifications ? "ENABLED" : "DISABLED"}
@@ -96,7 +203,8 @@ function Settings() {
           <div className="setting-action">
             <button
               className={`sp-setting-btn toggle-switch-btn ${autoSync ? "active" : ""}`}
-              onClick={() => setAutoSync(!autoSync)}
+              onClick={handleAutoSyncToggle}
+              disabled={loading || saving}
             >
               <span className="toggle-slider font-mono">
                 {autoSync ? "ENABLED" : "DISABLED"}
@@ -115,7 +223,7 @@ function Settings() {
             </div>
           </div>
           <div className="setting-action">
-            <button className="sp-setting-btn sp-setting-btn-outline">
+            <button className="sp-setting-btn sp-setting-btn-outline" onClick={handlePermissions}>
               Permissions
             </button>
           </div>
@@ -150,6 +258,7 @@ function Settings() {
             <button
               className="sp-setting-btn danger-btn font-mono"
               onClick={handleDelete}
+              disabled={saving}
             >
               PURGE DATA
             </button>

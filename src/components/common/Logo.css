@@ -32,7 +32,8 @@
   color: #ffffff;
 }
 .sp-logo-container.light .sp-brand-tag {
-  color: #58554e;
+  color: #f7f0e5;
+  opacity: 0.82;
 }
 
 /* Variant Dark (For light backgrounds) */

@@ -102,6 +102,7 @@ class NotificationPreference(Base):
     publishing_alert = Column(Boolean, default=True)
     post_reminder = Column(Boolean, default=True)
     team_alert = Column(Boolean, default=True)
+    auto_sync = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 

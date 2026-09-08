@@ -6,6 +6,9 @@ import {
   Sparkles,
   Layers,
   CheckCircle,
+  FileText,
+  Paperclip,
+  X,
 } from "lucide-react";
 import { FaLinkedin, FaInstagram, FaFacebook } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
@@ -21,7 +24,7 @@ const PLATFORM_KEYS = {
 };
 
 function Scheduler() {
-  const [selectedMedia, setSelectedMedia] = useState("/biking-over-bridge.jpg");
+  const [attachedFile, setAttachedFile] = useState(null);
   const [caption, setCaption] = useState("");
   const [selectedPlatforms, setSelectedPlatforms] = useState(["linkedin"]);
   const [scheduledDate, setScheduledDate] = useState("");
@@ -32,12 +35,6 @@ function Scheduler() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-
-  const publicImages = [
-    { id: 1, src: "/biking-over-bridge.jpg", name: "Biking over Bridge" },
-    { id: 2, src: "/images.jpg", name: "Abstract Structure" },
-    { id: 3, src: "/ripples-of-sand-in-black-and-white.jpg", name: "Ripples of Sand" },
-  ];
 
   const loadData = async () => {
     try {
@@ -68,6 +65,27 @@ function Scheduler() {
     setSelectedPlatforms((prev) =>
       prev.includes(key) ? prev.filter((platform) => platform !== key) : [...prev, key]
     );
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Attached documents must be smaller than 5 MB.");
+      event.target.value = "";
+      return;
+    }
+
+    setError("");
+    setAttachedFile(file);
+  };
+
+  const removeAttachedFile = () => {
+    setAttachedFile(null);
   };
 
   const getPlatformIcon = (platformName) => {
@@ -126,6 +144,7 @@ function Scheduler() {
           caption,
           title: caption.slice(0, 80),
           scheduled_time: scheduledDateTime,
+          image: attachedFile,
         });
       }
 
@@ -204,18 +223,41 @@ function Scheduler() {
             </div>
 
             <div className="form-section">
-              <span className="form-label font-mono">SELECT ATTACHED MEDIA</span>
-              <div className="media-selector-grid">
-                {publicImages.map((img) => (
-                  <div
-                    key={img.id}
-                    className={`media-select-thumb ${selectedMedia === img.src ? "thumb-selected" : ""}`}
-                    onClick={() => setSelectedMedia(img.src)}
-                  >
-                    <img src={img.src} alt={img.name} />
-                    <span className="thumb-caption font-mono">{img.name}</span>
+              <span className="form-label font-mono">ATTACH YOUR DOCUMENT</span>
+              <div className="document-attachment">
+                <label htmlFor="document-upload" className="document-upload-label">
+                  <Paperclip size={18} />
+                  <span>{attachedFile ? "Replace document" : "Choose from local computer"}</span>
+                </label>
+                <input
+                  id="document-upload"
+                  type="file"
+                  accept=".pdf,.doc,.docx,.txt,.csv,.xls,.xlsx,.ppt,.pptx,image/*"
+                  onChange={handleFileChange}
+                  className="document-upload-input"
+                />
+
+                {attachedFile ? (
+                  <div className="attached-document-row">
+                    <FileText size={18} />
+                    <span className="attached-document-name" title={attachedFile.name}>
+                      {attachedFile.name}
+                    </span>
+                    <span className="attached-document-size font-mono">
+                      {(attachedFile.size / 1024).toFixed(0)} KB
+                    </span>
+                    <button
+                      type="button"
+                      className="remove-document-button"
+                      onClick={removeAttachedFile}
+                      aria-label="Remove attached document"
+                    >
+                      <X size={16} />
+                    </button>
                   </div>
-                ))}
+                ) : (
+                  <span className="document-helper-text">Optional · PDF, Word, spreadsheet, text, presentation, or image · Max 5 MB</span>
+                )}
               </div>
             </div>
 
@@ -277,7 +319,7 @@ function Scheduler() {
                   return (
                     <div key={post.post_id} className="queue-flat-row hairline-b">
                       <div className="queue-thumb-wrap">
-                        <img src={selectedMedia} alt="Queued attachment" />
+                        <FileText size={28} />
                       </div>
 
                       <div className="queue-content-wrap">

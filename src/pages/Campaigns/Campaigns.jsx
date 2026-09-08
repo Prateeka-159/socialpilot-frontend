@@ -1,11 +1,60 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  getCampaigns,
-  createCampaign,
-  deleteCampaign,
-} from "../../services/campaignService";
+import { Trash2 } from "lucide-react";
 import "./Campaigns.css";
+
+const DEMO_CAMPAIGNS = [
+  {
+    campaign_id: 101,
+    campaign_name: "Autumn Product Launch",
+    objective: "Drive qualified product discovery",
+    budget: 18000,
+    platform: "Instagram",
+    start_date: "2026-09-01",
+    end_date: "2026-09-30",
+    status: "Active",
+  },
+  {
+    campaign_id: 102,
+    campaign_name: "Founder Thought Leadership",
+    objective: "Build executive audience trust",
+    budget: 9500,
+    platform: "LinkedIn",
+    start_date: "2026-08-18",
+    end_date: "2026-09-24",
+    status: "Active",
+  },
+  {
+    campaign_id: 103,
+    campaign_name: "Weekend Creator Series",
+    objective: "Increase community engagement",
+    budget: 7200,
+    platform: "YouTube",
+    start_date: "2026-09-05",
+    end_date: "2026-10-05",
+    status: "Active",
+  },
+  {
+    campaign_id: 104,
+    campaign_name: "Sustainable Studio Stories",
+    objective: "Grow brand consideration",
+    budget: 12400,
+    platform: "Facebook",
+    start_date: "2026-07-10",
+    end_date: "2026-08-31",
+    status: "Completed",
+  },
+  {
+    campaign_id: 105,
+    campaign_name: "Holiday Retargeting Sprint",
+    objective: "Recover high-intent visitors",
+    budget: 15600,
+    platform: "X(Twitter)",
+    start_date: "2026-10-12",
+    end_date: "2026-11-02",
+    status: "Paused",
+  },
+];
 
 export default function Campaigns() {
   const navigate = useNavigate();
@@ -26,8 +75,7 @@ export default function Campaigns() {
   const loadCampaigns = async () => {
     try {
       setError("");
-      const data = await getCampaigns();
-      setCampaigns(data.campaigns || []);
+      setCampaigns(DEMO_CAMPAIGNS);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -47,11 +95,14 @@ export default function Campaigns() {
     event.preventDefault();
 
     try {
-      await createCampaign({
+      const newCampaign = {
+        campaign_id: Date.now(),
         ...formData,
         budget: formData.budget ? Number(formData.budget) : null,
-      });
+        status: "Active",
+      };
 
+      setCampaigns((currentCampaigns) => [newCampaign, ...currentCampaigns]);
       setShowForm(false);
       setFormData({
         campaign_name: "",
@@ -61,7 +112,6 @@ export default function Campaigns() {
         start_date: "",
         end_date: "",
       });
-      await loadCampaigns();
     } catch (err) {
       alert(err.message);
     }
@@ -75,8 +125,9 @@ export default function Campaigns() {
     }
 
     try {
-      await deleteCampaign(campaignId);
-      await loadCampaigns();
+      setCampaigns((currentCampaigns) =>
+        currentCampaigns.filter((campaign) => campaign.campaign_id !== campaignId)
+      );
     } catch (err) {
       alert(err.message);
     }
@@ -105,68 +156,81 @@ export default function Campaigns() {
       </div>
 
       {loading && <p>Loading campaigns...</p>}
-      {error && <p style={{ color: "#dc2626" }}>{error}</p>}
+      {error && <p style={{ color: "#9b2c2c" }}>{error}</p>}
 
-      <div className="campaigns-list">
+      <div className="campaigns-table">
         {filteredCampaigns.length === 0 && !loading ? (
           <p>No campaigns found.</p>
         ) : (
-          filteredCampaigns.map((campaign) => (
-            <div
-              key={campaign.campaign_id}
-              className="campaign-card"
-              onClick={() => navigate(`/campaigns/analysis/${campaign.campaign_id}`)}
-            >
-              <div className="card-info">
-                <h3>{campaign.campaign_name}</h3>
-                <p>
-                  {campaign.platform} • {campaign.status}
-                </p>
-                <span>
+          <>
+            <div className="campaign-table-header font-mono">
+              <span>CAMPAIGN</span>
+              <span>PLATFORM</span>
+              <span>CAMPAIGN WINDOW</span>
+              <span>STATUS</span>
+              <span>BUDGET</span>
+              <span>ACTIONS</span>
+            </div>
+            {filteredCampaigns.map((campaign) => (
+              <div
+                key={campaign.campaign_id}
+                className="campaign-table-row"
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate(`/campaigns/analysis/${campaign.campaign_id}`)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    navigate(`/campaigns/analysis/${campaign.campaign_id}`);
+                  }
+                }}
+              >
+                <span className="campaign-name-button">{campaign.campaign_name}</span>
+                <span className="campaign-platform">{campaign.platform}</span>
+                <span className="campaign-dates">
                   {campaign.start_date} to {campaign.end_date}
                 </span>
+                <span className={`campaign-status ${campaign.status.toLowerCase()}`}>
+                  {campaign.status}
+                </span>
+                <span className="campaign-budget">
+                  ${Number(campaign.budget || 0).toLocaleString()}
+                </span>
+                <div className="campaign-actions">
+                  <button
+                    type="button"
+                    className="table-action-button secondary"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      navigate(`/campaigns/analysis/${campaign.campaign_id}`);
+                    }}
+                  >
+                    Analyze
+                  </button>
+                  <button
+                    type="button"
+                    className="table-action-icon danger"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      handleDelete(campaign.campaign_id);
+                    }}
+                    aria-label={`Delete ${campaign.campaign_name}`}
+                    title="Delete campaign"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
               </div>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <button
-                  className="create-btn"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    navigate(`/campaigns/track/${campaign.campaign_id}`);
-                  }}
-                >
-                  Track
-                </button>
-                <button
-                  className="create-btn"
-                  style={{ backgroundColor: "#6366f1" }}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    navigate(`/campaigns/analysis/${campaign.campaign_id}`);
-                  }}
-                >
-                  Analyze
-                </button>
-                <button
-                  className="create-btn"
-                  style={{ backgroundColor: "#6b7280" }}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    handleDelete(campaign.campaign_id);
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))
+            ))}
+          </>
         )}
       </div>
 
       {showForm && (
-        <div className="modal-overlay" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "grid", placeItems: "center" }}>
+        <div className="modal-overlay" style={{ position: "fixed", inset: 0, background: "var(--c-dark-80)", display: "grid", placeItems: "center" }}>
           <form
             onSubmit={handleCreate}
-            style={{ background: "#fff", padding: "24px", borderRadius: "12px", width: "420px", display: "grid", gap: "12px" }}
+            style={{ background: "var(--c-cream)", padding: "24px", borderRadius: "8px", width: "420px", display: "grid", gap: "12px" }}
           >
             <h3>Create Campaign</h3>
             <input

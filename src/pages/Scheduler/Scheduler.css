@@ -103,40 +103,74 @@
   border-bottom-color: var(--c-dark);
 }
 
-/* Media Selection Thumbnails */
-.media-selector-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-.media-select-thumb {
+.document-attachment {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
+  padding: 16px;
+  border: 1px dashed var(--c-taupe-40);
+}
+
+.document-upload-label {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--c-dark);
+  color: var(--c-dark);
+  font-size: 13px;
   cursor: pointer;
 }
 
-.media-select-thumb img {
-  width: 100%;
-  height: 100px;
-  object-fit: cover;
-  border: 1px solid var(--c-taupe-20);
-  transition: transform 0.3s ease;
+.document-upload-label:hover {
+  background: var(--c-dark);
+  color: var(--c-cream);
 }
 
-.media-select-thumb.thumb-selected img {
-  border: 2px solid var(--c-dark);
-  transform: scale(1.02);
+.document-upload-input {
+  display: none;
 }
 
-.thumb-caption {
-  font-size: 10px;
-  letter-spacing: 0.1em;
+.document-helper-text,
+.attached-document-size {
   color: var(--c-taupe);
-  text-overflow: ellipsis;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+
+.attached-document-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: var(--c-dark);
+}
+
+.attached-document-name {
   overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 13px;
+}
+
+.attached-document-size {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.remove-document-button {
+  display: inline-flex;
+  flex-shrink: 0;
+  border: 0;
+  padding: 2px;
+  background: transparent;
+  color: var(--c-taupe);
+  cursor: pointer;
+}
+
+.remove-document-button:hover {
+  color: var(--c-dark);
 }
 
 /* Timing Field Row */
@@ -179,6 +213,16 @@
   height: 90px;
   object-fit: cover;
   border: 1px solid var(--c-taupe-20);
+}
+
+.queue-thumb-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 110px;
+  height: 90px;
+  border: 1px solid var(--c-taupe-20);
+  color: var(--c-taupe);
 }
 
 .queue-content-wrap {

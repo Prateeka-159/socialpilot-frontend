@@ -1,11 +1,29 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  getCampaign,
-  getCampaignTracking,
-  getCampaignTrackingSummary,
-} from "../../services/campaignService";
 import "./CampaignTracker.css";
+
+const DEMO_TRACKING_DATA = {
+  campaign: {
+    campaign_id: 101,
+    campaign_name: "Autumn Product Launch",
+    platform: "Instagram",
+    status: "Active",
+    budget: 18000,
+  },
+  summary: {
+    reach: 49200,
+    impressions: 68400,
+    conversions: 186,
+  },
+  performance: [
+    { performance_id: "demo-101-1", record_date: "2026-09-02", impressions: 8200, clicks: 280, engagement_rate: 10.8, conversions: 21 },
+    { performance_id: "demo-101-2", record_date: "2026-09-03", impressions: 9400, clicks: 315, engagement_rate: 11.4, conversions: 25 },
+    { performance_id: "demo-101-3", record_date: "2026-09-04", impressions: 10100, clicks: 342, engagement_rate: 12.1, conversions: 28 },
+    { performance_id: "demo-101-4", record_date: "2026-09-05", impressions: 11300, clicks: 386, engagement_rate: 13.2, conversions: 34 },
+    { performance_id: "demo-101-5", record_date: "2026-09-06", impressions: 9800, clicks: 352, engagement_rate: 12.8, conversions: 31 },
+    { performance_id: "demo-101-6", record_date: "2026-09-07", impressions: 9600, clicks: 335, engagement_rate: 11.9, conversions: 27 },
+  ],
+};
 
 export default function CampaignTracker() {
   const { campaignId } = useParams();
@@ -20,15 +38,9 @@ export default function CampaignTracker() {
     const loadTracking = async () => {
       try {
         setError("");
-        const [campaignData, summaryData, trackingData] = await Promise.all([
-          getCampaign(campaignId),
-          getCampaignTrackingSummary(campaignId),
-          getCampaignTracking(campaignId),
-        ]);
-
-        setCampaign(campaignData.campaign);
-        setSummary(summaryData.summary);
-        setPerformance(trackingData.performance || []);
+        setCampaign(DEMO_TRACKING_DATA.campaign);
+        setSummary(DEMO_TRACKING_DATA.summary);
+        setPerformance(DEMO_TRACKING_DATA.performance);
       } catch (err) {
         setError(err.message);
       } finally {

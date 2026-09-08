@@ -1,10 +1,21 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { login as apiLogin, logout as apiLogout } from "../services/authServices";
 import { getProfile } from "../services/profileService";
-import { getToken, normalizeRole, removeToken } from "../services/api";
+import { getToken, normalizeRole, removeToken, setToken } from "../services/api";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext(null);
+
+const DEV_ADMIN_EMAIL = "admin@socialpilot.com";
+const DEV_ADMIN_PASSWORD = "admin123";
+const DEV_ADMIN_TOKEN = "development-admin-session";
+const DEV_ADMIN_USER = {
+  id: 1,
+  name: "System Administrator",
+  email: DEV_ADMIN_EMAIL,
+  role: "Administrator",
+  status: "Active",
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -26,6 +37,12 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
+      if (import.meta.env.DEV && getToken() === DEV_ADMIN_TOKEN) {
+        setUser(DEV_ADMIN_USER);
+        setLoading(false);
+        return;
+      }
+
       try {
         await loadUser();
       } catch {
@@ -40,6 +57,16 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
+    if (
+      import.meta.env.DEV &&
+      email === DEV_ADMIN_EMAIL &&
+      password === DEV_ADMIN_PASSWORD
+    ) {
+      setToken(DEV_ADMIN_TOKEN);
+      setUser(DEV_ADMIN_USER);
+      return true;
+    }
+
     await apiLogin(email, password);
     await loadUser();
     return true;

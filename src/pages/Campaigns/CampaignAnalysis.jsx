@@ -1,15 +1,48 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  getCampaign,
-  getCampaigns,
-  getCampaignTracking,
-  getCampaignTrackingSummary,
-  getCampaignPerformance,
-  getCampaignROI,
-  compareCampaignROI,
-} from "../../services/campaignService";
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { ChevronDown } from "lucide-react";
 import "./CampaignAnalysis.css";
+
+const DEMO_CAMPAIGNS = [
+  { campaign_id: "101", campaign_name: "Autumn Product Launch", platform: "Instagram", status: "Active", budget: 18000, objective: "Drive qualified product discovery", start_date: "2026-09-01", end_date: "2026-09-30" },
+  { campaign_id: "102", campaign_name: "Founder Thought Leadership", platform: "LinkedIn", status: "Active", budget: 9500, objective: "Build executive audience trust", start_date: "2026-08-18", end_date: "2026-09-24" },
+  { campaign_id: "103", campaign_name: "Weekend Creator Series", platform: "YouTube", status: "Active", budget: 7200, objective: "Increase community engagement", start_date: "2026-09-05", end_date: "2026-10-05" },
+  { campaign_id: "104", campaign_name: "Sustainable Studio Stories", platform: "Facebook", status: "Completed", budget: 12400, objective: "Grow brand consideration", start_date: "2026-07-10", end_date: "2026-08-31" },
+];
+
+const DEMO_CAMPAIGN_SUMMARY = {
+  reach: 49200,
+  impressions: 68400,
+  clicks: 2180,
+  conversions: 186,
+};
+
+const DEMO_PERFORMANCE = [
+  { performance_id: "demo-analysis-1", record_date: "2026-09-02", impressions: 8200, clicks: 280, engagement_rate: 10.8, conversions: 21 },
+  { performance_id: "demo-analysis-2", record_date: "2026-09-03", impressions: 9400, clicks: 315, engagement_rate: 11.4, conversions: 25 },
+  { performance_id: "demo-analysis-3", record_date: "2026-09-04", impressions: 10100, clicks: 342, engagement_rate: 12.1, conversions: 28 },
+  { performance_id: "demo-analysis-4", record_date: "2026-09-05", impressions: 11300, clicks: 386, engagement_rate: 13.2, conversions: 34 },
+  { performance_id: "demo-analysis-5", record_date: "2026-09-06", impressions: 9800, clicks: 352, engagement_rate: 12.8, conversions: 31 },
+];
+
+const DEMO_COMPARISON_METRICS = {
+  "101": { impressions: 68400, engagements: 8420, clicks: 2180, conversions: 186 },
+  "102": { impressions: 42700, engagements: 6190, clicks: 1430, conversions: 124 },
+  "103": { impressions: 35600, engagements: 4870, clicks: 980, conversions: 92 },
+  "104": { impressions: 29100, engagements: 3650, clicks: 740, conversions: 61 },
+};
 
 export default function CampaignAnalysis() {
   const { campaignId } = useParams();
@@ -22,6 +55,7 @@ export default function CampaignAnalysis() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedCampaigns, setSelectedCampaigns] = useState([]);
+  const [comparisonFilterOpen, setComparisonFilterOpen] = useState(false);
   const [roiData, setRoiData] = useState({
     revenue: "",
     conversions: "",
@@ -32,27 +66,15 @@ export default function CampaignAnalysis() {
     const loadData = async () => {
       try {
         setError("");
-        const [campaignData, allCampaignsData, summaryData, trackingData, roiDataResponse] = await Promise.all([
-          getCampaign(campaignId),
-          getCampaigns(),
-          getCampaignTrackingSummary(campaignId),
-          getCampaignTracking(campaignId),
-          getCampaignROI(campaignId),
-        ]);
+        const selectedCampaign = DEMO_CAMPAIGNS.find(
+          (item) => item.campaign_id === String(campaignId)
+        ) || DEMO_CAMPAIGNS[0];
 
-        setCampaign(campaignData.campaign);
-        setAllCampaigns(allCampaignsData.campaigns || []);
-        setSummary(summaryData.summary);
-        setPerformance(trackingData.performance || []);
-        
-        // Pre-populate ROI data from backend
-        if (roiDataResponse && roiDataResponse.roi) {
-          setRoiData({
-            revenue: roiDataResponse.roi.revenue || "",
-            conversions: roiDataResponse.roi.conversions || "",
-            costPerConversion: roiDataResponse.roi.cost_per_conversion || "",
-          });
-        }
+        setCampaign(selectedCampaign);
+        setAllCampaigns(DEMO_CAMPAIGNS);
+        setSummary(DEMO_CAMPAIGN_SUMMARY);
+        setPerformance(DEMO_PERFORMANCE);
+        setRoiData({ revenue: "23150", conversions: "186", costPerConversion: "96.77" });
         
         // Pre-select current campaign for comparison
         setSelectedCampaigns([campaignId]);
@@ -93,6 +115,13 @@ export default function CampaignAnalysis() {
     });
   };
 
+  const selectedComparisonData = allCampaigns
+    .filter((item) => selectedCampaigns.includes(item.campaign_id))
+    .map((item) => ({
+      name: item.campaign_name,
+      ...DEMO_COMPARISON_METRICS[item.campaign_id],
+    }));
+
   if (loading) {
     return <div className="analysis-page">Loading campaign analysis...</div>;
   }
@@ -110,12 +139,6 @@ export default function CampaignAnalysis() {
 
   return (
     <div className="analysis-page">
-      <div className="analysis-top-bar">
-        <button className="back-btn" onClick={() => navigate("/campaigns")}>
-          ← Back to Campaigns
-        </button>
-      </div>
-
       <div className="analysis-header">
         <div>
           <span className="section-label">CAMPAIGN ANALYSIS</span>
@@ -127,6 +150,9 @@ export default function CampaignAnalysis() {
             </span>
           </p>
         </div>
+        <button className="back-btn" onClick={() => navigate("/campaigns")}>
+          ← Back to Campaigns
+        </button>
       </div>
 
       <div className="analysis-tabs">
@@ -156,7 +182,7 @@ export default function CampaignAnalysis() {
         </button>
       </div>
 
-      <div className="analysis-content">
+      <div className={`analysis-content ${activeTab === "tracking" || activeTab === "compare" ? "tracking-analysis-content" : ""}`}>
         {activeTab === "tracking" && (
           <div className="tab-content tracking-tab">
             <h3>Tracking Analysis</h3>
@@ -197,6 +223,34 @@ export default function CampaignAnalysis() {
 
             <div className="tracker-table-card">
               <h3>Daily Performance Logs</h3>
+              <div className="analysis-chart-grid">
+                <div className="analysis-chart-panel">
+                  <h4>Daily Reach Trend</h4>
+                  <ResponsiveContainer width="100%" height={260}>
+                    <LineChart data={performance}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#d8cdbd" />
+                      <XAxis dataKey="record_date" stroke="#58554e" fontSize={11} />
+                      <YAxis stroke="#58554e" fontSize={11} />
+                      <Tooltip />
+                      <Legend />
+                      <Line type="monotone" dataKey="impressions" stroke="#27251f" strokeWidth={2.5} name="Impressions" />
+                      <Line type="monotone" dataKey="clicks" stroke="#8f8171" strokeWidth={2.5} name="Clicks" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="analysis-chart-panel">
+                  <h4>Daily Conversions</h4>
+                  <ResponsiveContainer width="100%" height={260}>
+                    <BarChart data={performance}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#d8cdbd" />
+                      <XAxis dataKey="record_date" stroke="#58554e" fontSize={11} />
+                      <YAxis stroke="#58554e" fontSize={11} />
+                      <Tooltip />
+                      <Bar dataKey="conversions" fill="#58554e" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
               <table className="tracker-table">
                 <thead>
                   <tr>
@@ -235,25 +289,79 @@ export default function CampaignAnalysis() {
             <p className="tab-description">Select campaigns to compare their performance metrics</p>
             
             <div className="campaign-selection">
-              <h4>Select Campaigns to Compare</h4>
-              <div className="campaign-checkbox-list">
-                {allCampaigns.map((cmp) => (
-                  <label key={cmp.campaign_id} className="campaign-checkbox-item">
-                    <input
-                      type="checkbox"
-                      checked={selectedCampaigns.includes(cmp.campaign_id)}
-                      onChange={() => handleCampaignSelection(cmp.campaign_id)}
-                    />
-                    <span>{cmp.campaign_name}</span>
-                    <span className="campaign-platform">{cmp.platform}</span>
-                  </label>
-                ))}
+              <div className="comparison-filter-dropdown">
+                <button
+                  type="button"
+                  className="comparison-filter-trigger"
+                  onClick={() => setComparisonFilterOpen((isOpen) => !isOpen)}
+                  aria-expanded={comparisonFilterOpen}
+                >
+                  <span>Compare campaigns</span>
+                  <span className="comparison-filter-count">
+                    {selectedCampaigns.length}
+                  </span>
+                  <ChevronDown size={16} />
+                </button>
+                {comparisonFilterOpen && (
+                  <div className="comparison-filter-menu">
+                    {allCampaigns.map((cmp) => (
+                      <label key={cmp.campaign_id} className="comparison-filter-option">
+                        <input
+                          type="checkbox"
+                          checked={selectedCampaigns.includes(cmp.campaign_id)}
+                          onChange={() => handleCampaignSelection(cmp.campaign_id)}
+                        />
+                        <span>{cmp.campaign_name}</span>
+                        <small>{cmp.platform}</small>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="comparison-selected-chips" aria-live="polite">
+                {allCampaigns
+                  .filter((cmp) => selectedCampaigns.includes(cmp.campaign_id))
+                  .map((cmp) => (
+                    <span key={cmp.campaign_id} className="comparison-selected-chip">
+                      {cmp.campaign_name}
+                    </span>
+                  ))}
               </div>
             </div>
 
             {selectedCampaigns.length > 0 && (
               <div className="comparison-table-card">
                 <h4>Performance Comparison</h4>
+                <div className="analysis-chart-grid comparison-charts">
+                  <div className="analysis-chart-panel">
+                    <h4>Campaign Reach &amp; Engagement</h4>
+                    <ResponsiveContainer width="100%" height={280}>
+                      <BarChart data={selectedComparisonData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#d8cdbd" />
+                        <XAxis dataKey="name" hide />
+                        <YAxis stroke="#58554e" fontSize={11} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="impressions" fill="#27251f" name="Impressions" />
+                        <Bar dataKey="engagements" fill="#8f8171" name="Engagements" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="analysis-chart-panel">
+                    <h4>Clicks &amp; Conversions</h4>
+                    <ResponsiveContainer width="100%" height={280}>
+                      <BarChart data={selectedComparisonData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#d8cdbd" />
+                        <XAxis dataKey="name" hide />
+                        <YAxis stroke="#58554e" fontSize={11} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="clicks" fill="#58554e" name="Clicks" />
+                        <Bar dataKey="conversions" fill="#b6a58f" name="Conversions" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
                 <table className="comparison-table">
                   <thead>
                     <tr>
@@ -261,7 +369,6 @@ export default function CampaignAnalysis() {
                       <th>Platform</th>
                       <th>Budget</th>
                       <th>Status</th>
-                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -276,14 +383,6 @@ export default function CampaignAnalysis() {
                             <span className={`status-pill ${cmp.status?.toLowerCase()}`}>
                               {cmp.status}
                             </span>
-                          </td>
-                          <td>
-                            <button
-                              className="action-btn"
-                              onClick={() => navigate(`/campaigns/analysis/${cmp.campaign_id}`)}
-                            >
-                              View Analysis
-                            </button>
                           </td>
                         </tr>
                       ))}
@@ -404,7 +503,7 @@ export default function CampaignAnalysis() {
             <p className="tab-description">Calculate Return on Investment for this campaign</p>
             
             <div className="roi-calculator">
-              <div className="roi-input-card">
+              <div className="roi-investment-section">
                 <h4>Campaign Investment</h4>
                 <div className="roi-display">
                   <span className="roi-label">Total Budget:</span>
@@ -412,7 +511,7 @@ export default function CampaignAnalysis() {
                 </div>
               </div>
 
-              <div className="roi-input-card">
+              <div className="roi-input-section">
                 <h4>Revenue & Conversions</h4>
                 <div className="roi-form">
                   <div className="form-group">
@@ -445,7 +544,7 @@ export default function CampaignAnalysis() {
                 </div>
               </div>
 
-              <div className="roi-results-card">
+              <div className="roi-results-section">
                 <h4>ROI Results</h4>
                 <div className="roi-metrics">
                   <div className="roi-metric">

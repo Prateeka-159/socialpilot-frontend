@@ -14,23 +14,82 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import {
-  getCampaigns,
-  getCampaignPerformance,
-} from "../../services/campaignService";
-import {
-  getPostAnalytics,
-  getPostEngagement,
-  getAudienceGrowth,
-  getOverallAnalytics,
-  getUserPerformanceMetrics,
-  getCrossPlatformAnalytics,
-  getCampaignEngagement,
-} from "../../services/analyticsService";
-import { getSocialAccounts } from "../../services/socialService";
+import { ChevronDown } from "lucide-react";
 import "./OverallAnalysis.css";
 
-const COLORS = ["#6366f1", "#8b5cf6", "#a855f7", "#d946ef", "#ec4899"];
+const COLORS = ["#27251f", "#58554e", "#8f8171", "#b6a58f", "#d1c2ad"];
+const USE_DEMO_DATA = true;
+
+const getDemoAnalyticsData = () => {
+  const campaigns = [
+    {
+      campaign_id: 101,
+      campaign_name: "Autumn Product Launch",
+      platform: "Instagram",
+      status: "Active",
+      budget: 18000,
+      engagement: { total_engagements: 8420, impressions: 68400, average_engagement_rate: 12.3, clicks: 2180, conversions: 186, reach: 49200 },
+    },
+    {
+      campaign_id: 102,
+      campaign_name: "Founder Thought Leadership",
+      platform: "LinkedIn",
+      status: "Active",
+      budget: 9500,
+      engagement: { total_engagements: 6190, impressions: 42700, average_engagement_rate: 9.8, clicks: 1430, conversions: 124, reach: 31800 },
+    },
+    {
+      campaign_id: 103,
+      campaign_name: "Weekend Creator Series",
+      platform: "YouTube",
+      status: "Active",
+      budget: 7200,
+      engagement: { total_engagements: 4870, impressions: 35600, average_engagement_rate: 8.6, clicks: 980, conversions: 92, reach: 26400 },
+    },
+    {
+      campaign_id: 104,
+      campaign_name: "Sustainable Studio Stories",
+      platform: "Facebook",
+      status: "Completed",
+      budget: 12400,
+      engagement: { total_engagements: 3650, impressions: 29100, average_engagement_rate: 7.4, clicks: 740, conversions: 61, reach: 21300 },
+    },
+  ];
+
+  const performanceData = [
+    { day: "Mon", impressions: 12400, engagement: 1820, clicks: 420, conversions: 28 },
+    { day: "Tue", impressions: 15800, engagement: 2240, clicks: 510, conversions: 36 },
+    { day: "Wed", impressions: 13200, engagement: 1970, clicks: 460, conversions: 31 },
+    { day: "Thu", impressions: 18900, engagement: 2890, clicks: 680, conversions: 48 },
+    { day: "Fri", impressions: 22400, engagement: 3150, clicks: 740, conversions: 55 },
+    { day: "Sat", impressions: 17600, engagement: 2460, clicks: 580, conversions: 42 },
+    { day: "Sun", impressions: 20500, engagement: 2820, clicks: 630, conversions: 49 },
+  ];
+
+  return {
+    campaigns,
+    campaignsData: campaigns,
+    overallMetrics: {
+      totalImpressions: 175800,
+      totalEngagements: 23130,
+      totalClicks: 5330,
+      totalConversions: 463,
+      totalReach: 128700,
+      averageEngagementRate: 9.53,
+      totalBudget: 47100,
+      totalRevenue: 23150,
+      averageROI:  -50.85,
+    },
+    performanceData,
+    platformDistribution: [
+      { name: "Instagram", value: 1 },
+      { name: "LinkedIn", value: 1 },
+      { name: "YouTube", value: 1 },
+      { name: "Facebook", value: 1 },
+    ],
+    audienceGrowth: [],
+  };
+};
 
 export default function OverallAnalysis() {
   const navigate = useNavigate();
@@ -39,6 +98,7 @@ export default function OverallAnalysis() {
   const [timeRange, setTimeRange] = useState("7d");
   const [metric, setMetric] = useState("impressions");
   const [selectedCampaigns, setSelectedCampaigns] = useState([]);
+  const [campaignFilterOpen, setCampaignFilterOpen] = useState(false);
   
   // Data states
   const [campaigns, setCampaigns] = useState([]);
@@ -67,6 +127,19 @@ export default function OverallAnalysis() {
     try {
       setError("");
       setLoading(true);
+
+      if (USE_DEMO_DATA) {
+        const demoData = getDemoAnalyticsData();
+        setCampaigns(demoData.campaigns);
+        setSelectedCampaigns(demoData.campaigns.map((campaign) => campaign.campaign_id));
+        setCampaignsData(demoData.campaignsData);
+        setOverallMetrics(demoData.overallMetrics);
+        setPerformanceData(demoData.performanceData);
+        setPlatformDistribution(demoData.platformDistribution);
+        setTopPerformingCampaigns(demoData.campaignsData);
+        setAudienceGrowth(demoData.audienceGrowth);
+        return;
+      }
 
       // Use the new backend overall analytics endpoint
       const overallData = await getOverallAnalytics(timeRange);
@@ -290,6 +363,71 @@ export default function OverallAnalysis() {
     });
   };
 
+  const visibleTopPerformingCampaigns = topPerformingCampaigns.filter((campaign) =>
+    selectedCampaigns.includes(campaign.campaign_id)
+  ).sort(
+    (firstCampaign, secondCampaign) =>
+      (secondCampaign.engagement?.total_engagements || 0) -
+      (firstCampaign.engagement?.total_engagements || 0)
+  );
+
+  const selectedCampaignData = campaignsData.filter((campaign) =>
+    selectedCampaigns.includes(campaign.campaign_id)
+  );
+  const selectedMetrics = selectedCampaignData.reduce(
+    (metrics, campaign) => {
+      const engagement = campaign.engagement || {};
+      metrics.totalImpressions += engagement.impressions || 0;
+      metrics.totalEngagements += engagement.total_engagements || 0;
+      metrics.totalClicks += engagement.clicks || 0;
+      metrics.totalConversions += engagement.conversions || 0;
+      metrics.totalReach += engagement.reach || 0;
+      metrics.totalBudget += Number(campaign.budget || 0);
+      return metrics;
+    },
+    {
+      totalImpressions: 0,
+      totalEngagements: 0,
+      totalClicks: 0,
+      totalConversions: 0,
+      totalReach: 0,
+      totalBudget: 0,
+    }
+  );
+  const selectedRevenue = selectedMetrics.totalConversions * 50;
+  const selectedROI = selectedMetrics.totalBudget > 0
+    ? ((selectedRevenue - selectedMetrics.totalBudget) / selectedMetrics.totalBudget * 100).toFixed(2)
+    : "0.00";
+  const selectedEngagementTotal = selectedCampaignData.reduce(
+    (total, campaign) => total + (campaign.engagement?.total_engagements || 0),
+    0
+  );
+  const selectedChartData = performanceData.map((point) => {
+    const chartPoint = { day: point.day };
+
+    selectedCampaignData.forEach((campaign) => {
+      const campaignWeight = selectedEngagementTotal
+        ? (campaign.engagement?.total_engagements || 0) / selectedEngagementTotal
+        : 0;
+      chartPoint[`campaign_${campaign.campaign_id}`] = Math.round(
+        (point[metric] || 0) * campaignWeight
+      );
+    });
+
+    return chartPoint;
+  });
+  const selectedPlatformDistribution = selectedCampaignData.reduce((distribution, campaign) => {
+    const existingPlatform = distribution.find((item) => item.name === campaign.platform);
+
+    if (existingPlatform) {
+      existingPlatform.value += 1;
+    } else {
+      distribution.push({ name: campaign.platform, value: 1 });
+    }
+
+    return distribution;
+  }, []);
+
   if (loading) {
     return (
       <div className="overall-analysis-page">
@@ -305,7 +443,7 @@ export default function OverallAnalysis() {
     return (
       <div className="overall-analysis-page">
         <div className="error-container">
-          <p style={{ color: "#dc2626" }}>{error}</p>
+          <p style={{ color: "#9b2c2c" }}>{error}</p>
           <button className="retry-btn" onClick={loadOverallAnalysis}>
             Retry
           </button>
@@ -347,6 +485,43 @@ export default function OverallAnalysis() {
         </div>
       </div>
 
+      <div className="campaign-filter-toolbar">
+        <div className="campaign-filter-dropdown">
+          <button
+            type="button"
+            className="campaign-filter-trigger"
+            onClick={() => setCampaignFilterOpen((isOpen) => !isOpen)}
+            aria-expanded={campaignFilterOpen}
+          >
+            <span>Filter campaigns</span>
+            <span className="campaign-filter-count">{selectedCampaigns.length} selected</span>
+            <ChevronDown size={16} />
+          </button>
+          {campaignFilterOpen && (
+            <div className="campaign-filter-menu">
+              {campaigns.map((campaign) => (
+                <label key={campaign.campaign_id} className="campaign-filter-option">
+                  <input
+                    type="checkbox"
+                    checked={selectedCampaigns.includes(campaign.campaign_id)}
+                    onChange={() => handleCampaignToggle(campaign.campaign_id)}
+                  />
+                  <span>{campaign.campaign_name}</span>
+                  <small>{campaign.platform}</small>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="selected-campaign-chips" aria-live="polite">
+          {selectedCampaignData.map((campaign) => (
+            <span key={campaign.campaign_id} className="selected-campaign-chip">
+              {campaign.campaign_name}
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* KPI Cards */}
       <div className="kpi-grid">
         <div className="kpi-card">
@@ -358,7 +533,7 @@ export default function OverallAnalysis() {
           </div>
           <div className="kpi-content">
             <p className="kpi-label">Total Impressions</p>
-            <h3 className="kpi-value">{overallMetrics.totalImpressions.toLocaleString()}</h3>
+            <h3 className="kpi-value">{selectedMetrics.totalImpressions.toLocaleString()}</h3>
             <p className="kpi-change positive">+12.5%</p>
           </div>
         </div>
@@ -371,7 +546,7 @@ export default function OverallAnalysis() {
           </div>
           <div className="kpi-content">
             <p className="kpi-label">Total Engagements</p>
-            <h3 className="kpi-value">{overallMetrics.totalEngagements.toLocaleString()}</h3>
+            <h3 className="kpi-value">{selectedMetrics.totalEngagements.toLocaleString()}</h3>
             <p className="kpi-change positive">+8.2%</p>
           </div>
         </div>
@@ -386,7 +561,7 @@ export default function OverallAnalysis() {
           </div>
           <div className="kpi-content">
             <p className="kpi-label">Total Clicks</p>
-            <h3 className="kpi-value">{overallMetrics.totalClicks.toLocaleString()}</h3>
+            <h3 className="kpi-value">{selectedMetrics.totalClicks.toLocaleString()}</h3>
             <p className="kpi-change positive">+15.1%</p>
           </div>
         </div>
@@ -400,7 +575,7 @@ export default function OverallAnalysis() {
           </div>
           <div className="kpi-content">
             <p className="kpi-label">Conversions</p>
-            <h3 className="kpi-value">{overallMetrics.totalConversions.toLocaleString()}</h3>
+            <h3 className="kpi-value">{selectedMetrics.totalConversions.toLocaleString()}</h3>
             <p className="kpi-change positive">+5.4%</p>
           </div>
         </div>
@@ -414,9 +589,9 @@ export default function OverallAnalysis() {
           </div>
           <div className="kpi-content">
             <p className="kpi-label">Average ROI</p>
-            <h3 className="kpi-value">{overallMetrics.averageROI}%</h3>
-            <p className={`kpi-change ${parseFloat(overallMetrics.averageROI) >= 0 ? 'positive' : 'negative'}`}>
-              {parseFloat(overallMetrics.averageROI) >= 0 ? '+' : ''}{overallMetrics.averageROI}%
+            <h3 className="kpi-value">{selectedROI}%</h3>
+            <p className={`kpi-change ${parseFloat(selectedROI) >= 0 ? 'positive' : 'negative'}`}>
+              {parseFloat(selectedROI) >= 0 ? '+' : ''}{selectedROI}%
             </p>
           </div>
         </div>
@@ -430,7 +605,7 @@ export default function OverallAnalysis() {
           </div>
           <div className="kpi-content">
             <p className="kpi-label">Total Budget</p>
-            <h3 className="kpi-value">${overallMetrics.totalBudget.toLocaleString()}</h3>
+            <h3 className="kpi-value">${selectedMetrics.totalBudget.toLocaleString()}</h3>
             <p className="kpi-change neutral">Active</p>
           </div>
         </div>
@@ -445,28 +620,32 @@ export default function OverallAnalysis() {
           </div>
           <div className="chart-container">
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={performanceData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="day" stroke="#64748b" fontSize={12} tickLine={false} />
-                <YAxis stroke="#64748b" fontSize={12} tickLine={false} />
+              <LineChart data={selectedChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#d8cdbd" />
+                <XAxis dataKey="day" stroke="#58554e" fontSize={12} tickLine={false} />
+                <YAxis stroke="#58554e" fontSize={12} tickLine={false} />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: '#ffffff', 
-                    borderColor: '#e2e8f0', 
-                    color: '#1e293b', 
+                    backgroundColor: '#f7f0e5',
+                    borderColor: '#d8cdbd',
+                    color: '#27251f',
                     fontSize: '12px', 
                     borderRadius: '8px',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                   }} 
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey={metric} 
-                  stroke="#6366f1" 
-                  strokeWidth={3} 
-                  dot={{ fill: '#6366f1', r: 5 }}
-                  activeDot={{ r: 7 }}
-                />
+                {selectedCampaignData.map((campaign, index) => (
+                  <Line
+                    key={campaign.campaign_id}
+                    type="monotone"
+                    dataKey={`campaign_${campaign.campaign_id}`}
+                    name={campaign.campaign_name}
+                    stroke={COLORS[index % COLORS.length]}
+                    strokeWidth={3}
+                    dot={{ fill: COLORS[index % COLORS.length], r: 5 }}
+                    activeDot={{ r: 7 }}
+                  />
+                ))}
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -481,7 +660,7 @@ export default function OverallAnalysis() {
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={platformDistribution}
+                  data={selectedPlatformDistribution}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
@@ -489,15 +668,15 @@ export default function OverallAnalysis() {
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {platformDistribution.map((entry, index) => (
+                  {selectedPlatformDistribution.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: '#ffffff', 
-                    borderColor: '#e2e8f0', 
-                    color: '#1e293b', 
+                    backgroundColor: '#f7f0e5',
+                    borderColor: '#d8cdbd',
+                    color: '#27251f',
                     fontSize: '12px', 
                     borderRadius: '8px'
                   }} 
@@ -506,7 +685,7 @@ export default function OverallAnalysis() {
             </ResponsiveContainer>
           </div>
           <div className="legend">
-            {platformDistribution.map((item, index) => (
+            {selectedPlatformDistribution.map((item, index) => (
               <div key={item.name} className="legend-item">
                 <div 
                   className="legend-color" 
@@ -531,65 +710,48 @@ export default function OverallAnalysis() {
             View All Campaigns
           </button>
         </div>
-        <div className="campaigns-grid">
-          {topPerformingCampaigns.map((campaign) => (
-            <div 
-              key={campaign.campaign_id} 
-              className="campaign-summary-card"
+        <div className="campaign-ranking-table">
+          <div className="campaign-ranking-header font-mono">
+            <span>RANK</span>
+            <span>CAMPAIGN</span>
+            <span>PLATFORM / STATUS</span>
+            <span>ENGAGEMENTS</span>
+            <span>IMPRESSIONS</span>
+            <span>ENG. RATE</span>
+            <span>BUDGET</span>
+          </div>
+          {visibleTopPerformingCampaigns.map((campaign, index) => (
+            <button
+              type="button"
+              key={campaign.campaign_id}
+              className="campaign-ranking-row"
               onClick={() => navigate(`/campaigns/analysis/${campaign.campaign_id}`)}
             >
-              <div className="campaign-summary-header">
-                <h4>{campaign.campaign_name}</h4>
-                <span className={`campaign-status ${campaign.status?.toLowerCase()}`}>
+              <span className="campaign-rank">{String(index + 1).padStart(2, "0")}</span>
+              <span className="campaign-ranking-name">{campaign.campaign_name}</span>
+              <span className="campaign-ranking-platform">
+                <strong>{campaign.platform}</strong>
+                <small className={`campaign-status ${campaign.status?.toLowerCase()}`}>
                   {campaign.status}
-                </span>
-              </div>
-              <div className="campaign-summary-metrics">
-                <div className="metric-item">
-                  <span className="metric-label">Engagements</span>
-                  <span className="metric-value">
-                    {(campaign.engagement?.total_engagements || 0).toLocaleString()}
-                  </span>
-                </div>
-                <div className="metric-item">
-                  <span className="metric-label">Impressions</span>
-                  <span className="metric-value">
-                    {(campaign.engagement?.impressions || 0).toLocaleString()}
-                  </span>
-                </div>
-                <div className="metric-item">
-                  <span className="metric-label">Engagement Rate</span>
-                  <span className="metric-value">
-                    {campaign.engagement?.average_engagement_rate || 0}%
-                  </span>
-                </div>
-              </div>
-              <div className="campaign-summary-footer">
-                <span className="platform-tag">{campaign.platform}</span>
-                <span className="budget-tag">${campaign.budget?.toLocaleString() || 0}</span>
-              </div>
-            </div>
+                </small>
+              </span>
+              <span className="campaign-ranking-value">
+                {(campaign.engagement?.total_engagements || 0).toLocaleString()}
+              </span>
+              <span className="campaign-ranking-value">
+                {(campaign.engagement?.impressions || 0).toLocaleString()}
+              </span>
+              <span className="campaign-ranking-value">
+                {campaign.engagement?.average_engagement_rate || 0}%
+              </span>
+              <span className="campaign-ranking-value">
+                ${Number(campaign.budget || 0).toLocaleString()}
+              </span>
+            </button>
           ))}
         </div>
       </div>
 
-      {/* Campaign Filter Section */}
-      <div className="campaign-filter-section">
-        <h3>Filter by Campaign</h3>
-        <div className="campaign-filter-list">
-          {campaigns.map((campaign) => (
-            <label key={campaign.campaign_id} className="campaign-filter-item">
-              <input
-                type="checkbox"
-                checked={selectedCampaigns.includes(campaign.campaign_id)}
-                onChange={() => handleCampaignToggle(campaign.campaign_id)}
-              />
-              <span className="campaign-filter-name">{campaign.campaign_name}</span>
-              <span className="campaign-filter-platform">{campaign.platform}</span>
-            </label>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

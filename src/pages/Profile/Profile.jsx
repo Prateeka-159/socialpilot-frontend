@@ -18,6 +18,8 @@ import {
 function Profile() {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState("/images.jpg");
+  const [coverPreview, setCoverPreview] = useState("/ripples-of-sand-in-black-and-white.jpg");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [profile, setProfile] = useState({
@@ -76,6 +78,16 @@ function Profile() {
     }
   };
 
+  const handleImageChange = (event, setPreview) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setPreview(URL.createObjectURL(file));
+  };
+
   return (
     <div className="profile-page">
       {loading && <p>Loading profile...</p>}
@@ -84,23 +96,43 @@ function Profile() {
       {/* Cover Photography Hero Frame */}
       <div className="profile-cover-frame hairline-b">
         <img
-          src="/ripples-of-sand-in-black-and-white.jpg"
+          src={coverPreview}
           alt="Profile cover photography"
           className="cover-photo"
         />
         <div className="cover-shade"></div>
         <div className="cover-tag font-mono">PROFILE OVERVIEW</div>
+        {isEditing && (
+          <label className="image-change-control cover-image-control">
+            Change background
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(event) => handleImageChange(event, setCoverPreview)}
+            />
+          </label>
+        )}
       </div>
 
       {/* Profile Header Row */}
       <div className="profile-header-row hairline-b">
         <div className="avatar-frame">
           <img
-            src="/images.jpg"
+            src={avatarPreview}
             alt="Alex Vance"
             className="avatar-photo"
           />
           <span className="online-indicator"></span>
+          {isEditing && (
+            <label className="avatar-image-control" title="Change profile picture">
+              <Pencil size={13} />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(event) => handleImageChange(event, setAvatarPreview)}
+              />
+            </label>
+          )}
         </div>
 
         <div className="profile-title-block">

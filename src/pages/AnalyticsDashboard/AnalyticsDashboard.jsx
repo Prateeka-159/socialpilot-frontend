@@ -39,13 +39,13 @@ export default function AnalyticsDashboard() {
   };
 
   return (
-    <div style={{ padding: '32px', color: '#111111', backgroundColor: '#f9f8f6', minHeight: '100vh', boxSizing: 'border-box' }}>
+    <div style={{ padding: '0', color: 'var(--c-dark)', backgroundColor: 'var(--c-cream)', minHeight: '100vh', boxSizing: 'border-box' }}>
       {/* Header Row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
         <div>
-          <span style={{ fontSize: '12px', fontFamily: 'monospace', letterSpacing: '0.1em', color: '#444444', textTransform: 'uppercase', fontWeight: '700' }}>PERFORMANCE METRICS</span>
-          <h2 style={{ fontSize: '28px', fontWeight: '800', margin: '4px 0 0 0', color: '#000000', letterSpacing: '-0.02em' }}>Interactive Analytics</h2>
-          <p style={{ fontSize: '14px', color: '#444444', marginTop: '4px', margin: 0, fontWeight: '500' }}>
+          <span style={{ fontSize: '12px', fontFamily: 'monospace', letterSpacing: '0.1em', color: 'var(--c-taupe)', textTransform: 'uppercase', fontWeight: '700' }}>PERFORMANCE METRICS</span>
+          <h2 style={{ fontSize: '28px', fontWeight: '800', margin: '4px 0 0 0', color: 'var(--c-dark)', letterSpacing: '-0.02em' }}>Interactive Analytics</h2>
+          <p style={{ fontSize: '14px', color: 'var(--c-taupe)', marginTop: '4px', margin: 0, fontWeight: '500' }}>
             Real-time engagement trends and campaign performance metrics.
           </p>
         </div>
@@ -53,16 +53,16 @@ export default function AnalyticsDashboard() {
           value={metric}
           onChange={(e) => setMetric(e.target.value)}
           style={{
-            backgroundColor: '#ffffff',
-            border: '1px solid #cccccc',
-            color: '#000000',
+            backgroundColor: 'var(--c-white)',
+            border: '1px solid var(--c-taupe-20)',
+            color: 'var(--c-dark)',
             fontSize: '13px',
             fontWeight: '600',
             borderRadius: '6px',
             padding: '8px 14px',
             cursor: 'pointer',
             outline: 'none',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+            boxShadow: '0 1px 3px var(--c-dark-10)',
           }}
         >
           <option value="impressions">Filter: Impressions</option>
@@ -82,17 +82,17 @@ export default function AnalyticsDashboard() {
           <div
             key={i}
             style={{
-              backgroundColor: '#ffffff',
-              border: '1px solid #dcdcdc',
+              backgroundColor: 'var(--c-white)',
+              border: '1px solid var(--c-taupe-20)',
               borderRadius: '8px',
               padding: '18px 20px',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
+              boxShadow: '0 2px 4px var(--c-dark-10)',
             }}
           >
-            <p style={{ fontSize: '11px', color: '#555555', margin: '0 0 8px 0', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'monospace', fontWeight: '700' }}>{kpi.title}</p>
+            <p style={{ fontSize: '11px', color: 'var(--c-taupe)', margin: '0 0 8px 0', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'monospace', fontWeight: '700' }}>{kpi.title}</p>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <span style={{ fontSize: '24px', fontWeight: '800', color: '#000000' }}>{kpi.val}</span>
-              <span style={{ fontSize: '13px', color: '#15803d', fontWeight: '700' }}>{kpi.change}</span>
+              <span style={{ fontSize: '24px', fontWeight: '800', color: 'var(--c-dark)' }}>{kpi.val}</span>
+              <span style={{ fontSize: '13px', color: '#4f6f52', fontWeight: '700' }}>{kpi.change}</span>
             </div>
           </div>
         ))}
@@ -101,36 +101,36 @@ export default function AnalyticsDashboard() {
       {/* Interactive Charts */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
         {/* Line Chart */}
-        <div style={{ backgroundColor: '#ffffff', border: '1px solid #dcdcdc', borderRadius: '8px', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.04)' }}>
-          <p style={{ fontSize: '14px', fontWeight: '700', color: '#000000', margin: '0 0 20px 0' }}>
+        <div style={{ backgroundColor: 'var(--c-white)', border: '1px solid var(--c-taupe-20)', borderRadius: '8px', padding: '20px', boxShadow: '0 2px 4px var(--c-dark-10)' }}>
+          <p style={{ fontSize: '14px', fontWeight: '700', color: 'var(--c-dark)', margin: '0 0 20px 0' }}>
             Daily {getMetricTitle()} Trend
           </p>
           <div style={{ width: '100%', height: '280px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={analyticsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-                <XAxis dataKey="day" stroke="#333333" fontSize={12} tickLine={false} />
-                <YAxis stroke="#333333" fontSize={12} tickLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cccccc', color: '#000000', fontSize: '12px', borderRadius: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                <Line type="monotone" dataKey={metric} stroke="#000000" strokeWidth={2.5} dot={{ fill: '#000000', r: 4 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#d8cdbd" />
+                <XAxis dataKey="day" stroke="#58554e" fontSize={12} tickLine={false} />
+                <YAxis stroke="#58554e" fontSize={12} tickLine={false} />
+                <Tooltip contentStyle={{ backgroundColor: '#f7f0e5', borderColor: '#d8cdbd', color: '#27251f', fontSize: '12px', borderRadius: '6px', boxShadow: '0 4px 12px rgba(39,37,31,0.1)' }} />
+                <Line type="monotone" dataKey={metric} stroke="#27251f" strokeWidth={2.5} dot={{ fill: '#27251f', r: 4 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Bar Chart */}
-        <div style={{ backgroundColor: '#ffffff', border: '1px solid #dcdcdc', borderRadius: '8px', padding: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.04)' }}>
-          <p style={{ fontSize: '14px', fontWeight: '700', color: '#000000', margin: '0 0 20px 0' }}>
+        <div style={{ backgroundColor: 'var(--c-white)', border: '1px solid var(--c-taupe-20)', borderRadius: '8px', padding: '20px', boxShadow: '0 2px 4px var(--c-dark-10)' }}>
+          <p style={{ fontSize: '14px', fontWeight: '700', color: 'var(--c-dark)', margin: '0 0 20px 0' }}>
             Daily {getMetricTitle()} Distribution
           </p>
           <div style={{ width: '100%', height: '280px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={analyticsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-                <XAxis dataKey="day" stroke="#333333" fontSize={12} tickLine={false} />
-                <YAxis stroke="#333333" fontSize={12} tickLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cccccc', color: '#000000', fontSize: '12px', borderRadius: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                <Bar dataKey={metric} fill="#222222" radius={[4, 4, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#d8cdbd" />
+                <XAxis dataKey="day" stroke="#58554e" fontSize={12} tickLine={false} />
+                <YAxis stroke="#58554e" fontSize={12} tickLine={false} />
+                <Tooltip contentStyle={{ backgroundColor: '#f7f0e5', borderColor: '#d8cdbd', color: '#27251f', fontSize: '12px', borderRadius: '6px', boxShadow: '0 4px 12px rgba(39,37,31,0.1)' }} />
+                <Bar dataKey={metric} fill="#27251f" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

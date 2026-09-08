@@ -6,8 +6,12 @@ import "./Login.css";
 import { useAuth } from "../../context/AuthContext";
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(
+    import.meta.env.DEV ? "admin@socialpilot.com" : ""
+  );
+  const [password, setPassword] = useState(
+    import.meta.env.DEV ? "admin123" : ""
+  );
 
   const navigate = useNavigate();
   const { login } = useAuth();

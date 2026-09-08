@@ -37,3 +37,14 @@ class UpdateProfileRequest(BaseModel):
     phone: Optional[str] = None
     location: Optional[str] = None
     bio: Optional[str] = None
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+class NotificationPreferencesRequest(BaseModel):
+    email_notification: Optional[bool] = None
+    push_notification: Optional[bool] = None
+    auto_sync: Optional[bool] = None

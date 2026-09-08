@@ -6,7 +6,6 @@
 
 .sp-main-content {
   margin-left: var(--sidebar-width);
-  margin-top: var(--navbar-height); /* Keeps content below the top navbar */
   min-height: calc(100vh - var(--navbar-height));
   padding: 40px;
   background-color: var(--c-cream);

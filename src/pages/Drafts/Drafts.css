@@ -16,6 +16,7 @@
   font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.5px;
+  color: #f7f0e5;
 }
 
 .new-draft-btn {
@@ -63,6 +64,7 @@
 
 .draft-title {
   font-weight: 500;
+  color: #f7f0e5;
 }
 
 .platform-tag {

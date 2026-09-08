@@ -11,6 +11,16 @@
   font-weight: 600;
 }
 
+.settings-feedback {
+  margin: 12px 0 0;
+  color: #4f6f52;
+  font-size: 13px;
+}
+
+.settings-error {
+  color: #b42318;
+}
+
 /* Settings Flat List (NO BOX CARDS!) */
 .settings-flat-list {
   display: flex;
@@ -107,6 +117,11 @@
 .sp-setting-btn-outline:hover {
   border-color: var(--c-dark);
   background-color: rgba(88, 85, 78, 0.05);
+}
+
+.sp-setting-btn:disabled {
+  cursor: wait;
+  opacity: 0.55;
 }
 
 .toggle-switch-btn {

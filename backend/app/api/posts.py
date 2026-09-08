@@ -141,34 +141,22 @@ async def create_post(
                 detail="Campaign not found"
             )
 
-    # Process image
+    # Process optional attachment
     image_data = None
     image_name = None
     image_type = None
 
     if image:
 
-        allowed_types = {
-            "image/jpeg",
-            "image/png",
-            "image/webp"
-        }
-
-        if image.content_type not in allowed_types:
-            raise HTTPException(
-                status_code=400,
-                detail="Only JPEG, PNG and WEBP images are allowed"
-            )
-
         image_data = await image.read()
 
-        # Maximum image size = 5 MB
+        # Maximum attachment size = 5 MB
         max_size = 5 * 1024 * 1024
 
         if len(image_data) > max_size:
             raise HTTPException(
                 status_code=400,
-                detail="Image size must be less than 5 MB"
+                detail="Attachment size must be less than 5 MB"
             )
 
         image_name = image.filename

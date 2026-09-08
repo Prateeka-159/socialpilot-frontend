@@ -5,131 +5,166 @@ import {
   Sparkles,
   TrendingUp,
   ArrowUpRight,
+  FileText,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { getOverallAnalytics, getAdminDashboard } from "../../services/analyticsService";
+import { getCampaigns } from "../../services/campaignService";
+import { getPosts } from "../../services/postService";
+import { getAccounts } from "../../services/socialService";
+import API_BASE_URL from "../../services/api";
 import "./Dashboard.css";
 
 function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [dashboardData, setDashboardData] = useState({
+    campaigns: [],
+    posts: [],
+    accounts: [],
+    overallMetrics: {},
+    adminMetrics: {},
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        setError("");
+        const [campaignData, postData, accountData, overallData, adminData] = await Promise.all([
+          getCampaigns(),
+          getPosts(),
+          getAccounts(),
+          getOverallAnalytics().catch(() => null),
+          user.role === "Administrator"
+            ? getAdminDashboard().catch(() => null)
+            : Promise.resolve(null),
+        ]);
+
+        setDashboardData({
+          campaigns: campaignData.campaigns || [],
+          posts: postData.posts || [],
+          accounts: accountData.accounts || [],
+          overallMetrics: overallData?.overall_metrics || {},
+          adminMetrics: adminData?.dashboard || {},
+        });
+      } catch (err) {
+        setError(err.message || "Unable to load dashboard data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboard();
+  }, [user.role]);
+
+  const { campaigns, posts, accounts, overallMetrics, adminMetrics } = dashboardData;
+  const activeCampaigns = campaigns.filter(
+    (campaign) => campaign.status?.toLowerCase() === "active"
+  ).length;
+  const scheduledPosts = posts.filter((post) =>
+    ["Scheduled", "Queued"].includes(post.status)
+  ).length;
+  const draftPosts = posts.filter((post) => post.status === "Draft").length;
+  const engagementRate = Number(overallMetrics.average_engagement_rate || 0);
 
   let stats = [];
   if (user.role === "Administrator") {
     stats = [
       {
         title: "TOTAL USERS",
-        value: "125",
-        change: "+8 New Users",
+        value: String(adminMetrics.total_users || 0),
+        change: `${adminMetrics.total_posts || 0} posts in system`,
         icon: <Users size={20} />,
       },
       {
-        title: "SYSTEM HEALTH",
-        value: "99.9%",
-        change: "Operational",
+        title: "CONNECTED ACCOUNTS",
+        value: String(adminMetrics.connected_accounts || accounts.length),
+        change: `${adminMetrics.total_campaigns || campaigns.length} campaigns`,
         icon: <Activity size={20} />,
       },
     ];
-  }
-
-  else if (user.role === "Business User") {
+  } else if (user.role === "Business User") {
     stats = [
       {
-        title: "CONNECTED BRANDS",
-        value: "12",
-        change: "+2 this month",
+        title: "CONNECTED ACCOUNTS",
+        value: String(accounts.length),
+        change: "From connected platforms",
         icon: <Users size={20} />,
       },
       {
         title: "ACTIVE CAMPAIGNS",
-        value: "8",
-        change: "Running",
+        value: String(activeCampaigns),
+        change: `${campaigns.length} total campaigns`,
         icon: <BarChart3 size={20} />,
       },
     ];
-  }
-
-  else if (user.role === "Marketing Team") {
+  } else if (user.role === "Marketing Team") {
     stats = [
       {
         title: "CAMPAIGNS",
-        value: "24",
-        change: "6 Scheduled",
+        value: String(campaigns.length),
+        change: `${scheduledPosts} scheduled posts`,
         icon: <BarChart3 size={20} />,
       },
       {
         title: "ENGAGEMENT",
-        value: "12.8%",
-        change: "+3%",
+        value: `${engagementRate}%`,
+        change: `${overallMetrics.total_engagements || 0} total engagements`,
         icon: <TrendingUp size={20} />,
       },
     ];
-  }
-
-  else {
+  } else {
     stats = [
       {
         title: "DRAFT POSTS",
-        value: "18",
-        change: "5 Pending Review",
+        value: String(draftPosts),
+        change: `${posts.length} total posts`,
         icon: <Sparkles size={20} />,
       },
       {
         title: "SCHEDULED POSTS",
-        value: "42",
-        change: "This Week",
+        value: String(scheduledPosts),
+        change: "From publication queue",
         icon: <BarChart3 size={20} />,
       },
     ];
   }
 
-  const recentActivity = [
-    {
-      id: 1,
-      time: "10:42 AM",
-      date: "TODAY",
-      platform: "LinkedIn",
-      action: "Published architectural case study carousel with 8 slides",
-      author: "Alex Vance",
-      status: "COMPLETED",
-    },
-    {
-      id: 2,
-      time: "08:15 AM",
-      date: "TODAY",
-      platform: "Instagram",
-      action: "Scheduled visual reel broadcast for 18:00 UTC",
-      author: "Automated Queue",
-      status: "QUEUED",
-    },
-    {
-      id: 3,
-      time: "04:30 PM",
-      date: "YESTERDAY",
-      platform: "Analytics Engine",
-      action: "Weekly cross-platform performance breakdown compiled",
-      author: "System Bot",
-      status: "SYNCED",
-    },
-    {
-      id: 4,
-      time: "11:20 AM",
-      date: "YESTERDAY",
-      platform: "X (Twitter)",
-      action: "Automated 5-part thread broadcast completed",
-      author: "Alex Vance",
-      status: "COMPLETED",
-    },
-    {
-      id: 5,
-      time: "09:00 AM",
-      date: "2 DAYS AGO",
-      platform: "Facebook",
-      action: "Updated cover banner & synchronized business account credentials",
-      author: "Alex Vance",
-      status: "UPDATED",
-    },
-  ];
+  const getAccountPlatform = (accountId) =>
+    accounts.find((account) => account.id === accountId)?.platform || "Unassigned";
+
+  const formatActivityTime = (value) => {
+    if (!value) {
+      return { time: "--:--", date: "NO DATE" };
+    }
+
+    const date = new Date(value);
+    return {
+      time: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      date: date.toLocaleDateString([], { month: "short", day: "numeric" }).toUpperCase(),
+    };
+  };
+
+  const recentActivity = posts.slice(0, 5).map((post) => {
+    const timestamp = formatActivityTime(post.updated_at || post.created_at);
+    return {
+      id: post.post_id,
+      ...timestamp,
+      platform: getAccountPlatform(post.social_account_id),
+      action: post.title || post.caption || "Untitled post",
+      author: user.name,
+      status: post.status?.toUpperCase() || "UNKNOWN",
+    };
+  });
+
+  const featuredPost = posts[0];
+  const featuredAccount = featuredPost
+    ? getAccountPlatform(featuredPost.social_account_id)
+    : "No connected platform";
 
   return (
     <div className="dashboard-page">
@@ -144,31 +179,45 @@ function Dashboard() {
         </div>
       </div>
 
+      {loading && <p className="dashboard-state">Loading live dashboard data...</p>}
+      {error && <p className="dashboard-state dashboard-error">{error}</p>}
+
       {/* Top Performing Post Banner */}
       <div className="top-post-banner hairline-b">
         <div className="showcase-img-frame">
-          <img
-            src="/biking-over-bridge.jpg"
-            alt="Highest reach post image"
-            className="showcase-img"
-          />
+          {featuredPost?.has_image ? (
+            <img
+              src={`${API_BASE_URL}/posts/${featuredPost.post_id}/image`}
+              alt={featuredPost.title || "Featured post attachment"}
+              className="showcase-img"
+            />
+          ) : (
+            <div className="showcase-empty-state">
+              <FileText size={32} />
+              <span>{featuredPost ? "No attachment" : "Your first post starts here"}</span>
+            </div>
+          )}
         </div>
         <div className="top-post-right">
           <div className="top-post-left">
             <div className="top-post-kicker font-mono">
               <TrendingUp size={14} />
-              <span>HIGHEST REACH POST</span>
+              <span>RECENT POST</span>
             </div>
-            <h2 className="top-post-title font-serif">"Urban Transitions &amp; Spatial Architecture Case Study"</h2>
+            <h2 className="top-post-title font-serif">
+              {featuredPost?.title || featuredPost?.caption || "Build your publishing rhythm"}
+            </h2>
             <p className="top-post-meta font-mono">
-              LinkedIn · Jul 28, 2026 · <strong>42,800 impressions</strong> · 9.2% engagement
+              {featuredPost ? `${featuredAccount} · ${featuredPost.status}` : "READY WHEN YOU ARE"}
             </p>
             <p className="top-post-nudge">
-              This post is your highest reach performer. Keep the momentum going — publish another update to extend audience reach and engagement.
+              {featuredPost
+                ? "This content is loaded from your latest backend post record."
+                : "Create your first post, choose a platform, and start building your content rhythm."}
             </p>
           </div>
-          <button className="top-post-cta" onClick={() => navigate("/scheduler") }>
-            <span>Schedule a Follow-up</span>
+          <button className="top-post-cta" onClick={() => navigate("/scheduler")}>
+            <span>{featuredPost ? "Schedule a Follow-up" : "Create Your First Post"}</span>
             <ArrowUpRight size={16} />
           </button>
         </div>
@@ -195,7 +244,9 @@ function Dashboard() {
             <Activity size={20} />
             <h2 className="section-heading font-serif">Activity Timeline</h2>
           </div>
-          <span className="section-count font-mono">5 RECENT EVENTS</span>
+          <span className="section-count font-mono">
+            {recentActivity.length} RECENT POSTS
+          </span>
         </div>
 
         <div className="timeline-table-header hairline-b font-mono">
@@ -206,7 +257,22 @@ function Dashboard() {
         </div>
 
         <div className="activity-flat-list">
-          {recentActivity.map((act) => (
+          {recentActivity.length === 0 && !loading ? (
+            <div className="dashboard-empty-activity">
+              <Sparkles size={20} />
+              <div>
+                <strong>Your activity timeline is waiting for its first post.</strong>
+                <p>Start with a caption, attach your content, and choose when to publish.</p>
+              </div>
+              <button
+                type="button"
+                className="activity-create-button"
+                onClick={() => navigate("/scheduler")}
+              >
+                Create Post
+              </button>
+            </div>
+          ) : recentActivity.map((act) => (
             <div key={act.id} className="activity-full-row hairline-b">
               <div className="col-time font-mono">
                 <span className="time-primary">{act.time}</span>
