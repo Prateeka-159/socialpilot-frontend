@@ -72,7 +72,13 @@ export default function CalendarView() {
   return (
     <div className="calendar-container">
       <div className="calendar-header">
-        <h2>Content Schedule</h2>
+        <div>
+          <p className="eyebrow-text font-mono">PUBLISHING CALENDAR</p>
+          <h2>Content Schedule</h2>
+          <p className="page-subtitle">
+            Track planned posts across the month and keep your publishing rhythm aligned.
+          </p>
+        </div>
         <div className="calendar-nav">
           <button className="nav-btn" onClick={handlePrevMonth}>&lt;</button>
           <span>{monthNames[month]} {year}</span>

@@ -64,13 +64,23 @@
   width: 100%;
   max-width: 480px;
   padding: 12px 16px;
-  border: 1px solid var(--c-taupe-20);
+  border: 1px solid rgba(39, 37, 31, 0.6);
   border-radius: 8px;
   background-color: var(--c-cream-80);
   font-size: 14px;
   outline: none;
   font-family: var(--font-sans);
   transition: var(--transition);
+}
+
+:root[data-theme="dark"] .campaigns-search-bar input {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(var(--brown-rgb), 0.36);
+  color: #f3ece4;
+}
+
+:root[data-theme="dark"] .campaigns-search-bar input::placeholder {
+  color: rgba(243, 236, 228, 0.62);
 }
 
 .campaigns-search-bar input:focus {
@@ -140,6 +150,48 @@
   white-space: nowrap;
   cursor: pointer;
   font-family: var(--font-sans);
+}
+
+:root[data-theme="dark"] .campaigns-page,
+:root[data-theme="dark"] .campaigns-header h2,
+:root[data-theme="dark"] .campaigns-header p,
+:root[data-theme="dark"] .campaign-name-button,
+:root[data-theme="dark"] .campaign-platform,
+:root[data-theme="dark"] .campaign-dates,
+:root[data-theme="dark"] .campaign-budget,
+:root[data-theme="dark"] .campaign-table-header,
+:root[data-theme="dark"] .campaign-table-row,
+:root[data-theme="dark"] .campaign-status.completed,
+:root[data-theme="dark"] .campaign-status.paused {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .campaign-table-header {
+  background: var(--surface-soft);
+  border-bottom-color: var(--border);
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .campaign-table-row {
+  border-bottom-color: var(--border);
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .campaign-name-button,
+:root[data-theme="dark"] .campaign-budget {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .campaign-platform,
+:root[data-theme="dark"] .campaign-dates {
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .campaign-status.active,
+:root[data-theme="dark"] .campaign-status.completed,
+:root[data-theme="dark"] .campaign-status.paused {
+  background: var(--button-dark);
+  color: #111111;
 }
 
 .campaign-name-button:hover {

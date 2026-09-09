@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
+import PilotChatWidget from "../common/PilotChatWidget";
 import "./MainLayout.css";
 
 function MainLayout() {
@@ -11,6 +12,7 @@ function MainLayout() {
       <main className="sp-main-content">
         <Outlet />
       </main>
+      <PilotChatWidget />
     </div>
   );
 }

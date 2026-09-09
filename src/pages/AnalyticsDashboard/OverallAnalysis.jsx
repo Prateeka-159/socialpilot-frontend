@@ -18,7 +18,13 @@ import { ChevronDown } from "lucide-react";
 import "./OverallAnalysis.css";
 
 const COLORS = ["#27251f", "#58554e", "#8f8171", "#b6a58f", "#d1c2ad"];
+const DARK_MODE_COLORS = ["#f5efe7", "#d6c5ad", "#c7ad8d", "#a98d6e", "#d8c1a2"];
 const USE_DEMO_DATA = true;
+
+const isDarkChartTheme = () => {
+  if (typeof document === "undefined") return false;
+  return document.documentElement.dataset.theme === "dark";
+};
 
 const getDemoAnalyticsData = () => {
   const campaigns = [
@@ -402,6 +408,7 @@ export default function OverallAnalysis() {
     (total, campaign) => total + (campaign.engagement?.total_engagements || 0),
     0
   );
+  const darkChartPalette = isDarkChartTheme() ? DARK_MODE_COLORS : COLORS;
   const selectedChartData = performanceData.map((point) => {
     const chartPoint = { day: point.day };
 
@@ -621,14 +628,14 @@ export default function OverallAnalysis() {
           <div className="chart-container">
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={selectedChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#d8cdbd" />
-                <XAxis dataKey="day" stroke="#58554e" fontSize={12} tickLine={false} />
-                <YAxis stroke="#58554e" fontSize={12} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={isDarkChartTheme() ? "rgba(245,239,231,0.28)" : "#d8cdbd"} />
+                <XAxis dataKey="day" stroke={isDarkChartTheme() ? "#f5efe7" : "#58554e"} fontSize={12} tickLine={false} />
+                <YAxis stroke={isDarkChartTheme() ? "#f5efe7" : "#58554e"} fontSize={12} tickLine={false} />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: '#f7f0e5',
-                    borderColor: '#d8cdbd',
-                    color: '#27251f',
+                    backgroundColor: isDarkChartTheme() ? '#111111' : '#f7f0e5',
+                    borderColor: isDarkChartTheme() ? 'rgba(245,239,231,0.2)' : '#d8cdbd',
+                    color: isDarkChartTheme() ? '#f5efe7' : '#27251f',
                     fontSize: '12px', 
                     borderRadius: '8px',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
@@ -640,9 +647,9 @@ export default function OverallAnalysis() {
                     type="monotone"
                     dataKey={`campaign_${campaign.campaign_id}`}
                     name={campaign.campaign_name}
-                    stroke={COLORS[index % COLORS.length]}
+                    stroke={darkChartPalette[index % darkChartPalette.length]}
                     strokeWidth={3}
-                    dot={{ fill: COLORS[index % COLORS.length], r: 5 }}
+                    dot={{ fill: darkChartPalette[index % darkChartPalette.length], r: 5 }}
                     activeDot={{ r: 7 }}
                   />
                 ))}
@@ -669,14 +676,14 @@ export default function OverallAnalysis() {
                   dataKey="value"
                 >
                   {selectedPlatformDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={`cell-${index}`} fill={darkChartPalette[index % darkChartPalette.length]} stroke={isDarkChartTheme() ? "#f5efe7" : "#ffffff"} strokeWidth={1.5} />
                   ))}
                 </Pie>
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: '#f7f0e5',
-                    borderColor: '#d8cdbd',
-                    color: '#27251f',
+                    backgroundColor: isDarkChartTheme() ? '#111111' : '#f7f0e5',
+                    borderColor: isDarkChartTheme() ? 'rgba(245,239,231,0.2)' : '#d8cdbd',
+                    color: isDarkChartTheme() ? '#f5efe7' : '#27251f',
                     fontSize: '12px', 
                     borderRadius: '8px'
                   }} 
@@ -689,7 +696,7 @@ export default function OverallAnalysis() {
               <div key={item.name} className="legend-item">
                 <div 
                   className="legend-color" 
-                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  style={{ backgroundColor: darkChartPalette[index % darkChartPalette.length] }}
                 ></div>
                 <span className="legend-label">{item.name}</span>
                 <span className="legend-value">{item.value}</span>

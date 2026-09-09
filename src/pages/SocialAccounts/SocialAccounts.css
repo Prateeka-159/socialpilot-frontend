@@ -24,6 +24,54 @@
   color: var(--c-taupe);
 }
 
+:root[data-theme="dark"] .social-accounts-page,
+:root[data-theme="dark"] .page-title,
+:root[data-theme="dark"] .acc-name,
+:root[data-theme="dark"] .m-val,
+:root[data-theme="dark"] .status-label-connected,
+:root[data-theme="dark"] .account-icon-frame,
+:root[data-theme="dark"] .sync-bar-left,
+:root[data-theme="dark"] .sync-bar-right,
+:root[data-theme="dark"] .list-table-header,
+:root[data-theme="dark"] .account-flat-row,
+:root[data-theme="dark"] .sp-btn-outline,
+:root[data-theme="dark"] .sp-btn-solid {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .page-subtitle,
+:root[data-theme="dark"] .acc-handle,
+:root[data-theme="dark"] .m-lbl,
+:root[data-theme="dark"] .sync-bar-right,
+:root[data-theme="dark"] .list-table-header,
+:root[data-theme="dark"] .status-label-disconnected,
+:root[data-theme="dark"] .sync-time {
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .account-flat-row:hover {
+  background: rgba(var(--brown-rgb), 0.12);
+}
+
+:root[data-theme="dark"] .account-icon-frame,
+:root[data-theme="dark"] .accounts-sync-bar {
+  background: rgba(var(--brown-rgb), 0.12);
+  border-color: rgba(var(--brown-rgb), 0.22);
+}
+
+:root[data-theme="dark"] .sp-btn-solid,
+:root[data-theme="dark"] .sp-btn-outline {
+  background: var(--button-dark);
+  color: #111111;
+  border-color: var(--button-dark);
+}
+
+:root[data-theme="dark"] .sp-btn-solid:hover,
+:root[data-theme="dark"] .sp-btn-outline:hover {
+  background: var(--primary-hover);
+  color: #111111;
+}
+
 /* Sync Status Bar (Without pictures) */
 .accounts-sync-bar {
   display: flex;

@@ -376,6 +376,59 @@
   color: var(--c-taupe);
 }
 
+:root[data-theme="dark"] .kpi-card {
+  background: rgba(124, 95, 67, 0.12);
+  border: 1px solid rgba(124, 95, 67, 0.22);
+}
+
+:root[data-theme="dark"] .kpi-card:hover {
+  background: rgba(124, 95, 67, 0.18);
+}
+
+:root[data-theme="dark"] .kpi-icon {
+  color: #111111;
+}
+
+:root[data-theme="dark"] .kpi-label,
+:root[data-theme="dark"] .kpi-change.neutral {
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .kpi-value,
+:root[data-theme="dark"] .kpi-change.positive,
+:root[data-theme="dark"] .kpi-change.negative {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .campaign-ranking-header,
+:root[data-theme="dark"] .campaign-table-header {
+  background: var(--surface-soft);
+  border-bottom-color: var(--border);
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .campaign-ranking-row,
+:root[data-theme="dark"] .campaign-table-row,
+:root[data-theme="dark"] .campaign-name-button,
+:root[data-theme="dark"] .campaign-platform,
+:root[data-theme="dark"] .campaign-dates,
+:root[data-theme="dark"] .campaign-budget,
+:root[data-theme="dark"] .campaign-ranking-name,
+:root[data-theme="dark"] .campaign-ranking-value,
+:root[data-theme="dark"] .campaign-ranking-platform {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .campaign-ranking-row:hover,
+:root[data-theme="dark"] .campaign-table-row:hover {
+  background: rgba(124, 95, 67, 0.12);
+}
+
+:root[data-theme="dark"] .campaign-table-row,
+:root[data-theme="dark"] .campaign-ranking-row {
+  border-bottom-color: var(--border);
+}
+
 /* Charts Section */
 .charts-section {
   display: grid;
@@ -523,13 +576,85 @@
   letter-spacing: 0.12em;
 }
 
-.campaign-ranking-row {
+:root[data-theme="dark"] .analysis-header h2,
+:root[data-theme="dark"] .section-label,
+:root[data-theme="dark"] .analysis-header p,
+:root[data-theme="dark"] .chart-header h3,
+:root[data-theme="dark"] .chart-subtitle,
+:root[data-theme="dark"] .legend-label,
+:root[data-theme="dark"] .legend-value,
+:root[data-theme="dark"] .section-header h3,
+:root[data-theme="dark"] .campaign-ranking-header,
+:root[data-theme="dark"] .campaign-ranking-name,
+:root[data-theme="dark"] .campaign-ranking-value,
+:root[data-theme="dark"] .campaign-ranking-platform,
+:root[data-theme="dark"] .campaign-ranking-row {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .chart-subtitle,
+:root[data-theme="dark"] .section-label,
+:root[data-theme="dark"] .campaign-ranking-header,
+:root[data-theme="dark"] .kpi-label,
+:root[data-theme="dark"] .campaign-filter-count,
+:root[data-theme="dark"] .campaign-filter-option small {
+  color: rgba(245, 239, 231, 0.72);
+}
+
+:root[data-theme="dark"] .chart-card {
+  background: rgba(255, 255, 255, 0.015);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme="dark"] .recharts-cartesian-grid line,
+:root[data-theme="dark"] .recharts-text {
+  stroke: rgba(245, 239, 231, 0.72);
+  fill: rgba(245, 239, 231, 0.78);
+}
+
+:root[data-theme="dark"] .recharts-tooltip-wrapper {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .kpi-card {
+  background: rgba(var(--brown-rgb), 0.08);
+  border: 1px solid rgba(var(--brown-rgb), 0.18);
+}
+
+:root[data-theme="dark"] .kpi-icon {
+  background: var(--brown-base);
+  color: #111111;
+  border-color: var(--brown-base);
+}
+
+:root[data-theme="dark"] .kpi-label,
+:root[data-theme="dark"] .campaign-ranking-header {
+  color: rgba(245, 239, 231, 0.72);
+}
+
+:root[data-theme="dark"] .kpi-value,
+:root[data-theme="dark"] .kpi-change.positive,
+:root[data-theme="dark"] .kpi-change.negative,
+:root[data-theme="dark"] .campaign-ranking-name,
+:root[data-theme="dark"] .campaign-ranking-value,
+:root[data-theme="dark"] .campaign-ranking-platform,
+:root[data-theme="dark"] .campaign-ranking-row {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .campaign-ranking-table,
+:root[data-theme="dark"] .campaign-ranking-header,
+:root[data-theme="dark"] .campaign-ranking-row {
+  background: transparent;
+  border-bottom-color: var(--border);
+}
+
+:root[data-theme="dark"] .campaign-ranking-row {
   width: 100%;
   padding: 18px 16px;
   border: 0;
-  border-bottom: 1px solid var(--c-taupe-20);
+  border-bottom: 1px solid var(--border);
   background: transparent;
-  color: var(--c-dark);
   text-align: left;
   cursor: pointer;
   font-family: var(--font-sans);

@@ -55,7 +55,13 @@ export default function Drafts() {
   return (
     <div className="drafts-container">
       <div className="drafts-header">
-        <h2>Drafts</h2>
+        <div>
+          <p className="eyebrow-text font-mono">CONTENT LIBRARY</p>
+          <h2>Drafts</h2>
+          <p className="page-subtitle">
+            Review saved drafts, fine-tune content, and move them back into the publishing flow.
+          </p>
+        </div>
         <button className="new-draft-btn" onClick={() => navigate("/scheduler")}>
           + Create Draft
         </button>
@@ -100,7 +106,7 @@ export default function Drafts() {
                   <td>
                     <button
                       className="action-btn edit-btn"
-                      onClick={() => navigate("/scheduler")}
+                      onClick={() => navigate("/scheduler", { state: { draft: item } })}
                     >
                       Edit
                     </button>

@@ -3,8 +3,8 @@
 .page {
   padding: var(--page-padding);
   min-height: calc(100vh - var(--navbar-height));
-  background-color: var(--c-cream);
-  color: var(--c-dark);
+  background-color: var(--background);
+  color: var(--text);
 }
 
 .page-header {
@@ -13,26 +13,26 @@
   align-items: flex-end;
   margin-bottom: 32px;
   padding-bottom: 24px;
-  border-bottom: 1px solid var(--c-taupe-20);
+  border-bottom: 1px solid var(--border);
 }
 
 .page-title {
   font-family: var(--font-serif);
   font-size: 34px;
   font-weight: 700;
-  color: var(--c-dark);
+  color: var(--text);
 }
 
 .page-subtitle {
   margin-top: 4px;
-  color: var(--c-taupe);
+  color: var(--text-muted);
   font-size: 15px;
 }
 
 /* Open section without cards/boxes */
 .section {
   padding: 24px 0;
-  border-bottom: 1px solid var(--c-taupe-20);
+  border-bottom: 1px solid var(--border);
   margin-bottom: 24px;
 }
 
@@ -41,5 +41,5 @@
   font-size: 22px;
   font-weight: 600;
   margin-bottom: 16px;
-  color: var(--c-dark);
+  color: var(--text);
 }

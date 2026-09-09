@@ -6,6 +6,7 @@ import {
   LogOut,
   ShieldCheck,
   Sliders,
+  Palette,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -18,17 +19,24 @@ import {
 } from "../../services/settingsService";
 import "./Settings.css";
 
+const THEME_STORAGE_KEY = "socialpilot-theme";
+
 function Settings() {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [notifications, setNotifications] = useState(true);
   const [autoSync, setAutoSync] = useState(true);
+  const [theme, setTheme] = useState("light");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
   useEffect(() => {
+    const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || "light";
+    setTheme(savedTheme);
+    document.documentElement.setAttribute("data-theme", savedTheme);
+
     const loadPreferences = async () => {
       try {
         const data = await getPreferences();
@@ -58,6 +66,13 @@ function Settings() {
     }
   };
 
+  const applyTheme = (nextTheme) => {
+    const normalizedTheme = nextTheme === "dark" ? "dark" : "light";
+    setTheme(normalizedTheme);
+    localStorage.setItem(THEME_STORAGE_KEY, normalizedTheme);
+    document.documentElement.setAttribute("data-theme", normalizedTheme);
+  };
+
   const handleNotificationsToggle = () => {
     const nextValue = !notifications;
     setNotifications(nextValue);
@@ -71,6 +86,11 @@ function Settings() {
     const nextValue = !autoSync;
     setAutoSync(nextValue);
     savePreferences({ auto_sync: nextValue }, () => setAutoSync(!nextValue));
+  };
+
+  const handleThemeChange = (selectedTheme) => {
+    applyTheme(selectedTheme);
+    setMessage("Appearance updated.");
   };
 
   const handlePasswordUpdate = async () => {
@@ -194,6 +214,35 @@ function Settings() {
         {/* Item 3 */}
         <div className="setting-flat-row hairline-b">
           <div className="setting-meta">
+            <Palette size={20} className="setting-icon" />
+            <div className="setting-titles">
+              <h3 className="setting-name">Workspace Appearance</h3>
+              <p className="setting-desc">Switch between the studio’s light and dark presentation modes.</p>
+            </div>
+          </div>
+          <div className="setting-action">
+            <div className="theme-toggle-group" aria-label="Theme selector">
+              <button
+                type="button"
+                className={`theme-option ${theme === "light" ? "active" : ""}`}
+                onClick={() => handleThemeChange("light")}
+              >
+                LIGHT
+              </button>
+              <button
+                type="button"
+                className={`theme-option ${theme === "dark" ? "active" : ""}`}
+                onClick={() => handleThemeChange("dark")}
+              >
+                DARK
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Item 4 */}
+        <div className="setting-flat-row hairline-b">
+          <div className="setting-meta">
             <Sliders size={20} className="setting-icon" />
             <div className="setting-titles">
               <h3 className="setting-name">Automatic API Pipeline Sync</h3>
@@ -213,7 +262,7 @@ function Settings() {
           </div>
         </div>
 
-        {/* Item 4 */}
+        {/* Item 5 */}
         <div className="setting-flat-row hairline-b">
           <div className="setting-meta">
             <ShieldCheck size={20} className="setting-icon" />
@@ -229,7 +278,7 @@ function Settings() {
           </div>
         </div>
 
-        {/* Item 5 */}
+        {/* Item 6 */}
         <div className="setting-flat-row hairline-b">
           <div className="setting-meta">
             <LogOut size={20} className="setting-icon" />
@@ -245,7 +294,7 @@ function Settings() {
           </div>
         </div>
 
-        {/* Item 6: Purge Workspace */}
+        {/* Item 7: Purge Workspace */}
         <div className="setting-flat-row hairline-b danger-row">
           <div className="setting-meta">
             <Trash2 size={20} className="setting-icon danger-icon" />

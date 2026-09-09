@@ -6,6 +6,10 @@
   overflow: hidden;
 }
 
+:root[data-theme="dark"] .login-canvas {
+  background-color: #111111;
+}
+
 /* Visual Left Pane */
 .login-visual-pane {
   flex: 1.1;
@@ -88,6 +92,58 @@
   justify-content: center;
   padding: 48px;
   background-color: var(--c-cream);
+}
+
+:root[data-theme="dark"] .login-form-pane {
+  background-color: #181715;
+}
+
+:root[data-theme="dark"] .form-title,
+:root[data-theme="dark"] .form-subtext,
+:root[data-theme="dark"] .field-label,
+:root[data-theme="dark"] .forgot-link,
+:root[data-theme="dark"] .footer-prompt,
+:root[data-theme="dark"] .bare-input,
+:root[data-theme="dark"] .register-link {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .form-eyebrow,
+:root[data-theme="dark"] .field-icon,
+:root[data-theme="dark"] .forgot-link,
+:root[data-theme="dark"] .footer-prompt,
+:root[data-theme="dark"] .form-subtext {
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .input-hairline-box {
+  border-bottom-color: rgba(245, 239, 231, 0.22);
+}
+
+:root[data-theme="dark"] .input-hairline-box:focus-within {
+  border-bottom-color: #f5efe7;
+}
+
+:root[data-theme="dark"] .bare-input {
+  background: transparent;
+}
+
+:root[data-theme="dark"] .bare-input::placeholder {
+  color: rgba(245, 239, 231, 0.55);
+}
+
+:root[data-theme="dark"] .sp-primary-submit {
+  background-color: var(--button-dark);
+  color: var(--button-dark-text);
+}
+
+:root[data-theme="dark"] .sp-primary-submit:hover {
+  background-color: var(--primary-hover);
+  color: #f7f0e5;
+}
+
+:root[data-theme="dark"] .register-link {
+  color: #f5efe7;
 }
 
 .form-inner {

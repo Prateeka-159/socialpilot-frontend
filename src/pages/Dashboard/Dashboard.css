@@ -4,6 +4,48 @@
   color: var(--c-dark);
 }
 
+:root[data-theme="dark"] .dashboard-page,
+:root[data-theme="dark"] .dashboard-state,
+:root[data-theme="dark"] .eyebrow-text,
+:root[data-theme="dark"] .date-tag,
+:root[data-theme="dark"] .dash-title,
+:root[data-theme="dark"] .dash-subtitle,
+:root[data-theme="dark"] .showcase-kicker,
+:root[data-theme="dark"] .showcase-heading,
+:root[data-theme="dark"] .showcase-desc,
+:root[data-theme="dark"] .showcase-meta,
+:root[data-theme="dark"] .inline-link-btn,
+:root[data-theme="dark"] .metric-label,
+:root[data-theme="dark"] .metric-value,
+:root[data-theme="dark"] .trend-card-content,
+:root[data-theme="dark"] .timeline-header,
+:root[data-theme="dark"] .timeline-table,
+:root[data-theme="dark"] .timeline-table th,
+:root[data-theme="dark"] .timeline-table td,
+:root[data-theme="dark"] .activity-card {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .dashboard-state,
+:root[data-theme="dark"] .eyebrow-text,
+:root[data-theme="dark"] .date-tag,
+:root[data-theme="dark"] .showcase-kicker,
+:root[data-theme="dark"] .showcase-desc,
+:root[data-theme="dark"] .showcase-meta,
+:root[data-theme="dark"] .metric-subtitle,
+:root[data-theme="dark"] .trend-card-subtitle,
+:root[data-theme="dark"] .timeline-table th {
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .date-tag,
+:root[data-theme="dark"] .metric-item,
+:root[data-theme="dark"] .trend-card,
+:root[data-theme="dark"] .timeline-table td,
+:root[data-theme="dark"] .activity-card {
+  border-color: var(--border);
+}
+
 .dashboard-state {
   color: var(--c-taupe);
   font-size: 13px;
@@ -292,6 +334,43 @@
   letter-spacing: 0.2em;
   color: var(--c-taupe);
   margin-bottom: 4px;
+}
+
+:root[data-theme="dark"] .timeline-table-header,
+:root[data-theme="dark"] .time-primary,
+:root[data-theme="dark"] .time-sub,
+:root[data-theme="dark"] .plat-badge,
+:root[data-theme="dark"] .action-text,
+:root[data-theme="dark"] .actor-name,
+:root[data-theme="dark"] .status-pill,
+:root[data-theme="dark"] .dashboard-empty-activity strong,
+:root[data-theme="dark"] .dashboard-empty-activity p,
+:root[data-theme="dark"] .section-title-row,
+:root[data-theme="dark"] .title-with-icon,
+:root[data-theme="dark"] .section-heading,
+:root[data-theme="dark"] .section-count {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .time-sub,
+:root[data-theme="dark"] .actor-name,
+:root[data-theme="dark"] .section-count,
+:root[data-theme="dark"] .dashboard-empty-activity,
+:root[data-theme="dark"] .dashboard-empty-activity p {
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .activity-full-row:hover {
+  background: rgba(var(--brown-rgb), 0.12);
+}
+
+:root[data-theme="dark"] .status-pill.queued,
+:root[data-theme="dark"] .status-pill.synced,
+:root[data-theme="dark"] .status-pill.updated,
+:root[data-theme="dark"] .status-pill.completed {
+  background: var(--button-dark);
+  color: #111111;
+  border-color: var(--button-dark);
 }
 
 .activity-flat-list {

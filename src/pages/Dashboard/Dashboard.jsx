@@ -94,7 +94,17 @@ function Dashboard() {
     let objectUrl = null;
 
     const loadFeaturedImage = async () => {
-      if (!posts.length || !posts[0]?.has_image) {
+      if (!posts.length) {
+        setFeaturedImageUrl("");
+        return;
+      }
+
+      if (import.meta.env.DEV && posts[0]?.image_url) {
+        setFeaturedImageUrl(posts[0].image_url);
+        return;
+      }
+
+      if (!posts[0]?.has_image) {
         setFeaturedImageUrl("");
         return;
       }

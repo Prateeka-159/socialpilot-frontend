@@ -6,6 +6,48 @@
   color: var(--c-dark);
 }
 
+:root[data-theme="dark"] .profile-page,
+:root[data-theme="dark"] .profile-name,
+:root[data-theme="dark"] .bio-text,
+:root[data-theme="dark"] .detail-value-side {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .profile-role,
+:root[data-theme="dark"] .bio-label,
+:root[data-theme="dark"] .detail-label-side {
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .detail-flat-row:hover {
+  background: rgba(var(--brown-rgb), 0.08);
+}
+
+:root[data-theme="dark"] .cover-tag,
+:root[data-theme="dark"] .image-change-control,
+:root[data-theme="dark"] .avatar-image-control,
+:root[data-theme="dark"] .profile-header-action button,
+:root[data-theme="dark"] .sp-dark-btn,
+:root[data-theme="dark"] .create-btn,
+:root[data-theme="dark"] .retry-btn,
+:root[data-theme="dark"] .view-all-btn {
+  background: var(--button-dark);
+  color: #111111;
+  border-color: var(--button-dark);
+}
+
+:root[data-theme="dark"] .cover-tag:hover,
+:root[data-theme="dark"] .image-change-control:hover,
+:root[data-theme="dark"] .avatar-image-control:hover,
+:root[data-theme="dark"] .profile-header-action button:hover,
+:root[data-theme="dark"] .sp-dark-btn:hover,
+:root[data-theme="dark"] .create-btn:hover,
+:root[data-theme="dark"] .retry-btn:hover,
+:root[data-theme="dark"] .view-all-btn:hover {
+  background: var(--primary-hover);
+  color: #111111;
+}
+
 .profile-cover-frame {
   position: relative;
   height: 220px;

@@ -9,10 +9,12 @@ import {
   FileText,
   ListOrdered,
   Megaphone,
+  Users,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import Logo from "../common/Logo";
 import { useAuth } from "../../context/AuthContext";
+import { PAGE_ACCESS } from "../../utils/roles";
 import "./Sidebar.css";
 
 function Sidebar() {
@@ -21,6 +23,7 @@ function Sidebar() {
 
   const menu = [
     { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={18} /> },
+    { name: "Users", path: "/users", icon: <Users size={18} /> },
     { name: "Social Accounts", path: "/social-accounts", icon: <Link2 size={18} /> },
     { name: "Scheduler", path: "/scheduler", icon: <Calendar size={18} /> },
     { name: "Drafts", path: "/drafts", icon: <FileText size={18} /> },
@@ -31,6 +34,11 @@ function Sidebar() {
     { name: "Profile", path: "/profile", icon: <User size={18} /> },
     { name: "Settings", path: "/settings", icon: <Settings size={18} /> },
   ];
+
+  const visibleMenu = menu.filter((item) => {
+    const allowedPages = PAGE_ACCESS[user?.role] || [];
+    return allowedPages.includes(item.path);
+  });
 
   const handleLogout = async () => {
     await logout();
@@ -46,7 +54,7 @@ function Sidebar() {
       <div className="sidebar-section-label">NAVIGATION</div>
 
       <nav className="sidebar-nav">
-        {menu.map((item) => (
+        {visibleMenu.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}

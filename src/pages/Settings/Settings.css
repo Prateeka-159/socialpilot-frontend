@@ -1,13 +1,13 @@
 .settings-page {
   display: flex;
   flex-direction: column;
-  color: var(--c-dark);
+  color: var(--text);
 }
 
 .status-indicator {
   font-size: 10px;
   letter-spacing: 0.15em;
-  color: var(--c-taupe);
+  color: var(--text-muted);
   font-weight: 600;
 }
 
@@ -18,7 +18,7 @@
 }
 
 .settings-error {
-  color: #b42318;
+  color: #d46b5d;
 }
 
 /* Settings Flat List (NO BOX CARDS!) */
@@ -37,7 +37,7 @@
 }
 
 .setting-flat-row:hover {
-  background-color: rgba(88, 85, 78, 0.03);
+  background-color: rgba(88, 85, 78, 0.04);
 }
 
 .setting-meta {
@@ -48,12 +48,12 @@
 }
 
 .setting-icon {
-  color: var(--c-dark);
+  color: var(--text);
   flex-shrink: 0;
 }
 
 .danger-icon {
-  color: var(--c-dark);
+  color: var(--text);
 }
 
 .setting-titles {
@@ -64,12 +64,12 @@
 .setting-name {
   font-size: 16px;
   font-weight: 600;
-  color: var(--c-dark);
+  color: var(--text);
 }
 
 .setting-desc {
   font-size: 13px;
-  color: var(--c-taupe);
+  color: var(--text-muted);
   margin-top: 2px;
 }
 
@@ -77,6 +77,43 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  gap: 10px;
+}
+
+.theme-toggle-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 999px;
+}
+
+.theme-option {
+  min-width: 74px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.theme-option.active {
+  background: var(--c-dark);
+  border-color: var(--c-dark);
+  color: var(--c-cream);
+}
+
+:root[data-theme="dark"] .theme-option.active {
+  background: var(--c-cream);
+  border-color: var(--c-cream);
+  color: var(--c-dark);
 }
 
 /* Standardized Button Sizing across ALL Settings rows */
@@ -103,19 +140,30 @@
   border: 1px solid var(--c-dark);
 }
 
+:root[data-theme="dark"] .sp-setting-btn-solid {
+  background-color: var(--c-cream);
+  border-color: var(--c-cream);
+  color: var(--c-dark);
+}
+
 .sp-setting-btn-solid:hover {
   background-color: #1a1915;
   color: var(--c-white);
 }
 
+:root[data-theme="dark"] .sp-setting-btn-solid:hover {
+  background-color: #d8cdb9;
+  color: #111111;
+}
+
 .sp-setting-btn-outline {
   background: transparent;
-  color: var(--c-dark);
+  color: var(--text);
   border: 1px solid var(--c-taupe-40);
 }
 
 .sp-setting-btn-outline:hover {
-  border-color: var(--c-dark);
+  border-color: var(--text);
   background-color: rgba(88, 85, 78, 0.05);
 }
 
@@ -134,10 +182,15 @@
   border-color: var(--c-dark);
 }
 
+:root[data-theme="dark"] .toggle-switch-btn.active {
+  background: var(--c-cream);
+  border-color: var(--c-cream);
+}
+
 .toggle-slider {
   font-size: 11px;
   letter-spacing: 0.15em;
-  color: var(--c-dark);
+  color: var(--text);
   font-weight: 700;
 }
 
@@ -145,14 +198,23 @@
   color: var(--c-cream);
 }
 
+:root[data-theme="dark"] .toggle-switch-btn.active .toggle-slider {
+  color: var(--c-dark);
+}
+
 .danger-btn {
   background: transparent;
-  border: 1px solid var(--c-dark);
-  color: var(--c-dark);
+  border: 1px solid var(--text);
+  color: var(--text);
   font-weight: 700;
 }
 
 .danger-btn:hover {
   background-color: var(--c-dark);
   color: var(--c-cream);
+}
+
+:root[data-theme="dark"] .danger-btn:hover {
+  background-color: #d8cdb9;
+  color: #111111;
 }

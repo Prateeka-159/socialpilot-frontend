@@ -134,6 +134,50 @@
   color: var(--c-taupe);
 }
 
+:root[data-theme="dark"] .analytics-page,
+:root[data-theme="dark"] .analytics-summary-badge,
+:root[data-theme="dark"] .chart-heading,
+:root[data-theme="dark"] .chart-badge,
+:root[data-theme="dark"] .posts-table-header,
+:root[data-theme="dark"] .posts-table-header span,
+:root[data-theme="dark"] .post-headline,
+:root[data-theme="dark"] .col-p-imp,
+:root[data-theme="dark"] .col-p-date,
+:root[data-theme="dark"] .eng-rate,
+:root[data-theme="dark"] .eng-label,
+:root[data-theme="dark"] .custom-chart-tooltip,
+:root[data-theme="dark"] .tt-label,
+:root[data-theme="dark"] .tt-value {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .chart-badge,
+:root[data-theme="dark"] .posts-table-header,
+:root[data-theme="dark"] .posts-table-header span,
+:root[data-theme="dark"] .col-p-date,
+:root[data-theme="dark"] .m-sub,
+:root[data-theme="dark"] .filter-label,
+:root[data-theme="dark"] .m-tag {
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .filter-btn.is-active,
+:root[data-theme="dark"] .plat-tag {
+  background: var(--button-dark);
+  color: #111111;
+  border-color: var(--button-dark);
+}
+
+:root[data-theme="dark"] .custom-chart-tooltip {
+  background: rgba(17,17,17,0.96);
+  border: 1px solid rgba(var(--brown-rgb), 0.26);
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .tt-value {
+  color: var(--text);
+}
+
 .chart-wrap {
   position: relative;
   width: 100%;

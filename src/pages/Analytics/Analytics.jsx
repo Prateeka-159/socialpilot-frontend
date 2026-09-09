@@ -80,6 +80,12 @@ const initialPosts = [
 ];
 
 const STRICT_COLORS = ["#27251f", "#58554e", "rgba(39,37,31,0.6)", "rgba(88,85,78,0.4)"];
+const DARK_MODE_CHART_COLORS = ["#f5efe7", "#d6c5ad", "#c7ad8d", "#a98d6e"];
+
+const isDarkChartTheme = () => {
+  if (typeof document === "undefined") return false;
+  return document.documentElement.dataset.theme === "dark";
+};
 
 function CustomTooltip({ active, payload, label }) {
   if (active && payload && payload.length) {
@@ -155,6 +161,10 @@ function Analytics() {
   }, [selectedPlatform]);
 
   const pieChartTitle = selectedPlatform === "ALL" ? "Platform Share" : "Post Topic Share";
+  const activeChartPalette = isDarkChartTheme() ? DARK_MODE_CHART_COLORS : STRICT_COLORS;
+  const chartGridStroke = isDarkChartTheme() ? "rgba(245,239,231,0.28)" : "rgba(88,85,78,0.15)";
+  const chartAxisStroke = isDarkChartTheme() ? "#f5efe7" : "#58554e";
+  const chartLineStroke = isDarkChartTheme() ? "#f5efe7" : "#27251f";
 
   return (
     <div className="analytics-page">
@@ -358,17 +368,17 @@ function Analytics() {
           <div className="chart-wrap">
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={dynamicGraphData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="2 2" stroke="rgba(88,85,78,0.15)" vertical={false} />
-                <XAxis dataKey="month" stroke="#58554e" fontSize={11} tickLine={false} axisLine={false} />
-                <YAxis stroke="#58554e" fontSize={11} tickLine={false} axisLine={false} />
+                <CartesianGrid strokeDasharray="2 2" stroke={chartGridStroke} vertical={false} />
+                <XAxis dataKey="month" stroke={chartAxisStroke} fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis stroke={chartAxisStroke} fontSize={11} tickLine={false} axisLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Line
                   type="monotone"
                   dataKey="value"
-                  stroke="#27251f"
+                  stroke={chartLineStroke}
                   strokeWidth={3}
-                  dot={{ fill: "#27251f", r: 4 }}
-                  activeDot={{ r: 7, fill: "#ffffff", stroke: "#27251f", strokeWidth: 2 }}
+                  dot={{ fill: chartLineStroke, r: 4 }}
+                  activeDot={{ r: 7, fill: "#ffffff", stroke: chartLineStroke, strokeWidth: 2 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -397,7 +407,12 @@ function Analytics() {
                   paddingAngle={4}
                 >
                   {dynamicPieData.map((entry, index) => (
-                    <Cell key={index} fill={STRICT_COLORS[index % STRICT_COLORS.length]} stroke="var(--c-cream)" strokeWidth={2} />
+                    <Cell
+                      key={index}
+                      fill={activeChartPalette[index % activeChartPalette.length]}
+                      stroke={isDarkChartTheme() ? "#f5efe7" : "var(--c-cream)"}
+                      strokeWidth={2}
+                    />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -408,7 +423,7 @@ function Analytics() {
             <div className="pie-legend-grid">
               {dynamicPieData.map((item, idx) => (
                 <div key={item.name} className="legend-item font-mono">
-                  <span className="legend-color-dot" style={{ backgroundColor: STRICT_COLORS[idx % STRICT_COLORS.length] }}></span>
+                  <span className="legend-color-dot" style={{ backgroundColor: activeChartPalette[idx % activeChartPalette.length] }}></span>
                   <span className="legend-name">{item.name}</span>
                   <span className="legend-val">{item.value}%</span>
                 </div>

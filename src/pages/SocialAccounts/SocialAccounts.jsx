@@ -106,6 +106,9 @@ function SocialAccounts() {
       icon: PLATFORM_ICONS[connected?.platform] || PLATFORM_ICONS.Twitter,
       connected: Boolean(connected),
       platform: item.platform,
+      followers: connected?.followers ?? 0,
+      posts: connected?.posts ?? 0,
+      engagement: connected?.engagement ?? 0,
     };
   });
 
@@ -164,19 +167,19 @@ function SocialAccounts() {
             <div className="col-stats account-metrics">
               <div className="metric-pill">
                 <span className="m-val font-serif">
-                  {account.connected ? "—" : "--"}
+                  {account.connected ? account.followers.toLocaleString() : "--"}
                 </span>
                 <span className="m-lbl font-mono">FOLLOWERS</span>
               </div>
               <div className="metric-pill">
                 <span className="m-val font-serif">
-                  {account.connected ? "—" : "--"}
+                  {account.connected ? account.posts : "--"}
                 </span>
                 <span className="m-lbl font-mono">POSTS</span>
               </div>
               <div className="metric-pill">
                 <span className="m-val font-serif">
-                  {account.connected ? "—" : "--"}
+                  {account.connected ? `${account.engagement}%` : "--"}
                 </span>
                 <span className="m-lbl font-mono">ENGAGEMENT</span>
               </div>
