@@ -1,11 +1,11 @@
 import { apiRequest } from "./api";
 
 export const getAccounts = async () => {
-  return apiRequest("/social-accounts");
+  return apiRequest("/social-accounts/");
 };
 
 export const getSocialAccounts = async () => {
-  return apiRequest("/social-accounts");
+  return apiRequest("/social-accounts/");
 };
 
 export const connectAccount = async (platform, username) => {

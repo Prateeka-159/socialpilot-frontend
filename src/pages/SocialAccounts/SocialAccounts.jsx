@@ -19,10 +19,10 @@ const PLATFORM_ICONS = {
 };
 
 const DEFAULT_PLATFORMS = [
-  { platform: "linkedin", name: "LinkedIn Studio", handle: "" },
-  { platform: "instagram", name: "Instagram Editorial", handle: "" },
-  { platform: "facebook", name: "Facebook Page", handle: "" },
-  { platform: "twitter", name: "X Channel", handle: "" },
+  { platform: "LinkedIn", name: "LinkedIn Studio", handle: "" },
+  { platform: "Instagram", name: "Instagram Editorial", handle: "" },
+  { platform: "Facebook", name: "Facebook Page", handle: "" },
+  { platform: "Twitter", name: "X Channel", handle: "" },
 ];
 
 function SocialAccounts() {
@@ -48,9 +48,19 @@ function SocialAccounts() {
   }, []);
 
   const getAccountForPlatform = (platform) => {
-    return accounts.find(
-      (account) => account.platform.toLowerCase() === platform.toLowerCase()
-    );
+    return accounts.find((account) => {
+      const backendPlatform = account.platform.toLowerCase();
+      const frontendPlatform = platform.toLowerCase();
+
+      if (
+        (backendPlatform === "x" && frontendPlatform === "twitter") ||
+        (backendPlatform === "twitter" && frontendPlatform === "x")
+      ) {
+        return true;
+      }
+
+      return backendPlatform === frontendPlatform;
+    });
   };
 
   const handleConnect = async (platform) => {
