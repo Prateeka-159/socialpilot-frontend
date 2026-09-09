@@ -95,15 +95,30 @@ class NotificationPreference(Base):
     __tablename__ = "notification_preferences"
 
     notification_id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), unique=True, nullable=False)
+    user_id = Column(
+        Integer,
+        ForeignKey("users.user_id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False
+    )
     email_notification = Column(Boolean, default=True)
     push_notification = Column(Boolean, default=True)
     campaign_alert = Column(Boolean, default=True)
     publishing_alert = Column(Boolean, default=True)
     post_reminder = Column(Boolean, default=True)
     team_alert = Column(Boolean, default=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    auto_sync = Column(Boolean, default=True, nullable=False)
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False
+    )
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False
+    )
 
     user = relationship("User", back_populates="notification_preferences")
 

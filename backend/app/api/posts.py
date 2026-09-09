@@ -5,6 +5,8 @@ from app.core.security import get_current_user
 from app.services.queue_service import add_post_to_queue
 from typing import Optional
 from zoneinfo import ZoneInfo
+from fastapi.responses import Response
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -13,6 +15,9 @@ from fastapi import (
     File,
     Form,
 )
+
+from fastapi.responses import Response
+
 from app.models.sql_models import (
     User,
     Post,
@@ -22,16 +27,15 @@ from app.models.sql_models import (
     RecurringFrequencyEnum,
     RecurringPostRule,
     PublishingQueue,
-    
 )
+
 from app.schemas.post import (
     UpdatePostRequest,
     CreateDraftRequest,
     ScheduleDraftRequest,
     CreateRecurringRequest,
     UpdateRecurringRequest,
-    ToggleRecurringRequest
-
+    ToggleRecurringRequest,
 )
 
 
@@ -98,6 +102,7 @@ async def create_post(
 
     # Validate scheduled time
     india_tz = ZoneInfo("Asia/Kolkata")
+
     if scheduled_time.tzinfo is None:
         scheduled_time = scheduled_time.replace(tzinfo=india_tz)
 
@@ -125,7 +130,6 @@ async def create_post(
 
     # Validate campaign
     if campaign_id:
-
         campaign = (
             db.query(Campaign)
             .filter(
@@ -141,13 +145,12 @@ async def create_post(
                 detail="Campaign not found"
             )
 
-    # Process image
+    # Process optional image attachment
     image_data = None
     image_name = None
     image_type = None
 
     if image:
-
         allowed_types = {
             "image/jpeg",
             "image/png",
@@ -193,7 +196,6 @@ async def create_post(
 
     # Save post + queue
     try:
-
         db.add(new_post)
         db.commit()
         db.refresh(new_post)
@@ -206,7 +208,6 @@ async def create_post(
         )
 
     except Exception as exc:
-
         db.rollback()
 
         print(f"Create post error: {exc}")
@@ -239,13 +240,13 @@ async def create_post(
         }
     }
 
+
 # Frontend: Get all posts belonging to the current user.
 @router.get("/")
 def get_posts(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-
     db_user = get_db_user(db, current_user)
 
     posts = (
@@ -297,23 +298,22 @@ def get_all_recurring_posts(
     )
 
     return {
-    "total_rules": len(recurring_rules),
-    "rules": [
-        {
-            "rule_id": rule.rule_id,
-            "post_id": rule.post_id,
-            "frequency": rule.frequency,
-            "cron_expression": rule.cron_expression,
-            "start_date": rule.start_date,
-            "end_date": rule.end_date,
-            "is_active": rule.is_active,
-            "created_at": rule.created_at,
-            "updated_at": rule.updated_at
-        }
-        for rule in recurring_rules
-    ]
+        "total_rules": len(recurring_rules),
+        "rules": [
+            {
+                "rule_id": rule.rule_id,
+                "post_id": rule.post_id,
+                "frequency": rule.frequency,
+                "cron_expression": rule.cron_expression,
+                "start_date": rule.start_date,
+                "end_date": rule.end_date,
+                "is_active": rule.is_active,
+                "created_at": rule.created_at,
+                "updated_at": rule.updated_at
+            }
+            for rule in recurring_rules
+        ]
     }
-
 
 
 # Frontend: Retrieve all saved draft posts for the current user.
@@ -362,7 +362,6 @@ def get_post(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-
     db_user = get_db_user(db, current_user)
 
     post = get_post_or_404(
@@ -424,7 +423,6 @@ async def update_post(
 
     # Scheduled time validation
     if scheduled_time is not None:
-
         if scheduled_time.tzinfo is None:
             scheduled_time = scheduled_time.replace(
                 tzinfo=ZoneInfo("Asia/Kolkata")
@@ -437,9 +435,7 @@ async def update_post(
             )
 
     # Social account validation
-
     if social_account_id is not None:
-
         social = (
             db.query(SocialAccount)
             .filter(
@@ -459,7 +455,6 @@ async def update_post(
 
     # Campaign validation
     if campaign_id is not None:
-
         campaign = (
             db.query(Campaign)
             .filter(
@@ -489,7 +484,6 @@ async def update_post(
 
     # Update image
     if image is not None:
-
         allowed_types = {
             "image/jpeg",
             "image/png",
@@ -517,14 +511,11 @@ async def update_post(
         post.image_type = image.content_type
 
     # Save
-
     try:
-
         db.commit()
         db.refresh(post)
 
     except Exception as exc:
-
         db.rollback()
 
         print(f"Update post error: {exc}")
@@ -570,27 +561,33 @@ def delete_post(
 ):
     # Get logged-in user
     db_user = get_db_user(db, current_user)
+
     # Get post
     post = get_post_or_404(
         db,
         db_user.user_id,
         post_id
     )
+
     # Published posts cannot be deleted
     if post.status == PostStatusEnum.PUBLISHED:
         raise HTTPException(
             status_code=400,
             detail="Published posts cannot be deleted"
         )
+
     try:
         db.delete(post)
         db.commit()
+
     except Exception:
         db.rollback()
+
         raise HTTPException(
             status_code=500,
             detail="Failed to delete post"
         )
+
     return {
         "message": "Post deleted successfully",
         "deleted_post": {
@@ -654,7 +651,6 @@ async def create_draft(
     image_type = None
 
     if image is not None:
-
         allowed_types = {
             "image/jpeg",
             "image/png",
@@ -728,7 +724,6 @@ async def create_draft(
     }
 
 
-
 # Frontend: Fetch one draft post by ID.
 @router.get("/drafts/{draft_id}")
 def get_single_draft(
@@ -763,7 +758,6 @@ def get_single_draft(
             "title": draft.title,
             "caption": draft.caption,
 
-            # Image information
             "image_name": draft.image_name,
             "image_type": draft.image_type,
             "has_image": draft.image_data is not None,
@@ -779,16 +773,17 @@ def get_single_draft(
     }
 
 
-
 # Frontend: Update an existing draft post.
 @router.put("/drafts/{draft_id}")
 async def update_draft(
     draft_id: int,
+
     social_account_id: Optional[int] = Form(None),
     campaign_id: Optional[int] = Form(None),
     title: Optional[str] = Form(None),
     caption: Optional[str] = Form(None),
     image: Optional[UploadFile] = File(None),
+
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
@@ -901,16 +896,20 @@ async def update_draft(
     # Return updated draft
     return {
         "message": "Draft updated successfully",
+
         "draft": {
             "post_id": draft.post_id,
             "title": draft.title,
             "caption": draft.caption,
+
             "image_name": draft.image_name,
             "image_type": draft.image_type,
             "has_image": draft.image_data is not None,
+
             "status": draft.status.value,
             "social_account_id": draft.social_account_id,
             "campaign_id": draft.campaign_id,
+
             "updated_at": draft.updated_at
         }
     }
@@ -962,7 +961,7 @@ def delete_draft(
         }
     }
 
-# Frontend: Schedule a draft post for future publishing.
+
 # Frontend: Schedule a draft post for future publishing.
 @router.post("/drafts/{draft_id}/schedule")
 def schedule_draft(
@@ -1045,7 +1044,7 @@ def schedule_draft(
         }
     }
 
-    
+
 # Frontend: Create a recurring posting rule for an existing post.
 @router.post("/{post_id}/recurring", status_code=201)
 def create_recurring_post(
@@ -1073,7 +1072,7 @@ def create_recurring_post(
             detail="Post not found"
         )
 
-    # Optional: Only Draft or Scheduled posts can have recurring rules
+    # Only Draft or Scheduled posts can have recurring rules
     if post.status not in [
         PostStatusEnum.DRAFT,
         PostStatusEnum.SCHEDULED
@@ -1085,9 +1084,7 @@ def create_recurring_post(
 
     # Validate dates
     if request.end_date:
-
         if request.end_date <= request.start_date:
-
             raise HTTPException(
                 status_code=400,
                 detail="End date must be greater than start date"
@@ -1132,16 +1129,16 @@ def create_recurring_post(
         )
 
     return {
-    "message": "Recurring rule created successfully",
-    "rule": {
-        "rule_id": recurring_rule.rule_id,
-        "post_id": recurring_rule.post_id,
-        "frequency": recurring_rule.frequency,
-        "cron_expression": recurring_rule.cron_expression,
-        "start_date": recurring_rule.start_date,
-        "end_date": recurring_rule.end_date,
-        "is_active": recurring_rule.is_active,
-        "created_at": recurring_rule.created_at
+        "message": "Recurring rule created successfully",
+        "rule": {
+            "rule_id": recurring_rule.rule_id,
+            "post_id": recurring_rule.post_id,
+            "frequency": recurring_rule.frequency,
+            "cron_expression": recurring_rule.cron_expression,
+            "start_date": recurring_rule.start_date,
+            "end_date": recurring_rule.end_date,
+            "is_active": recurring_rule.is_active,
+            "created_at": recurring_rule.created_at
         }
     }
 
@@ -1190,7 +1187,6 @@ def get_recurring_rule(
     }
 
 
-
 # Frontend: Update a recurring posting rule.
 @router.put("/recurring/{rule_id}")
 def update_recurring_rule(
@@ -1220,8 +1216,17 @@ def update_recurring_rule(
         )
 
     # Validate dates
-    start_date = request.start_date if request.start_date else rule.start_date
-    end_date = request.end_date if request.end_date else rule.end_date
+    start_date = (
+        request.start_date
+        if request.start_date
+        else rule.start_date
+    )
+
+    end_date = (
+        request.end_date
+        if request.end_date
+        else rule.end_date
+    )
 
     if end_date and end_date <= start_date:
         raise HTTPException(
@@ -1272,7 +1277,6 @@ def delete_recurring_rule(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-    # Get logged-in user
     db_user = get_db_user(db, current_user)
 
     # Find recurring rule
@@ -1311,7 +1315,6 @@ def delete_recurring_rule(
             detail="Failed to delete recurring rule"
         )
 
-    # Return deleted rule
     return {
         "message": "Recurring rule deleted successfully",
         "deleted_rule": {
@@ -1330,7 +1333,6 @@ def toggle_recurring_rule(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-    # Get logged-in user
     db_user = get_db_user(db, current_user)
 
     # Find recurring rule
@@ -1367,7 +1369,6 @@ def toggle_recurring_rule(
             detail="Failed to toggle recurring rule"
         )
 
-    # Return updated rule
     return {
         "message": "Recurring rule status updated successfully",
         "rule": {
@@ -1379,7 +1380,6 @@ def toggle_recurring_rule(
         }
     }
 
-from fastapi.responses import Response
 
 # Frontend: Download the image attached to a post.
 @router.get("/{post_id}/image")
@@ -1415,6 +1415,3 @@ def get_post_image(
         content=post.image_data,
         media_type=post.image_type
     )
-
-
-

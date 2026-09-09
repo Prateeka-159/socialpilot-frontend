@@ -1,0 +1,96 @@
+.drafts-container {
+  padding: 32px;
+  color: #ffffff;
+  background-color: #0d0d0d;
+  min-height: 100vh;
+}
+
+.drafts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.drafts-header h2 {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  color: #f7f0e5;
+}
+
+.new-draft-btn {
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.new-draft-btn:hover {
+  opacity: 0.9;
+}
+
+.drafts-table-wrapper {
+  background: #141414;
+  border: 1px solid #262626;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.drafts-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.drafts-table th {
+  padding: 16px 20px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #808080;
+  border-bottom: 1px solid #262626;
+  background-color: #171717;
+}
+
+.drafts-table td {
+  padding: 18px 20px;
+  font-size: 14px;
+  border-bottom: 1px solid #1f1f1f;
+}
+
+.draft-title {
+  font-weight: 500;
+  color: #f7f0e5;
+}
+
+.platform-tag {
+  background: #222;
+  border: 1px solid #333;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #ccc;
+}
+
+.sub-text {
+  color: #888;
+}
+
+.action-btn {
+  background: transparent;
+  border: 1px solid #333;
+  color: #ccc;
+  padding: 6px 12px;
+  border-radius: 4px;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.action-btn:hover {
+  background: #222;
+  color: #fff;
+}

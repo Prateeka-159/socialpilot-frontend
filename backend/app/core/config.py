@@ -11,11 +11,11 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = ""
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: str = "5432"
-    POSTGRES_DB: str = "Social_db"
+    POSTGRES_DB: str = "socialpilot"
 
     # MongoDB
     MONGODB_URI: str = "mongodb://localhost:27017"
-    MONGODB_DB: str = "Social_db"
+    MONGODB_DB: str = "socialpilot_db"
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     # JWT
     SECRET_KEY: str = ""
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
 
     model_config = SettingsConfigDict(
         env_file=os.path.join(
